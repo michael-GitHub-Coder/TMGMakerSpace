@@ -1,0 +1,95 @@
+<app-header></app-header>
+<!-- Hero Section -->
+<section id="hero">
+  <div class="row">
+    <!-- Hero Text -->
+    <div class="col-lg-6 hero-content">
+      <div class="container">
+        <h1 data-aos="fade-up">Welcome to TMG Makerspace</h1>
+        <p data-aos="fade-up" data-aos-delay="100">
+          We provide Africans with the <span>knowledge</span>, <span>skills</span>, and <span>resources</span> they need to innovate and solve Africa's problems.
+        </p>
+        <a data-aos="fade-up" data-aos-delay="200" 
+           href="./images/THULIKACEB ROBOTIC ARM.mp4" 
+           class="glightbox btn button-pulse">
+          <i class="bi bi-play"></i> More Info
+        </a>
+        <a data-aos="fade-up" data-aos-delay="300" 
+           routerLink="/booking" 
+           class="btn button-pulse ms-3">
+          <i class="bi bi-calendar-check"></i> Request Equipment
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero Images -->
+    <div class="col-lg-6 d-none d-lg-block" data-aos="fade-up">
+      <section class="hexagon-gallery">
+        <div class="hexagon-gallery-top">
+          <div class="hex"><img src="./images/Home_Pic 1.jpg" alt="Hero image 1"/></div>
+          <div class="hex"><img src="./images/Home_Pic 2.png" alt="Hero image 2"/></div>
+        </div>
+        <div class="hexagon-gallery-bottom">
+          <div class="hex"><img src="./images/Home_Pic 3.png" alt="Hero image 3"/></div>
+          <div class="hex"><img src="./images/Homepage 4.jpg" alt="Hero image 4"/></div>
+          <div class="hex"><img src="./images/Homepage 5.jpg" alt="Hero image 5"/></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+<section id="partners">
+  <div class="container">
+    <div class="partners-header">
+      <p>Our Clients</p>
+    </div>
+
+    <owl-carousel-o [options]="carouselOptions">
+      <ng-container *ngFor="let col of columns">
+        <ng-template carouselSlide>
+          <div class="partner-column">
+            <div class="partner-item" *ngFor="let logo of col">
+              <img [src]="logo" [alt]="'Partner'" />
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+    </owl-carousel-o>
+  </div>
+</section>
+
+
+  <!-- Partners Section -->
+  <!-- <section id="partners">
+  <div class="container"> -->
+    <!-- Title above logos -->
+    <!-- <div class="row">
+      <div class="col-12">
+        <p class="our-clients-title">Our Clients</p>
+      </div>
+    </div> -->
+    <!-- Swiper Container for Partner Logos -->
+    <!-- <swiper-container
+      #partnersSwiper
+      class="partners-swiper"
+      slides-per-view="5"          
+      slides-per-group="1"          
+      space-between="20"
+      loop="true"
+      loop-fill-group-with-blank="true"
+      speed="800"
+      navigation="true"
+      pagination='{"clickable": true}'
+      autoplay='{"delay":1000,"disableOnInteraction":false}' 
+    >
+      <swiper-slide *ngFor="let col of logos; let colIndex = index">
+        <div class="partner-column">
+          <div class="partner-wrap" *ngFor="let logo of col; let i = index">
+            <img [src]="logo" [alt]="'Partner ' + (colIndex*4 + i + 1)" loading="lazy" />
+          </div>
+        </div>
+      </swiper-slide>
+    </swiper-container>
+  </div>
+</section> -->
+<app-footer></app-footer>

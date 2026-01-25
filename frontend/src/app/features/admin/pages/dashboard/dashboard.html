@@ -1,0 +1,83 @@
+<app-header></app-header>
+
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+
+  <!-- Main Content -->
+  <div class="dashboard-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h2>Admin Dashboard</h2>
+      <p>Welcome back, {{ role || 'Admin' }}!</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="dashboard-cards">
+      <!-- Blogs Card -->
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        <h3>Total Blogs</h3>
+        <p>{{ getBlogsCount() }} Blogs</p>
+        <button
+          class="card-btn"
+          (click)="navigateTo('/admin/blogs'); $event.stopPropagation()"
+        >
+          Manage Blogs
+        </button>
+      </div>
+
+      <!-- Members Card -->
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3>Total Members</h3>
+        <p>{{ getMembersCount() }} Members</p>
+        <button
+          class="card-btn"
+          (click)="navigateTo('/admin/members/'); $event.stopPropagation()"
+        >
+          Manage Members
+        </button>
+      </div>
+
+      <!-- Admins Card -->
+      <div class="dashboard-card" *ngIf="role === 'superadmin'">
+        <div class="card-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h3>Total Admins</h3>
+        <p>{{ getAdminsCount() }} Admins</p>
+        <button
+          class="card-btn"
+          (click)="navigateTo('/admin/create-admin'); $event.stopPropagation()"
+        >
+          Manage Admins
+        </button>
+      </div>
+
+      <!-- Bookings Card -->
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3>Equipment Bookings</h3>
+        <p>{{ getBookingsCount() }} Bookings</p>
+        <button
+          class="card-btn"
+          (click)="navigateTo('/admin/bookings-management'); $event.stopPropagation()"
+        >
+          Manage Bookings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+  
+</div>
+
+<app-footer></app-footer> 

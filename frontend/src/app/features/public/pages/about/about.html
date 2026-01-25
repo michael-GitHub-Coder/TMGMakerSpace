@@ -1,0 +1,166 @@
+<!-- Spinner -->
+<!-- <div id="spinner" class="show">
+    <div class="spinner-border"></div>
+</div> -->
+ <app-header></app-header> 
+<!-- Contact floating button -->
+<div class="floating-btn">
+    <a class="btn back-to-top" data-aos="zoom-in"><i class="bi bi-arrow-up"></i></a>
+</div>
+
+<!-- header -->
+<!-- <header>
+    <div class="mini-nav">
+        <div class="container">
+            <a><i class="bi bi-envelope-at"></i> info@tmgmakerspace.africa</a>
+        </div>
+    </div>
+    <nav class="navbar">
+        <div class="container">
+            <a routerLink="/home" class="logo">
+                <img src="./images/Tmg-makerspace-Logo.png" alt="TMG Makerspace Logo"/>
+            </a>
+           <ul class="nav-menu">
+                <li class="nav-item"><a routerLink="/about" class="nav-link">About</a></li>
+                <li class="nav-item"><a routerLink="/services" class="nav-link">Services</a></li>
+                <li class="nav-item"><a routerLink="/members" class="nav-link">Members</a></li>
+                <li class="nav-item"><a routerLink="/blog" class="nav-link">Blog</a></li>
+                <li class="nav-item"><a routerLink="/contact" class="nav-link">Contact Us</a></li>
+                <li class="nav-item"><a routerLink="/sign-in" class="nav-link">Sign in</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+</header> -->
+
+<!-- Banner -->
+<!-- <section id="banner">
+    <div class="container">
+        <div class="banner-content">
+            <h1>About Us</h1>
+            <div class="mt-3">
+                <a routerLink="/home">Home</a>
+                <i class="bi bi-chevron-right"></i>
+                <span> About Us</span>
+            </div>
+        </div>
+    </div>
+</section> -->
+<app-banner 
+  [heading]="'About Us'" 
+  [route]="'/home'" 
+  [routeLabel]="'Home'">
+</app-banner>
+
+<!-- About Us -->
+<section id="about">
+    <div class="container">
+        <div class="col-lg-12" style="padding: 0;">
+            <h2 class="about-title">About TMG Makerspace</h2>
+            <p class="company-desc">
+                At TMG Makerspace, our mission is to provide Africans with the knowledge, skills, 
+                and resources they need to innovate and solve African problems. We achieve this through our comprehensive programs, focusing on Makerspace Design and Setup, Skills and People Development, 
+                Product Development Support and Programme Design and Implementation.
+                With our wealth of experience in makerspace design and set up, TMG Makerspace is your go-to partner. We have successfully established and operated the Tshimologong Makerspace for Wits Tshimologong Precinct since 2018, 
+                and recently collaborated with the Royal Bafokeng Nation Development Trust to launch the Bafokeng RoboticsLab.
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="00">
+                <div class="about-item-content">
+                    <h2 class="about-title">Our Vision</h2>
+                    <p>
+                        Empowering Africa communities through innovation and technology, TMG Makerspace
+                        envisions a future where Africans have the knowledge, skills, and resources to address 
+                        local challenges, foster sustainable development, and contribute to a thriving continent.
+                    </p>    
+                </div>
+                <div class="about-item-content" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+                    <h2 class="about-title">Our Mission</h2>
+                    <p>
+                        At TMG Makerspace, our mission is to provide Africans with the tools they need to innovate, develop
+                        essential skills, and tackle African challenges. Through comprehensive programs focusing on idea
+                        development, product development, and projects, we aim to be a catalyst for positive change 
+                        by nurturing a culture of creativity, problem-solving, and innovation.
+                    </p>    
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                <h2 class="about-title">Our Values</h2>
+                <div>
+                    <p class="font-weight-bold">Inclusivity</p>
+                    <p>We believe in creating an inclusive environment that welcomes individuals from diverse backgrounds, ensuring equal access to knowledge, skills, and resources.</p>
+                </div>
+                <div>
+                    <p class="font-weight-bold">Empowerment</p>
+                    <p>We are committed to empowering Africans through practical skills development, providing them with the confidence and capabilities to shape their future.</p>
+                </div>
+                <div>
+                    <p class="font-weight-bold">Innovation</p>
+                    <p>Embracing a culture of innovation, we encourage out-of-the-box thinking, continuous learning, and the exploration of emerging technologies to drive positive change.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                <div class="about-item-content mt-5">
+                    <div>
+                        <p class="font-weight-bold">Collaboration</p>
+                        <p>We recognize the power of collaboration and actively seek partnerships with academic institutes, corporate companies, and government entities to create impactful projects.</p>
+                    </div>
+                    <div>
+                        <p class="font-weight-bold">Practical Learning</p>
+                        <p>Our approach to skills development emphasizes hands-on practical learning, ensuring participants gain proficiency in technologies such as CAD, 3D Printing, IoT, Robotics, and AI.</p>
+                    </div>
+                    <div>
+                        <p class="font-weight-bold">Community Impact</p>
+                        <p>We measure our success by the positive impact we have on communities. By lowering barriers to entry for emerging technologies and supporting local innovators, we strive to enhance the quality of life, safety, and efficiency in African cities.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<app-footer></app-footer> 
+<!-- Call to action -->
+<!-- <section id="contact">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 page-title" data-aos="fade-up">
+                <h2 style="color: #fff;">Get in touch with us.</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 contact-logo" data-aos="fade-right">
+                <div class="contact-logo">
+                    <img src="./images/Tmg-makerspace-Logo.png" alt="TMG Logo"/>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6" data-aos="fade-left">
+                <div class="contact-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <p>41 Juta Street, Braamfontein, Johannesburg, ZA</p>
+                </div>
+                <div class="contact-item">
+                    <i class="bi bi-envelope-at"></i>
+                    <p>info@tmgmakerspace.africa</p>
+                </div>
+                <div class="contact-item social-icons">
+                    <a href=""><i class="bi bi-facebook"></i></a>
+                    <a href=""><i class="bi bi-twitter"></i></a>
+                    <a href=""><i class="bi bi-linkedin"></i></a>
+                    <a href=""><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> -->
+
+<!-- Footer -->
+<!-- <section id="footer">
+    <div class="container">
+        &copy2024 TMG Makerspace. All Rights Reserved.
+    </div>
+</section> -->

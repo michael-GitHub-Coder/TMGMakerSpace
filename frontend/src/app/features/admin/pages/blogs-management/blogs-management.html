@@ -1,0 +1,37 @@
+<app-header></app-header>
+
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-content">
+    <div class="dashboard-header">
+      <h2>Blogs Management</h2>
+    </div>
+
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Subtitle</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let blog of blogs">
+          <td>{{ blog.title }}</td>
+          <td>{{ blog.subtitle }}</td>
+          <td style="max-width: 400px; overflow-wrap: break-word;">{{ blog.description }}</td>
+          <td>{{ blog.dateTime | date:'short' }}</td>
+          <td>
+            <button class="btn btn-primary btn-sm me-2" (click)="editBlog(blog.id)">Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteBlog(blog.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-footer></app-footer>

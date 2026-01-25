@@ -1,0 +1,333 @@
+<app-header></app-header>
+
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-content">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2 text-muted">Loading bookings...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="alert alert-danger d-flex align-items-center" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <div>
+        {{ error }}
+      </div>
+      <button type="button" class="btn-close ms-auto" (click)="error = null" aria-label="Close"></button>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!isLoading">
+      <div class="bookings-header">
+        <div>
+          <h2><i class="bi bi-calendar-check"></i> Equipment Bookings</h2>
+          <p class="text-muted small mb-0">Manage and monitor equipment reservations</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary" (click)="loadBookings()" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button class="btn btn-success" (click)="exportToCSV()" title="Export to CSV">
+            <i class="bi bi-download"></i> Export
+          </button>
+        </div>
+      </div>
+
+    <!-- Filters and Search -->
+    <div class="filters-section">
+      <div class="row g-3">
+        <!-- Search -->
+        <div class="col-md-3">
+          <label class="form-label">Search</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Search by name, email, or phone..." 
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="applyFilters()">
+          </div>
+        </div>
+        
+        <!-- Status Filter -->
+        <div class="col-md-2">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()">
+            <option value="all">All Status</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="pending">Pending</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        
+        <!-- Machine Filter -->
+        <div class="col-md-2">
+          <label class="form-label">Machine Type</label>
+          <select class="form-select" [(ngModel)]="filterMachine" (ngModelChange)="applyFilters()">
+            <option value="all">All Machines</option>
+            <option *ngFor="let machine of getUniqueMachines()" [value]="machine">{{ machine }}</option>
+          </select>
+        </div>
+        
+        <!-- Sort By -->
+        <div class="col-md-2">
+          <label class="form-label">Sort By</label>
+          <select class="form-select" [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+            <option value="date">Date</option>
+            <option value="name">Name</option>
+            <option value="machine">Machine</option>
+            <option value="price">Price</option>
+          </select>
+        </div>
+        
+        <!-- Sort Order -->
+        <div class="col-md-1">
+          <label class="form-label">Order</label>
+          <button 
+            class="btn btn-outline-secondary w-100" 
+            (click)="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; applyFilters()" 
+            [title]="sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'"
+            style="height: 38px">
+            <i class="bi" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+          </button>
+        </div>
+        
+        <!-- Active Filters Badge -->
+        <div class="col-md-2 d-flex align-items-end">
+          <span class="badge bg-light text-dark border w-100 py-2">
+            <i class="bi bi-funnel me-1"></i>
+            {{ filteredBookings.length }} {{ filteredBookings.length === 1 ? 'booking' : 'bookings' }} found
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th class="ps-4" (click)="setSort('date')" style="cursor: pointer;">
+              Date & Time
+              <i *ngIf="sortBy === 'date'" class="bi ms-1" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            </th>
+            <th (click)="setSort('name')" style="cursor: pointer;">
+              User
+              <i *ngIf="sortBy === 'name'" class="bi ms-1" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            </th>
+            <th (click)="setSort('machineType')" style="cursor: pointer;">
+              Machine
+              <i *ngIf="sortBy === 'machineType'" class="bi ms-1" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            </th>
+            <th (click)="setSort('duration')" style="cursor: pointer;">
+              Duration
+              <i *ngIf="sortBy === 'duration'" class="bi ms-1" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            </th>
+            <th (click)="setSort('totalPrice')" style="cursor: pointer;">
+              Price
+              <i *ngIf="sortBy === 'totalPrice'" class="bi ms-1" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            </th>
+            <th (click)="setSort('status')" style="cursor: pointer;">
+              Status
+              <i *ngIf="sortBy === 'status'" class="bi ms-1" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            </th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- No bookings message -->
+          <tr *ngIf="filteredBookings.length === 0">
+            <td colspan="7" class="text-center py-4">
+              <div class="text-muted">
+                <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                <p class="mt-2 mb-0">No bookings found</p>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Bookings list -->
+          <tr *ngFor="let booking of filteredBookings" [ngClass]="{
+            'table-success': booking.status === 'confirmed',
+            'table-warning': booking.status === 'pending',
+            'table-light': booking.status === 'cancelled'
+          }">
+            <td class="ps-4">
+              <div class="fw-medium">
+                <i class="bi bi-calendar-event me-1"></i>
+                {{ formatDate(booking.bookingDate) || 'N/A' }}
+              </div>
+              <div class="text-muted small">
+                <i class="bi bi-clock me-1"></i>
+                {{ formatTime(booking.bookingTime) || 'N/A' }}
+              </div>
+            </td>
+            <td>
+              <div class="fw-medium">
+                <i class="bi bi-person me-1"></i>
+                {{ (booking.name || '') + ' ' + (booking.surname || '') || 'N/A' }}
+              </div>
+              <div class="text-muted small text-truncate" style="max-width: 150px;" [title]="booking.email || 'N/A'">
+                <i class="bi bi-envelope me-1"></i>
+                {{ booking.email || 'N/A' }}
+              </div>
+              <div class="small text-primary">
+                <i class="bi bi-telephone me-1"></i>
+                {{ booking.phone || 'N/A' }}
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-pc-display me-1"></i>
+                {{ booking.machineType || 'N/A' }}
+              </span>
+              <div class="small text-muted mt-1" *ngIf="booking.pricePerHour">
+                <i class="bi bi-currency-dollar me-1"></i>
+                {{ booking.pricePerHour | number:'1.2-2' }}/hr
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info bg-opacity-10 text-info">
+                <i class="bi bi-clock-history me-1"></i>
+                {{ booking.duration || 0 }} {{ (booking.duration === 1 ? 'hour' : 'hours') }}
+              </span>
+            </td>
+            <td class="fw-medium">
+              {{ booking.totalPrice ? (booking.totalPrice | currency:'ZAR':'symbol':'1.2-2') : 'N/A' }}
+            </td>
+            <td>
+              <span [ngClass]="getStatusClass(booking.status)" [title]="(booking.status || '') | titlecase">
+                <i class="bi {{ getStatusIcon(booking.status) }} me-1"></i>
+                {{ (booking.status || 'N/A') | titlecase }}
+              </span>
+            </td>
+            <td class="text-end pe-4">
+              <div class="btn-group btn-group-sm" dropdown>
+                <button type="button" class="btn btn-outline-primary" [routerLink]="['/admin/bookings', booking.id]" title="View Details">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="editBooking(booking)" title="Edit Booking">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger" (click)="showCancelConfirmation(booking)" 
+                        [disabled]="booking.status === 'cancelled'" [title]="booking.status === 'cancelled' ? 'Already cancelled' : 'Cancel Booking'">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="#" (click)="sendReminder(booking); $event.preventDefault()">
+                      <i class="bi bi-send me-2"></i>Send Reminder
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="#" (click)="showDeleteConfirmation(booking); $event.preventDefault()">
+                      <i class="bi bi-trash me-2"></i>Delete
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Empty State -->
+          <tr *ngIf="filteredBookings.length === 0 && !isLoading">
+            <td colspan="8" class="text-center py-5">
+              <i class="bi bi-inbox" style="font-size: 3rem; color: #e9ecef;"></i>
+              <p class="mt-3 text-muted">No bookings found matching your criteria</p>
+              <button class="btn btn-outline-primary btn-sm" (click)="resetFilters()">
+                <i class="bi bi-funnel"></i> Clear All Filters
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="row mt-4 g-3">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-uppercase text-muted small mb-1">Total Bookings</h6>
+                <h3 class="mb-0">{{ filteredBookings.length }}</h3>
+              </div>
+              <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                <i class="bi bi-calendar-check text-primary" style="font-size: 1.5rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-uppercase text-muted small mb-1">Total Revenue</h6>
+                <h3 class="mb-0">R{{ getTotalRevenue() | number:'1.2-2' }}</h3>
+              </div>
+              <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                <i class="bi bi-currency-dollar text-success" style="font-size: 1.5rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-uppercase text-muted small mb-1">Avg. Booking</h6>
+                <h3 class="mb-0">
+                  {{ filteredBookings.length > 0 ? 'R' + (getTotalRevenue() / filteredBookings.length | number:'1.2-2') : 'R0.00' }}
+                </h3>
+              </div>
+              <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                <i class="bi bi-graph-up text-info" style="font-size: 1.5rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- End of Main Content -->
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ confirmationMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmAction()">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>

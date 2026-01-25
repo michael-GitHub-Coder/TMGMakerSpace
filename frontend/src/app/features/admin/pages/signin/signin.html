@@ -1,0 +1,83 @@
+<div class="signin-page">
+  <div class="signin-card">
+    <div class="text-center mb-4">
+      <h2>Admin Portal</h2>
+      <p class="text-muted">Please sign in with your admin credentials</p>
+    </div>
+    
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+    </div>
+    
+    <form (ngSubmit)="onSubmit()" #signinForm="ngForm">
+      <div class="form-group mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          class="form-control"
+          required
+          email
+          [disabled]="isLoading"
+          placeholder="Enter admin email"
+          #emailField="ngModel"
+        />
+        <div *ngIf="emailField.invalid && emailField.touched" class="invalid-feedback">
+          <div *ngIf="emailField.errors?.['required']">Email is required</div>
+          <div *ngIf="emailField.errors?.['email']">Please enter a valid email</div>
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          class="form-control"
+          required
+          minlength="6"
+          [disabled]="isLoading"
+          placeholder="Enter your password"
+          #passwordField="ngModel"
+        />
+        <div *ngIf="passwordField.invalid && passwordField.touched" class="invalid-feedback">
+          <div *ngIf="passwordField.errors?.['required']">Password is required</div>
+          <div *ngIf="passwordField.errors?.['minlength']">
+            Password must be at least 6 characters
+          </div>
+        </div>
+      </div>
+
+      <div class="form-check mb-3">
+        <input
+          type="checkbox"
+          id="rememberMe"
+          [(ngModel)]="rememberMe"
+          name="rememberMe"
+          class="form-check-input"
+          [disabled]="isLoading"
+        />
+        <label class="form-check-label" for="rememberMe">
+          Remember me
+        </label>
+      </div>
+
+      <!-- Submit button -->
+      <button 
+        type="submit" 
+        class="btn btn-primary w-100"
+        [disabled]="!email || !password || isLoading"
+      >
+        <span *ngIf="!isLoading">
+          <i class="bi bi-shield-lock me-2"></i>Sign In to Admin
+        </span>
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      </button>
+    </form>
+  </div>
+</div>

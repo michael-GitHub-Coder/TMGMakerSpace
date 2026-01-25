@@ -1,0 +1,52 @@
+<app-header></app-header>
+
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content -->
+  <div class="admin-content">
+    <div class="page-header">
+      <h2>{{ isEditMode ? 'Edit Blog' : 'Add New Blog' }}</h2>
+    </div>
+
+    <form (ngSubmit)="saveBlog()" class="blog-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input id="title" type="text" [(ngModel)]="blog.title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="subtitle">Subtitle</label>
+          <input id="subtitle" type="text" [(ngModel)]="blog.subtitle" name="subtitle" />
+        </div>
+      </div>
+
+      <div class="form-row full-width">
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea id="description" [(ngModel)]="blog.description" name="description" rows="5"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="image">Blog Image</label>
+          <input type="file" id="image" (change)="onImageUpload($event)" />
+          <div class="preview" *ngIf="blog.image">
+            <img [src]="blog.image" alt="Blog Image" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          {{ isEditMode ? 'Update Blog' : 'Add Blog' }}
+        </button>
+        <button type="button" class="btn btn-secondary" routerLink="/admin/blogs-management">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-footer></app-footer>

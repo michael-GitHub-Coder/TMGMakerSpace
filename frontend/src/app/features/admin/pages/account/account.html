@@ -1,0 +1,46 @@
+<app-header></app-header>
+
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-content">
+    <div class="dashboard-header">
+      <h2>Admins Account</h2>
+      <p>Welcome back, {{ role || 'Admin' }}!</p>
+    </div>
+
+    <table class="table-tray">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Current logged-in admin -->
+        <tr>
+          <td>{{ currentAdmin?.name }}</td>
+          <td>{{ currentAdmin?.email }}</td>
+          <td>{{ currentAdmin?.role }}</td>
+          <td>
+            <button class="btn logout" (click)="logout()">Logout</button>
+          </td>
+        </tr>
+
+        <!-- Other admins (visible only to superadmin) -->
+        <tr *ngFor="let admin of admins">
+          <td>{{ admin.name }}</td>
+          <td>{{ admin.email }}</td>
+          <td>{{ admin.role }}</td>
+          <td>
+            <button class="btn delete" (click)="deleteAdmin(admin.email)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-footer></app-footer>

@@ -1,0 +1,61 @@
+<header>
+  <div class="mini-nav d-none d-lg-block">
+    <div class="container">
+      <span><i class="bi bi-envelope-at"></i> info@tmgmakerspace.africa</span>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <div class="container">
+      <!-- Logo -->
+      <a routerLink="/" class="logo">
+        <img src="./images/Tmg-makerspace-Logo.png" alt="TMG Makerspace Logo"/>
+      </a>
+
+      <!-- Navigation Menu -->
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a routerLink="/about" routerLinkActive="active" class="nav-link">About</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/services" routerLinkActive="active" class="nav-link">Services</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/members" routerLinkActive="active" class="nav-link">Members</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/blog" routerLinkActive="active" class="nav-link">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/contact" routerLinkActive="active" class="nav-link">Contact Us</a>
+        </li>
+
+        <!-- Show Sign In if NOT logged in -->
+        <!-- <li class="nav-item profile-btn" *ngIf="!loggedIn">
+          <a routerLink="/admin/signin" class="signin-btn">
+            <i class="bi bi-person-circle"></i> Sign In
+          </a>
+        </li> -->
+        <li class="nav-item profile-btn" *ngIf="!loggedIn">
+          <a routerLink="/admin/signin" class="signin-btn">
+            <i class="bi bi-person-circle"></i> Sign In
+          </a>
+        </li>
+
+        <!-- Show Logout if logged in -->
+        <li class="nav-item profile-btn" *ngIf="loggedIn">
+          <a href="#" (click)="logout()" class="signin-btn">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
+        </li>
+      </ul>
+
+      <!-- Hamburger Menu -->
+      <div class="hamburger" (click)="toggleMenu()">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+  </nav>
+</header>

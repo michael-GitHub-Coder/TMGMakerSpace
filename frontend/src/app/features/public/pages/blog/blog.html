@@ -1,0 +1,45 @@
+<app-header></app-header>
+
+<app-banner 
+  [heading]="'Blog'" 
+  [route]="'/home'" 
+  [routeLabel]="'Home'">
+</app-banner>
+
+<section id="blogs">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-3">
+        <h2 class="blogs-title">Latest Blogs</h2>
+        <!-- <p class="blogs-desc">
+          Read our latest insights, news, and articles from TMG Makerspace.
+        </p> -->
+      </div>
+
+      <!-- Carousel -->
+      <owl-carousel-o [options]="blogOptions" class="w-100">
+        <ng-container *ngFor="let blog of blogs">
+          <ng-template carouselSlide>
+            <div class="blog-card shadow rounded">
+              <div class="blog-card-image">
+                <img [src]="blog.image" [alt]="blog.title" class="img-fluid rounded-top" />
+              </div>
+              <div class="blog-card-content p-3 d-flex flex-column">
+                <div class="blog-meta mb-2">
+                  <span class="blog-date">{{ blog.date }}</span>
+                  <span class="blog-time ms-2">{{ blog.time }}</span>
+                </div>
+                <h3 class="blog-title mb-1">{{ blog.title }}</h3>
+                <p class="blog-subtitle">{{ blog.subtitle }}</p>
+                <a href="#" class="read-more mt-auto align-self-start">Read More</a>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+      </owl-carousel-o>
+
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

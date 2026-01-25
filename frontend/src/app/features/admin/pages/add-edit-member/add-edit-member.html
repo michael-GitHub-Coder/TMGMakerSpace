@@ -1,0 +1,71 @@
+<app-header></app-header>
+<div class="admin-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <div class="card">
+      <h2>{{ isEditMode ? 'Edit Member' : 'Add New Member' }}</h2>
+
+      <form (ngSubmit)="saveMember()">
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input id="name" type="text" [(ngModel)]="member.name" name="name" required />
+        </div>
+
+        <!-- Badges -->
+        <div class="form-group">
+          <label for="badges">Badges (comma separated)</label>
+          <input
+            id="badges"
+            type="text"
+            [(ngModel)]="member.badges"
+            name="badges"
+            placeholder="Robotics, AI, Design"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="member.description"
+            name="description"
+            placeholder="Describe the member"
+          ></textarea>
+        </div>
+
+        <!-- Links -->
+        <div class="form-group">
+          <label for="links">Links (comma separated)</label>
+          <input
+            id="links"
+            type="text"
+            [(ngModel)]="member.links"
+            name="links"
+            placeholder="https://twitter.com, https://linkedin.com"
+          />
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label for="image">Upload Image</label>
+          <input id="image" type="file" (change)="onImageUpload($event)" accept="image/*" />
+          <div *ngIf="member.image" class="image-preview">
+            <img [src]="member.image" alt="Member Image" />
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-primary">
+            {{ isEditMode ? 'Update Member' : 'Add Member' }}
+          </button>
+          <a routerLink="/admin/members-management" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>

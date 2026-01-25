@@ -1,0 +1,39 @@
+<app-header></app-header>
+
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+
+  <!-- Main Content -->
+  <div class="dashboard-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h2>Member Dashboard</h2>
+      <p>Welcome back, {{ role || (isMember ? 'Member' : 'Admin') }}!</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="dashboard-cards">
+
+      <!-- Bookings Card - Always visible -->
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3>Equipment Bookings</h3>
+        <p>{{ getBookingsCount() }} Bookings</p>
+        <button
+          class="card-btn"
+          (click)="navigateTo('/admin/bookings-management'); $event.stopPropagation()"
+        >
+          {{ isMember ? 'View Bookings' : 'Manage Bookings' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+  
+</div>
+
+<app-footer></app-footer> 

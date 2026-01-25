@@ -1,0 +1,15 @@
+<section id="partners" class="partners-carousel">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12"><p>Our Clients</p></div>
+      <div class="carousel-wrapper">
+        <div class="carousel-slide" *ngFor="let group of partners; let i = index"
+             [class.active]="i === currentSlide">
+          <a *ngFor="let logo of group" href="#">
+            <img [src]="'./images/patners/' + logo" alt="Partner Logo">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

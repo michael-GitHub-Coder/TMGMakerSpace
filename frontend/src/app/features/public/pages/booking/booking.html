@@ -1,0 +1,194 @@
+<app-header></app-header>
+<app-banner 
+  [heading]="'Request Equipment'" 
+  [route]="'/home'" 
+  [routeLabel]="'Home'">
+</app-banner>
+
+<section class="booking-section">
+  <div class="container">
+    <!-- Success Message -->
+    <div class="alert alert-success alert-dismissible fade show" *ngIf="showSuccess" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <strong>Booking Successful!</strong> Your equipment booking has been confirmed. 
+      A confirmation email has been sent to your email address.
+      <button type="button" class="btn-close" (click)="closeSuccessMessage()"></button>
+    </div>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger alert-dismissible fade show" *ngIf="showError" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>Error!</strong> {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="closeErrorMessage()"></button>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="booking-card">
+          <div class="booking-header">
+            <h2><i class="bi bi-calendar-check"></i> Equipment Booking</h2>
+            <p>Fill in the form below to book your equipment session</p>
+          </div>
+
+          <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+            <!-- Personal Information Section -->
+            <div class="form-section">
+              <h4><i class="bi bi-person-fill"></i> Personal Information</h4>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="role" class="form-label">Role *</label>
+                  <select class="form-select" id="role" formControlName="role">
+                    <option value="">Select your role</option>
+                    <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('role')?.invalid && bookingForm.get('role')?.touched">
+                    Please select your role
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="name" class="form-label">Name *</label>
+                  <input type="text" class="form-control" id="name" formControlName="name" placeholder="Enter your name">
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('name')?.invalid && bookingForm.get('name')?.touched">
+                    Please enter your name (minimum 2 characters)
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="surname" class="form-label">Surname *</label>
+                  <input type="text" class="form-control" id="surname" formControlName="surname" placeholder="Enter your surname">
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('surname')?.invalid && bookingForm.get('surname')?.touched">
+                    Please enter your surname (minimum 2 characters)
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="email" class="form-label">Email *</label>
+                  <input type="email" class="form-control" id="email" formControlName="email" placeholder="your.email@example.com">
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('email')?.invalid && bookingForm.get('email')?.touched">
+                    Please enter a valid email address
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="phone" class="form-label">Phone Number *</label>
+                  <input type="tel" class="form-control" id="phone" formControlName="phone" placeholder="0123456789">
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('phone')?.invalid && bookingForm.get('phone')?.touched">
+                    Please enter a valid 10-digit phone number
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Booking Details Section -->
+            <div class="form-section">
+              <h4><i class="bi bi-tools"></i> Booking Details</h4>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="machineType" class="form-label">Machine Type *</label>
+                  <select class="form-select" id="machineType" formControlName="machineType">
+                    <option value="">Select a machine</option>
+                    <option *ngFor="let machine of machineTypes" [value]="machine.name">
+                      {{ machine.name }} - R{{ machine.pricePerHour }}/hour
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('machineType')?.invalid && bookingForm.get('machineType')?.touched">
+                    Please select a machine type
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="duration" class="form-label">Duration (hours) *</label>
+                  <select class="form-select" id="duration" formControlName="duration">
+                    <option *ngFor="let dur of durations" [value]="dur">{{ dur }} hour(s)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="bookingDate" class="form-label">Booking Date *</label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="bookingDate" 
+                    formControlName="bookingDate"
+                    [min]="getMinDate()"
+                    [max]="getMaxDate()">
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('bookingDate')?.invalid && bookingForm.get('bookingDate')?.touched">
+                    Please select a booking date
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="bookingTime" class="form-label">Booking Time *</label>
+                  <select class="form-select" id="bookingTime" formControlName="bookingTime">
+                    <option value="">Select a time slot</option>
+                    <option 
+                      *ngFor="let time of timeSlots" 
+                      [value]="time"
+                      [disabled]="isTimeSlotDisabled(time)">
+                      {{ time }} {{ isTimeSlotDisabled(time) ? '(Booked)' : '' }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="bookingForm.get('bookingTime')?.invalid && bookingForm.get('bookingTime')?.touched">
+                    Please select a time slot
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price Display -->
+              <div class="price-display" *ngIf="bookingForm.get('machineType')?.value">
+                <div class="price-breakdown">
+                  <div class="price-item">
+                    <span>Price per hour:</span>
+                    <span class="price-value">R{{ getSelectedMachinePrice() }}</span>
+                  </div>
+                  <div class="price-item">
+                    <span>Duration:</span>
+                    <span class="price-value">{{ bookingForm.get('duration')?.value }} hour(s)</span>
+                  </div>
+                  <div class="price-item total">
+                    <span>Total Price:</span>
+                    <span class="price-value">R{{ getTotalPrice() }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg"
+                [disabled]="isSubmitting || bookingForm.invalid">
+                <span *ngIf="!isSubmitting">
+                  <i class="bi bi-check-circle"></i> Book Equipment
+                </span>
+                <span *ngIf="isSubmitting">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Processing...
+                </span>
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary btn-lg ms-3"
+                (click)="bookingForm.reset()"
+                [disabled]="isSubmitting">
+                <i class="bi bi-x-circle"></i> Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

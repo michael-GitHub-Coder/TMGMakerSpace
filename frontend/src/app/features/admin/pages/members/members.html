@@ -1,0 +1,58 @@
+<app-header></app-header>
+
+<section class="add-member-section">
+  <div class="add-member-card">
+    <h2>Add New Member</h2>
+    <form (ngSubmit)="addMember()">
+
+      <!-- Name and Badges -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input id="name" type="text" placeholder="Member Name" [(ngModel)]="newMember.name" name="name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="badges">Badges</label>
+          <input id="badges" type="text" placeholder="Robotics, AI, Design" [(ngModel)]="newMember.badges" name="badges" />
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea id="description" placeholder="Describe the member" [(ngModel)]="newMember.description" name="description"></textarea>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="links">Links</label>
+          <input id="links" type="text" placeholder="https://twitter.com, https://linkedin.com" [(ngModel)]="newMember.links" name="links" />
+        </div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="image">Upload Image</label>
+          <input id="image" type="file" (change)="onImageUpload($event)" accept="image/*" />
+          <div *ngIf="newMember.image" class="image-preview">
+            <img [src]="newMember.image" alt="Member Image" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="form-buttons">
+        <button type="submit" class="btn btn-danger">Add Member</button>
+        <a routerLink="/admin/dashboard" class="btn btn-secondary" href="/admin/dashboard">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+<app-footer></app-footer>
