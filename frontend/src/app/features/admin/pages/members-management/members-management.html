@@ -13,19 +13,19 @@
       <table class="dashboard-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <!-- <th>ID</th> -->
             <th>Name</th>
             <th>Email</th>
-            <th>Joined At</th>
+            <th>Documents</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let member of members">
-            <td>{{ member.id }}</td>
+            <!-- <td>{{ member.id }}</td> -->
             <td>{{ member.name }}</td>
             <td>{{ member.email }}</td>
-            <td>{{ member.joinedAt }}</td>
+            <td>{{ member.documents }}</td>
             <td>
               <button class="btn edit" (click)="editMember(member.id)">Edit</button>
               <button class="btn delete" (click)="deleteMember(member.id)">Delete</button>

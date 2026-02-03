@@ -6,6 +6,7 @@ import { FooterComponent } from '../../../shared/footer/footer';
 import { HeaderComponent } from '../../../shared/header/header';
 import { BookingComponent,Booking } from '../../public/pages/booking/booking';
 import { BookingService } from '../../../shared/booking/booking.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 interface Member {
   name: string;
@@ -36,16 +37,20 @@ interface Admin {
 
 
 export class DashboardComponent2 implements OnInit {
+  name: string | null = null;
   role: string | null = null;
   members: Member[] = [];
   blogs: BlogPost[] = [];
   admins: Admin[] = [];
   bookings: Booking[] = [];
 
-  constructor(private router: Router, private bookingService: BookingService) {}
+  constructor(private router: Router, private bookingService: BookingService,private authService: AuthService ) {}
 
   ngOnInit() {
+    const user = this.authService.getCurrentUser();
+
     this.role = localStorage.getItem('role');
+    this.name = user?.firstName || user?.name || 'Admin';
     this.members = JSON.parse(localStorage.getItem('members') || '[]');
     this.blogs = JSON.parse(localStorage.getItem('blogs') || '[]');
     this.admins = JSON.parse(localStorage.getItem('admins') || '[]');

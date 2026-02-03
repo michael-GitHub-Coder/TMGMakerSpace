@@ -29,6 +29,10 @@ export const PUBLIC_ROUTES: Routes = [
         path: 'booking',
         loadComponent: () => import('./pages/booking/booking').then(m => m.BookingComponent)
     },
+    {
+        path: 'apply',
+        loadComponent: () => import('../Application/Application').then(m => m.ApplicationComponent)
+    },
 
     // {
     //     path: 'sign-in',

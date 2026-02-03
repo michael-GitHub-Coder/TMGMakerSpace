@@ -7,7 +7,7 @@ import { FooterComponent } from '../../../../shared/footer/footer';
 import { BannerComponent } from '../../../../shared/banner/banner';
 import { BookingService, Booking } from '../../../../shared/booking/booking.service';
 import { EmailService } from '../../../../shared/email/email.service';
-
+import { AuthService } from '../../../../shared/services/auth.service';
 interface MachineType {
   name: string;
   pricePerHour: number;
@@ -51,26 +51,41 @@ export class BookingComponent implements OnInit {
     private fb: FormBuilder,
     private bookingService: BookingService,
     private emailService: EmailService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
-    this.loadBookedSlots();
+    // this.loadBookedSlots();
+
+    const currentUser = this.authService.getCurrentUser(); 
+    if (currentUser) {
+      // patch form values for personal info
+      this.bookingForm.patchValue({
+        name: currentUser.firstName,
+        surname: currentUser.lastName,
+        email: currentUser.email,
+        phone: currentUser.phone
+      });
+    }
   }
 
+
   initializeForm(): void {
+    const currentUser = this.authService.getCurrentUser();
+
     this.bookingForm = this.fb.group({
-      role: ['', Validators.required],
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      surname: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      role: [currentUser?.role || 'Member'],
+      name: [currentUser?.firstName || ''],
+      surname: [currentUser?.lastName || ''],
+      email: [currentUser?.email || ''],
+      phone: [currentUser?.phone || ''],
       machineType: ['', Validators.required],
       bookingDate: ['', [Validators.required, this.futureDateValidator()]],
       bookingTime: ['', Validators.required],
       duration: [1, [
-        Validators.required, 
+        Validators.required,
         Validators.min(1),
         Validators.max(8),
         Validators.pattern('^[0-9]*$')
@@ -80,7 +95,8 @@ export class BookingComponent implements OnInit {
     // Update price when machine type or duration changes
     this.bookingForm.get('machineType')?.valueChanges.subscribe(() => this.updatePrice());
     this.bookingForm.get('duration')?.valueChanges.subscribe(() => this.updatePrice());
-  }
+}
+
 
   private futureDateValidator() {
     return (control: { value: string | number | Date; }) => {
@@ -149,9 +165,9 @@ export class BookingComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
+
   async onSubmit(): Promise<void> {
     if (this.bookingForm.invalid) {
-      // Mark all fields as touched to show validation errors
       Object.keys(this.bookingForm.controls).forEach(key => {
         const control = this.bookingForm.get(key);
         control?.markAsTouched();
@@ -165,60 +181,31 @@ export class BookingComponent implements OnInit {
     this.showSuccess = false;
 
     try {
-      const formValue = this.bookingForm.getRawValue();
-      console.log('Form values:', formValue);
+      const formValue = this.bookingForm.getRawValue(); 
 
-      // Get the price per hour for the selected machine
-      const pricePerHour = this.getSelectedMachinePrice();
-      const duration = Math.max(1, Number(formValue.duration) || 1);
-      const totalPrice = this.getTotalPrice();
+   
+      const currentUser = this.authService.getCurrentUser();
 
-      // Prepare booking data with all required fields
       const bookingData = {
-        role: formValue.role || 'Makerspace User',
-        name: (formValue.name || '').trim(),
-        surname: (formValue.surname || '').trim(),
-        email: (formValue.email || '').trim().toLowerCase(),
-        phone: (formValue.phone || '').trim(),
+        name: currentUser?.firstName || '',
+        surname: currentUser?.lastName || '',
+        email: currentUser?.email || '',
+        phone: currentUser?.phone || '',
         machineType: formValue.machineType || '',
-        pricePerHour: pricePerHour,
+        pricePerHour: this.getSelectedMachinePrice(),
         bookingDate: formValue.bookingDate || '',
         bookingTime: formValue.bookingTime || '',
-        duration: duration,
-        totalPrice: totalPrice
+        duration: Number(formValue.duration) || 1,
+        totalPrice: this.getTotalPrice()
       };
 
-      console.log('Prepared booking data:', JSON.stringify(bookingData, null, 2));
+      console.log("booking data:"  ,bookingData);
 
-      // Basic validation
-      if (!bookingData.bookingDate || !bookingData.bookingTime || !bookingData.machineType) {
-        throw new Error('Please fill in all required fields');
-      }
-
-      if (isNaN(bookingData.duration) || bookingData.duration <= 0) {
-        throw new Error('Please enter a valid duration');
-      }
-
-      if (isNaN(bookingData.totalPrice) || bookingData.totalPrice <= 0) {
-        throw new Error('Invalid price calculation. Please try again.');
-      }
-
-      console.log('Submitting booking data to server...');
-      const newBooking = await this.bookingService.createBooking(bookingData);
-      
-      if (!newBooking) {
-        throw new Error('Failed to create booking. Please try again.');
-      }
-
-      console.log('Booking created successfully:', newBooking);
+      await this.bookingService.createBooking(bookingData);
       this.showSuccess = true;
-      this.bookingForm.reset({ duration: 1 }); // Reset form but keep duration as 1
+      this.bookingForm.reset({ duration: 1 });
       this.loadBookedSlots();
-
-      // Scroll to success message
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 100);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } catch (error: any) {
       this.showError = true;
@@ -228,6 +215,87 @@ export class BookingComponent implements OnInit {
       this.isSubmitting = false;
     }
   }
+
+
+  // async onSubmit(): Promise<void> {
+  //   if (this.bookingForm.invalid) {
+  //     // Mark all fields as touched to show validation errors
+  //     Object.keys(this.bookingForm.controls).forEach(key => {
+  //       const control = this.bookingForm.get(key);
+  //       control?.markAsTouched();
+  //       control?.updateValueAndValidity();
+  //     });
+  //     return;
+  //   }
+
+  //   this.isSubmitting = true;
+  //   this.showError = false;
+  //   this.showSuccess = false;
+
+  //   try {
+  //     const formValue = this.bookingForm.getRawValue();
+  //     console.log('Form values:', formValue);
+
+  //     // Get the price per hour for the selected machine
+  //     const pricePerHour = this.getSelectedMachinePrice();
+  //     const duration = Math.max(1, Number(formValue.duration) || 1);
+  //     const totalPrice = this.getTotalPrice();
+
+  //     // Prepare booking data with all required fields
+  //     const bookingData = {
+  //       role: formValue.role || 'Makerspace User',
+  //       name: (formValue.name || '').trim(),
+  //       surname: (formValue.surname || '').trim(),
+  //       email: (formValue.email || '').trim().toLowerCase(),
+  //       phone: (formValue.phone || '').trim(),
+  //       machineType: formValue.machineType || '',
+  //       pricePerHour: pricePerHour,
+  //       bookingDate: formValue.bookingDate || '',
+  //       bookingTime: formValue.bookingTime || '',
+  //       duration: duration,
+  //       totalPrice: totalPrice
+  //     };
+
+  //     console.log('Prepared booking data:', JSON.stringify(bookingData, null, 2));
+
+  //     // Basic validation
+  //     if (!bookingData.bookingDate || !bookingData.bookingTime || !bookingData.machineType) {
+  //       throw new Error('Please fill in all required fields');
+  //     }
+
+  //     if (isNaN(bookingData.duration) || bookingData.duration <= 0) {
+  //       throw new Error('Please enter a valid duration');
+  //     }
+
+  //     if (isNaN(bookingData.totalPrice) || bookingData.totalPrice <= 0) {
+  //       throw new Error('Invalid price calculation. Please try again.');
+  //     }
+
+  //     console.log('Submitting booking data to server...');
+  //     const newBooking = await this.bookingService.createBooking(bookingData);
+      
+  //     if (!newBooking) {
+  //       throw new Error('Failed to create booking. Please try again.');
+  //     }
+
+  //     console.log('Booking created successfully:', newBooking);
+  //     this.showSuccess = true;
+  //     this.bookingForm.reset({ duration: 1 }); // Reset form but keep duration as 1
+  //     this.loadBookedSlots();
+
+  //     // Scroll to success message
+  //     setTimeout(() => {
+  //       window.scrollTo({ top: 0, behavior: 'smooth' });
+  //     }, 100);
+
+  //   } catch (error: any) {
+  //     this.showError = true;
+  //     this.errorMessage = error.message || 'An error occurred while booking. Please try again.';
+  //     window.scrollTo({ top: 0, behavior: 'smooth' });
+  //   } finally {
+  //     this.isSubmitting = false;
+  //   }
+  // }
 
   closeSuccessMessage(): void {
     this.showSuccess = false;

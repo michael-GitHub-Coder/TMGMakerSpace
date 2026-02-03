@@ -18,4 +18,14 @@ export class UsersService {
     const user = this.usersRepository.create(userData);
     return this.usersRepository.save(user);
   }
+
+  async findById(id: number) {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async update(id: number, updateData: Partial<User>) {
+    await this.usersRepository.update(id, updateData);
+    return this.findById(id); 
+  }
+
 }

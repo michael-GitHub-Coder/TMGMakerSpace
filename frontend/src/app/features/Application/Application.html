@@ -1,0 +1,52 @@
+<div class="application-container">
+  <h2>Membership Application</h2>
+
+  <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" formControlName="name" />
+      <small *ngIf="applicationForm.get('name')?.touched && applicationForm.get('name')?.invalid">
+        Name is required
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Surname</label>
+      <input type="text" formControlName="surname" />
+      <small *ngIf="applicationForm.get('surname')?.touched && applicationForm.get('surname')?.invalid">
+        Surname is required
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" formControlName="email" />
+      <small *ngIf="applicationForm.get('email')?.touched && applicationForm.get('email')?.invalid">
+        Enter a valid email
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="text" formControlName="phone" />
+      <small *ngIf="applicationForm.get('phone')?.touched && applicationForm.get('phone')?.invalid">
+        Phone number is required
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Supporting Documents</label>
+      <input type="file" multiple (change)="onFileChange($event)" />
+      <small>You can upload multiple files (PDF, images, etc.)</small>
+    </div>
+
+    <button type="submit" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Submitting...' : 'Submit Application' }}
+    </button>
+
+    <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  </form>
+</div>

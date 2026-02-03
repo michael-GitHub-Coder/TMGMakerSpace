@@ -72,6 +72,13 @@ let AuthService = class AuthService {
         const user = await this.validateUser(loginDto.email, loginDto.password);
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
+        if (user.mustChangePassword) {
+            return {
+                status: 'pending',
+                message: 'Password change required',
+                data: { userId: user.id, email: user.email },
+            };
+        }
         const token = this.generateToken(user);
         return {
             status: 'success',
@@ -99,6 +106,21 @@ let AuthService = class AuthService {
             message: 'Registration successful',
             token,
             data: { user: result },
+        };
+    }
+    async changePassword(dto) {
+        const user = await this.usersService.findById(dto.userId);
+        if (!user)
+            throw new common_1.UnauthorizedException('User not found');
+        user.password = await bcrypt.hash(dto.newPassword, 10);
+        user.mustChangePassword = false;
+        await this.usersService.update(user.id, user);
+        const token = this.generateToken(user);
+        return {
+            status: 'success',
+            message: 'Password changed successfully',
+            token,
+            data: { user },
         };
     }
 };

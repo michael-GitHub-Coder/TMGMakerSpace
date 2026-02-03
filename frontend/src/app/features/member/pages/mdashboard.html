@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <div class="dashboard-layout">
-  <app-sidebar></app-sidebar>
+  <app-sidebar ></app-sidebar>
 
 
   <!-- Main Content -->
@@ -9,7 +9,7 @@
     <!-- Header -->
     <div class="dashboard-header">
       <h2>Member Dashboard</h2>
-      <p>Welcome back </p>
+      <p>Welcome back {{ name || 'Member' }}!</p>
     </div>
 
     <!-- Dashboard Cards -->
@@ -24,9 +24,9 @@
         <p>{{ getBookingsCount() }} Bookings</p>
         <button
           class="card-btn"
-          (click)="navigateTo('/admin/bookings-management'); $event.stopPropagation()"
+          (click)="navigateTo('/booking'); $event.stopPropagation()"
         >
-          View Bookings
+          Book 
         </button>
       </div>
     </div>

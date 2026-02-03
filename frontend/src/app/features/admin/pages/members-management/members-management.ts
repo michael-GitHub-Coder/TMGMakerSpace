@@ -9,7 +9,7 @@ interface Member {
   id: number;
   name: string;
   email: string;
-  joinedAt: string;
+  documents: string;
 }
 
 @Component({

@@ -1,25 +1,12 @@
-import { EmailService } from '../email/email.service';
-import { Booking, CreateBookingDto, UpdateBookingDto } from './booking.entity';
+import { Repository } from 'typeorm';
+import { BookingEntity } from './booking.entity';
+import { CreateBookingDto, UpdateBookingDto } from './DTO/Booking.dto';
 export declare class BookingsService {
-    private readonly emailService;
-    private bookings;
-    private idCounter;
-    constructor(emailService: EmailService);
-    private toDateTime;
-    private hasConflict;
-    create(createBookingDto: CreateBookingDto): Promise<Booking>;
-    findAll(): Booking[];
-    findOne(id: string): Booking;
-    update(id: string, updateBookingDto: UpdateBookingDto): Booking;
-    cancel(id: string): Booking;
-    delete(id: string): void;
-    getAvailableSlots(date: string, machineType: string): string[];
-    private generateTimeSlots;
-    getStatistics(): {
-        total: number;
-        confirmed: number;
-        pending: number;
-        cancelled: number;
-        totalRevenue: number;
-    };
+    private readonly bookingRepo;
+    constructor(bookingRepo: Repository<BookingEntity>);
+    create(createBookingDto: CreateBookingDto): Promise<BookingEntity>;
+    findAll(): Promise<BookingEntity[]>;
+    findOne(id: string): Promise<BookingEntity>;
+    update(id: string, dto: UpdateBookingDto): Promise<BookingEntity>;
+    delete(id: string): Promise<BookingEntity>;
 }

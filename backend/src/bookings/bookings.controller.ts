@@ -9,14 +9,19 @@ import {
   Query,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
-import { CreateBookingDto, UpdateBookingDto } from './booking.entity';
+import { CreateBookingDto, UpdateBookingDto } from './DTO/Booking.dto';
 
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
+  // @Post()
+  // create(@Body() createBookingDto: CreateBookingDto) {
+  //   return this.bookingsService.create(createBookingDto);
+  // }
   @Post()
   create(@Body() createBookingDto: CreateBookingDto) {
+    // console.log('CreateBookingDto:', createBookingDto); 
     return this.bookingsService.create(createBookingDto);
   }
 
@@ -25,18 +30,18 @@ export class BookingsController {
     return this.bookingsService.findAll();
   }
 
-  @Get('statistics')
-  getStatistics() {
-    return this.bookingsService.getStatistics();
-  }
+  // @Get('statistics')
+  // getStatistics() {
+  //   return this.bookingsService.getStatistics();
+  // }
 
-  @Get('available-slots')
-  getAvailableSlots(
-    @Query('date') date: string,
-    @Query('machineType') machineType: string,
-  ) {
-    return this.bookingsService.getAvailableSlots(date, machineType);
-  }
+  // @Get('available-slots')
+  // getAvailableSlots(
+  //   @Query('date') date: string,
+  //   @Query('machineType') machineType: string,
+  // ) {
+  //   return this.bookingsService.getAvailableSlots(date, machineType);
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -48,10 +53,10 @@ export class BookingsController {
     return this.bookingsService.update(id, updateBookingDto);
   }
 
-  @Put(':id/cancel')
-  cancel(@Param('id') id: string) {
-    return this.bookingsService.cancel(id);
-  }
+  // @Put(':id/cancel')
+  // cancel(@Param('id') id: string) {
+  //   return this.bookingsService.cancel(id);
+  // }
 
   @Delete(':id')
   delete(@Param('id') id: string) {

@@ -1,64 +1,78 @@
-export interface Booking {
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+@Entity('bookings')
+export class BookingEntity {
+  @PrimaryColumn()
   id: string;
 
-  // User details
-  role: string;
+  // @Column()
+  // userId: string;
+
+  @Column()
   name: string;
+
+  @Column()
   surname: string;
+
+  @Column()
   email: string;
+
+  @Column()
   phone: string;
 
   // Machine & pricing
+  @Column()
   machineType: string;
+
+  @Column('decimal')
   pricePerHour: number;
 
   // Booking timing
-  bookingDate: string;  // format: YYYY-MM-DD
-  bookingTime: string;  // format: HH:mm
-  duration: number;     // duration in hours
-  totalPrice: number;   // pricePerHour * duration
+  @Column()
+  bookingDate: string;
+
+  @Column()
+  bookingTime: string;
+
+  @Column()
+  duration: number;
+
+  @Column('decimal')
+  totalPrice: number;
 
   // Status
+  @Column({ default: 'pending' })
   status: 'pending' | 'confirmed' | 'cancelled';
 
   // Timestamps
+  @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
   updatedAt: Date;
 }
 
-/**
- * DTO used to CREATE a booking.
- * All fields required except ID and timestamps.
- */
-export class CreateBookingDto {
+
+export interface Booking {
+  id: string;
   role: string;
   name: string;
   surname: string;
   email: string;
   phone: string;
-
   machineType: string;
   pricePerHour: number;
-
   bookingDate: string;
   bookingTime: string;
   duration: number;
-
   totalPrice: number;
-}
-
-/**
- * DTO used to UPDATE a booking.
- * Only optional fields here.
- */
-export class UpdateBookingDto {
-  status?: 'pending' | 'confirmed' | 'cancelled';
-
-  // Optional updated schedule
-  bookingDate?: string;
-  bookingTime?: string;
-  duration?: number;
-
-  // Optional machine change
-  machineType?: string;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  createdAt: Date;
+  updatedAt: Date;
 }

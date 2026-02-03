@@ -15,7 +15,8 @@ const bookings_module_1 = require("./bookings/bookings.module");
 const email_module_1 = require("./email/email.module");
 const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
-const user_entity_1 = require("./users/user.entity");
+const Membership_Module_1 = require("./memberApplication/Membership.Module");
+const MembershipAdmin_Module_1 = require("./memberAdmin/MembershipAdmin.Module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,7 +30,7 @@ exports.AppModule = AppModule = __decorate([
                 username: 'TMG_USER',
                 password: 'TMG_USERPASS',
                 database: 'TMGMakerSpace',
-                entities: [user_entity_1.User],
+                autoLoadEntities: true,
                 synchronize: true,
                 options: {
                     encrypt: false,
@@ -40,6 +41,8 @@ exports.AppModule = AppModule = __decorate([
             email_module_1.EmailModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
+            Membership_Module_1.MembershipModule,
+            MembershipAdmin_Module_1.MembershipAdminModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

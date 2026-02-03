@@ -5,7 +5,7 @@ import { tap } from 'rxjs/operators';
 
 export interface Booking {
   id: string;
-  role: string;
+  // role: string;
   name: string;
   surname: string;
   email: string;
@@ -62,7 +62,7 @@ export class BookingService implements OnDestroy {
         // Normalize booking data with fallback values
         return {
           id: booking.id || '',
-          role: booking.role || 'user',
+          // role: booking.role || 'user',
           name: booking.name || '',
           surname: booking.surname || '',
           email: booking.email || '',
@@ -131,7 +131,7 @@ export class BookingService implements OnDestroy {
       
       // Create a clean booking object with all required fields
       const booking = {
-        role: bookingData.role || 'Makerspace User',
+        // role: bookingData.role || 'Makerspace User',
         name: (bookingData.name || '').trim(),
         surname: (bookingData.surname || '').trim(),
         email: (bookingData.email || '').trim().toLowerCase(),
@@ -152,15 +152,15 @@ export class BookingService implements OnDestroy {
       console.log('Processed booking data being sent to server:', JSON.stringify(booking, null, 2));
       
       // First check if the slot is still available
-      const isAvailable = await this.isTimeSlotAvailable(
-        booking.machineType, 
-        booking.bookingDate, 
-        booking.bookingTime
-      );
+      // const isAvailable = await this.isTimeSlotAvailable(
+      //   booking.machineType, 
+      //   booking.bookingDate, 
+      //   booking.bookingTime
+      // );
 
-      if (!isAvailable) {
-        throw new Error('This time slot is no longer available. Please select a different time.');
-      }
+      // if (!isAvailable) {
+      //   throw new Error('This time slot is no longer available. Please select a different time.');
+      // }
 
       const newBooking = await firstValueFrom(
         this.http.post<Booking>(this.apiUrl, booking).pipe(

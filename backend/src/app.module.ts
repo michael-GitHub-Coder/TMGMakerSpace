@@ -7,6 +7,9 @@ import { EmailModule } from './email/email.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
+import { BookingEntity } from './models/Booking.model';
+import { MembershipModule } from './memberApplication/Membership.Module';
+import { MembershipAdminModule } from './memberAdmin/MembershipAdmin.Module';
 
 @Module({
   imports: [
@@ -17,7 +20,8 @@ import { User } from './users/user.entity';
       username: 'TMG_USER',              
       password: 'TMG_USERPASS',    
       database: 'TMGMakerSpace',    
-      entities: [User],
+      autoLoadEntities: true,
+      // entities: [User,BookingEntity],
       synchronize: true,            
       options: {
         encrypt: false,             
@@ -28,6 +32,8 @@ import { User } from './users/user.entity';
     EmailModule,
     AuthModule,
     UsersModule,
+    MembershipModule,
+    MembershipAdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

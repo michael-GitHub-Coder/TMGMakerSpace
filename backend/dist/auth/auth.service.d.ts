@@ -1,5 +1,6 @@
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ChangePasswordDto } from './DTO/ChangePasswordDto';
 export interface LoginDto {
     email: string;
     password: string;
@@ -21,9 +22,20 @@ export declare class AuthService {
     login(loginDto: LoginDto): Promise<{
         status: string;
         message: string;
+        data: {
+            userId: any;
+            email: any;
+            user?: undefined;
+        };
+        token?: undefined;
+    } | {
+        status: string;
+        message: string;
         token: string;
         data: {
             user: any;
+            userId?: undefined;
+            email?: undefined;
         };
     }>;
     register(registerDto: RegisterDto): Promise<{
@@ -37,7 +49,16 @@ export declare class AuthService {
                 lastName: string;
                 email: string;
                 role: string;
+                mustChangePassword: boolean;
             };
+        };
+    }>;
+    changePassword(dto: ChangePasswordDto): Promise<{
+        status: string;
+        message: string;
+        token: string;
+        data: {
+            user: import("../users/user.entity").User;
         };
     }>;
 }

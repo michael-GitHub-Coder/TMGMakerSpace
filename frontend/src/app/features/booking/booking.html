@@ -1,0 +1,110 @@
+<app-header></app-header>
+<app-banner 
+  [heading]="'Request Equipment'" 
+  [route]="'/home'" 
+  [routeLabel]="'Home'">
+</app-banner>
+
+<section class="booking-section py-5">
+  <div class="container">
+    <!-- Success Message -->
+    <div class="alert alert-success alert-dismissible fade show" *ngIf="showSuccess" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <strong>Booking Successful!</strong> Your equipment booking has been confirmed.
+      <button type="button" class="btn-close" (click)="closeSuccessMessage()"></button>
+    </div>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger alert-dismissible fade show" *ngIf="showError" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>Error!</strong> {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="closeErrorMessage()"></button>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm p-4">
+          <h2 class="mb-3"><i class="bi bi-calendar-check"></i> Book Equipment</h2>
+          <p class="text-muted mb-4">Fill in the form below to book your equipment session</p>
+
+          <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+           
+            <!-- Booking Details -->
+            <h5 class="mb-3"><i class="bi bi-tools"></i> Booking Details</h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="machineType" class="form-label">Machine Type *</label>
+                <select class="form-select" id="machineType" formControlName="machineType">
+                  <option value="">Select a machine</option>
+                  <option *ngFor="let machine of machineTypes" [value]="machine.name">
+                    {{ machine.name }} - R{{ machine.pricePerHour }}/hour
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="bookingForm.get('machineType')?.invalid && bookingForm.get('machineType')?.touched">
+                  Select a machine type
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="duration" class="form-label">Duration (hours) *</label>
+                <select class="form-select" id="duration" formControlName="duration">
+                  <option *ngFor="let dur of durations" [value]="dur">{{ dur }} hour(s)</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="bookingDate" class="form-label">Booking Date *</label>
+                <input type="date" class="form-control" id="bookingDate" formControlName="bookingDate"
+                  [min]="getMinDate()" [max]="getMaxDate()">
+                <div class="invalid-feedback" *ngIf="bookingForm.get('bookingDate')?.invalid && bookingForm.get('bookingDate')?.touched">
+                  Select a booking date
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="bookingTime" class="form-label">Booking Time *</label>
+                <select class="form-select" id="bookingTime" formControlName="bookingTime">
+                  <option value="">Select a time slot</option>
+                  <option *ngFor="let time of timeSlots" [value]="time" [disabled]="isTimeSlotDisabled(time)">
+                    {{ time }} {{ isTimeSlotDisabled(time) ? '(Booked)' : '' }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="bookingForm.get('bookingTime')?.invalid && bookingForm.get('bookingTime')?.touched">
+                  Select a time slot
+                </div>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-4" *ngIf="bookingForm.get('machineType')?.value">
+              <div class="d-flex justify-content-between border p-3 rounded">
+                <span>Price per hour:</span>
+                <strong>R{{ getSelectedMachinePrice() }}</strong>
+              </div>
+              <div class="d-flex justify-content-between border p-3 rounded mt-2">
+                <span>Duration:</span>
+                <strong>{{ bookingForm.get('duration')?.value }} hour(s)</strong>
+              </div>
+              <div class="d-flex justify-content-between border p-3 rounded mt-2 bg-light">
+                <span>Total Price:</span>
+                <strong>R{{ getTotalPrice() }}</strong>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-start gap-3">
+              <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || bookingForm.invalid">
+                <span *ngIf="!isSubmitting"><i class="bi bi-check-circle"></i> Book Equipment</span>
+                <span *ngIf="isSubmitting">
+                  <span class="spinner-border spinner-border-sm me-2"></span>Processing...
+                </span>
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="bookingForm.reset({ duration: 1 })" [disabled]="isSubmitting">
+                <i class="bi bi-x-circle"></i> Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

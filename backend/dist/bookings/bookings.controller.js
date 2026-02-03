@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingsController = void 0;
 const common_1 = require("@nestjs/common");
 const bookings_service_1 = require("./bookings.service");
-const booking_entity_1 = require("./booking.entity");
+const Booking_dto_1 = require("./DTO/Booking.dto");
 let BookingsController = class BookingsController {
     bookingsService;
     constructor(bookingsService) {
@@ -27,20 +27,11 @@ let BookingsController = class BookingsController {
     findAll() {
         return this.bookingsService.findAll();
     }
-    getStatistics() {
-        return this.bookingsService.getStatistics();
-    }
-    getAvailableSlots(date, machineType) {
-        return this.bookingsService.getAvailableSlots(date, machineType);
-    }
     findOne(id) {
         return this.bookingsService.findOne(id);
     }
     update(id, updateBookingDto) {
         return this.bookingsService.update(id, updateBookingDto);
-    }
-    cancel(id) {
-        return this.bookingsService.cancel(id);
     }
     delete(id) {
         this.bookingsService.delete(id);
@@ -52,7 +43,7 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [booking_entity_1.CreateBookingDto]),
+    __metadata("design:paramtypes", [Booking_dto_1.CreateBookingDto]),
     __metadata("design:returntype", void 0)
 ], BookingsController.prototype, "create", null);
 __decorate([
@@ -61,20 +52,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], BookingsController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)('statistics'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], BookingsController.prototype, "getStatistics", null);
-__decorate([
-    (0, common_1.Get)('available-slots'),
-    __param(0, (0, common_1.Query)('date')),
-    __param(1, (0, common_1.Query)('machineType')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", void 0)
-], BookingsController.prototype, "getAvailableSlots", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -87,16 +64,9 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, booking_entity_1.UpdateBookingDto]),
+    __metadata("design:paramtypes", [String, Booking_dto_1.UpdateBookingDto]),
     __metadata("design:returntype", void 0)
 ], BookingsController.prototype, "update", null);
-__decorate([
-    (0, common_1.Put)(':id/cancel'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], BookingsController.prototype, "cancel", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

@@ -18,6 +18,7 @@ let User = class User {
     email;
     password;
     role;
+    mustChangePassword;
 };
 exports.User = User;
 __decorate([
@@ -44,6 +45,10 @@ __decorate([
     (0, typeorm_1.Column)({ default: 'user' }),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "mustChangePassword", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

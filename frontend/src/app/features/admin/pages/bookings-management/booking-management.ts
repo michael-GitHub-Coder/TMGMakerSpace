@@ -10,7 +10,7 @@ import { BookingService, Booking } from '../../../../shared/booking/booking.serv
 @Component({
   selector: 'app-bookings-management',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SidebarComponent, FooterComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, SidebarComponent, HeaderComponent],
   templateUrl: './bookings-management.html',
   styleUrls: ['./booking-management.css']
 })
@@ -352,7 +352,7 @@ export class BookingsManagementComponent implements OnInit {
       b.surname,
       b.email,
       b.phone,
-      b.role,
+      // b.role,
       b.machineType,
       b.duration,
       b.totalPrice,

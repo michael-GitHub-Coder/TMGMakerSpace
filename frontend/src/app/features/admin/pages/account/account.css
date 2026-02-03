@@ -1,0 +1,72 @@
+.dashboard-layout {
+  display: flex;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 2rem;
+  background: #f9f9f9;
+  min-height: 100vh;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.profile-info h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+.profile-actions {
+  margin-top: 1rem;
+}
+
+.profile-actions .btn {
+  margin-right: 1rem;
+}
+
+.booking-history {
+  display: grid;
+  gap: 1rem;
+}
+
+.booking-card {
+  background: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.no-bookings {
+  text-align: center;
+  font-style: italic;
+  margin-top: 2rem;
+}
+
+.btn.primary {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn.secondary {
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+}

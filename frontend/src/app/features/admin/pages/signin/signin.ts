@@ -50,7 +50,9 @@ export class SigninComponent {
       finalize(() => this.isLoading = false)
     ).subscribe(success => {
       if (success) {
+
         const user = this.authService.getUser();
+        console.log('Logged in user:', user);
         if (user?.role === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else if (user?.role === 'member') {

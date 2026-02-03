@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
    
       if (user.role === 'admin') return this.router.createUrlTree(['/admin/dashboard']);
       if (user.role === 'member') return this.router.createUrlTree(['/member/dashboard']);
-      return this.router.createUrlTree(['/home']); // default landing for users/clients
+      return this.router.createUrlTree(['/home']); 
     }
 
     return true; // logged in and role is allowed
