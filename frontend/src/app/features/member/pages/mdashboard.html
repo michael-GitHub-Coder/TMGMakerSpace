@@ -18,10 +18,40 @@
       <!-- Bookings Card - Always visible -->
       <div class="dashboard-card">
         <div class="card-icon">
+          <i class="fas fa-key"></i>
+        </div>
+        <h3>Key Situation here</h3>
+        <!-- <p>{{ tot_bookings() }} Bookings</p> -->
+        <!-- <button
+          class="card-btn"
+          (click)="navigateTo('/booking'); $event.stopPropagation()"
+        >
+          Book 
+        </button> -->
+      </div>
+
+         <!-- Bookings Card - Always visible -->
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-alarm-clock"></i>
+        </div>
+        <h3>Feedback improvement </h3>
+        <!-- <p>{{ tot_bookings() }} Bookings</p> -->
+        <!-- <button
+          class="card-btn"
+          (click)="navigateTo('/booking'); $event.stopPropagation()"
+        >
+          Book 
+        </button> -->
+      </div>
+
+       <!-- Bookings Card - Always visible -->
+      <div class="dashboard-card">
+        <div class="card-icon">
           <i class="fas fa-calendar-check"></i>
         </div>
         <h3>Equipment Bookings</h3>
-        <p>{{ getBookingsCount() }} Bookings</p>
+        <p>{{ tot_bookings() }} Bookings</p>
         <button
           class="card-btn"
           (click)="navigateTo('/booking'); $event.stopPropagation()"
@@ -29,6 +59,7 @@
           Book 
         </button>
       </div>
+
     </div>
   </div>
 

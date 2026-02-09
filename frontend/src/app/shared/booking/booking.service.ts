@@ -35,6 +35,12 @@ export class BookingService implements OnDestroy {
     this.refreshInterval = setInterval(() => this.loadBookings(), 30000);
   }
 
+  findByEmail(email: string) {
+    return this.http.get<Booking[]>(
+      `${this.apiUrl}/by-email/${email}`
+    );
+  }
+  
   ngOnDestroy() {
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
@@ -92,7 +98,7 @@ export class BookingService implements OnDestroy {
         }
       });
       
-      console.log('Processed and sorted bookings:', sortedBookings);
+      console.log('Processed and sorted bookings 1:', sortedBookings);
       this.bookingsSubject.next(sortedBookings);
     } catch (error) {
       console.error('Error loading bookings:', error);

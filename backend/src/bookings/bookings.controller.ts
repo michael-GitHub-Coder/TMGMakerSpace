@@ -30,6 +30,11 @@ export class BookingsController {
     return this.bookingsService.findAll();
   }
 
+    
+  @Get('by-email/:email')
+  findByEmail(@Param('email') email: string) {
+    return this.bookingsService.findByEmail(email);
+  }
   // @Get('statistics')
   // getStatistics() {
   //   return this.bookingsService.getStatistics();
@@ -63,4 +68,6 @@ export class BookingsController {
     this.bookingsService.delete(id);
     return { message: 'Booking deleted successfully' };
   }
+
+
 }

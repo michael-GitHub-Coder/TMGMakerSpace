@@ -9,4 +9,5 @@ export declare class BookingsService {
     findOne(id: string): Promise<BookingEntity>;
     update(id: string, dto: UpdateBookingDto): Promise<BookingEntity>;
     delete(id: string): Promise<BookingEntity>;
+    findByEmail(email: string): Promise<BookingEntity[]>;
 }
