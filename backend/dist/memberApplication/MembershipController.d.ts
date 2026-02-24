@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { MembershipService } from './Membership.Service';
 import { UpdateMembershipDto } from './DTO/membership.dto';
 export declare class MembershipController {

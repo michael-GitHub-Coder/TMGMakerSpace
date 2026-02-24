@@ -33,10 +33,12 @@ export const PUBLIC_ROUTES: Routes = [
         path: 'apply',
         loadComponent: () => import('../Application/Application').then(m => m.ApplicationComponent)
     },
-
+    
+   
     // {
     //     path: 'sign-in',
     //     loadComponent: () => import('./pages/signin/Signin').then(m => m.SigninComponent)
     // },
     { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];  
+

@@ -17,6 +17,7 @@ const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const Membership_Module_1 = require("./memberApplication/Membership.Module");
 const MembershipAdmin_Module_1 = require("./memberAdmin/MembershipAdmin.Module");
+const keys_module_1 = require("./keys/keys.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,18 +25,15 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
-                type: 'mssql',
+                type: 'postgres',
                 host: 'localhost',
-                port: 1433,
-                username: 'TMG_USER',
-                password: 'TMG_USERPASS',
+                port: 5432,
+                username: 'postgres',
+                password: 'Ntokz@084',
                 database: 'TMGMakerSpace',
                 autoLoadEntities: true,
                 synchronize: true,
-                options: {
-                    encrypt: false,
-                    trustServerCertificate: true,
-                },
+                ssl: false,
             }),
             bookings_module_1.BookingsModule,
             email_module_1.EmailModule,
@@ -43,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             Membership_Module_1.MembershipModule,
             MembershipAdmin_Module_1.MembershipAdminModule,
+            keys_module_1.KeysModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

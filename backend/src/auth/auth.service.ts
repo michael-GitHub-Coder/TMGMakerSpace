@@ -42,40 +42,40 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  // async login(loginDto: LoginDto) {
-  //   const user = await this.validateUser(loginDto.email, loginDto.password);
-  //   if (!user) throw new UnauthorizedException('Invalid credentials');
-
-  //   const token = this.generateToken(user);
-
-  //   return {
-  //     status: 'success',
-  //     message: 'Login successful',
-  //     token, 
-  //     data: { user },
-  //   };
-  // }
-
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    if (user.mustChangePassword) {
-      return {
-        status: 'pending',
-        message: 'Password change required',
-        data: { userId: user.id, email: user.email },
-      };
-    }
-
     const token = this.generateToken(user);
+
     return {
       status: 'success',
       message: 'Login successful',
-      token,
+      token, 
       data: { user },
     };
   }
+
+  // async login(loginDto: LoginDto) {
+  //   const user = await this.validateUser(loginDto.email, loginDto.password);
+  //   if (!user) throw new UnauthorizedException('Invalid credentials');
+
+  //   if (user.mustChangePassword) {
+  //     return {
+  //       status: 'pending',
+  //       message: 'Password change required',
+  //       data: { userId: user.id, email: user.email },
+  //     };
+  //   }
+
+  //   const token = this.generateToken(user);
+  //   return {
+  //     status: 'success',
+  //     message: 'Login successful',
+  //     token,
+  //     data: { user },
+  //   };
+  // }
 
 
   async register(registerDto: RegisterDto) {

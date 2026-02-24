@@ -34,6 +34,11 @@ export const ADMIN_ROUTES: Routes = [
   canActivate: [AuthGuard]
   },
   {
+    path: 'key-management',
+    loadComponent: () => import('./pages/key-management/key-management').then(m => m.KeyManagementComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'create-admin',
     loadComponent: () => import('./pages/create-admin/create-admin').then(m => m.CreateAdminComponent),
     canActivate: [AuthGuard]
