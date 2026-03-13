@@ -52,7 +52,8 @@ export class SigninComponent {
       if (success) {
 
         const user = this.authService.getUser();
-        console.log('Logged in user:', user);
+        localStorage.setItem('role', user.role);
+
         if (user?.role === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else if (user?.role === 'member') {

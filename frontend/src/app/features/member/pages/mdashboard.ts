@@ -26,48 +26,64 @@ interface Admin {
   role: string;
 }
 
+// @Component({
+//   selector: 'app-dashboard',
+//   standalone: true,
+//   imports: [CommonModule, RouterModule, SidebarComponent, HeaderComponent],
+//   templateUrl: './mdashboard.html',
+//   styleUrls: ['./mdashboard.css']
+// })
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule,SidebarComponent, HeaderComponent],
   templateUrl: './mdashboard.html',
   styleUrls: ['./mdashboard.css']
 })
 
-
-
 export class DashboardComponent2 implements OnInit {
   name: string | null = null;
   role: string | null = null;
-  members: Member[] = [];
-  blogs: BlogPost[] = [];
-  admins: Admin[] = [];
+  email: string | null = null;
   bookings: Booking[] = [];
 
-  constructor(private router: Router, private bookingService: BookingService,private authService: AuthService ) {}
+  constructor(
+    private router: Router,
+    private bookingService: BookingService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     const user = this.authService.getCurrentUser();
 
-    this.role = localStorage.getItem('role');
-    this.name = user?.firstName || user?.name || 'Admin';
-    this.members = JSON.parse(localStorage.getItem('members') || '[]');
-    this.blogs = JSON.parse(localStorage.getItem('blogs') || '[]');
-    this.admins = JSON.parse(localStorage.getItem('admins') || '[]');
-    
-    // Subscribe to bookings updates
-    this.bookingService.bookings$.subscribe(bookings => {
-      this.bookings = bookings;
+    this.email = user?.email || null;
+    this.name = user?.firstName || user?.name || 'Member';
+    this.role = user?.role || null;
+
+    if (this.email) {
+      this.loadMyBookings(this.email);
+    }
+  }
+
+  loadMyBookings(email: string) {
+    this.bookingService.findByEmail(email).subscribe({
+      next: (bookings: Booking[]) => {
+        this.bookings = bookings;
+      },
+      error: () => {
+        this.bookings = [];
+      }
     });
+  }
+
+  tot_bookings(): number {
+    return this.bookings.length;
   }
 
   navigateTo(path: string) {
     this.router.navigate([path]);
   }
-
-  getBlogsCount(): number { return this.blogs.length; }
-  getMembersCount(): number { return this.members.length; }
-  getAdminsCount(): number { return this.admins.length; }
-  getBookingsCount(): number { return this.bookings.length; }
-  
 }
+
+

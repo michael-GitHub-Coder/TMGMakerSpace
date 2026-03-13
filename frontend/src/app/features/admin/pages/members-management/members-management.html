@@ -1,34 +1,46 @@
 <app-header></app-header>
-
 <div class="dashboard-layout">
   <app-sidebar></app-sidebar>
 
   <div class="dashboard-content">
     <div class="dashboard-header">
-      <h2>Members Management</h2>
-      <p>View, edit, or delete members</p>
+      <h2>Membership Applications</h2>
+      <p>View, approve, or reject applications</p>
     </div>
 
-    <div class="table-responsive">
+    <div *ngIf="loading">Loading applications...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <div class="table-responsive" *ngIf="!loading && members.length">
       <table class="dashboard-table">
         <thead>
           <tr>
-            <!-- <th>ID</th> -->
             <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
             <th>Documents</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let member of members">
-            <!-- <td>{{ member.id }}</td> -->
-            <td>{{ member.name }}</td>
+            <td>{{ member.name }} {{ member.surname }}</td>
             <td>{{ member.email }}</td>
-            <td>{{ member.documents }}</td>
+            <td>{{ member.phone }}</td>
+            <td>{{ member.status || 'pending' }}</td>
             <td>
-              <button class="btn edit" (click)="editMember(member.id)">Edit</button>
-              <button class="btn delete" (click)="deleteMember(member.id)">Delete</button>
+              <button class="btn view" (click)="viewDocuments(member)">
+                View Documents
+              </button>
+            </td>
+            <td>
+              <button class="btn approve" (click)="approveApplication(member.id)">
+                Approve
+              </button>
+              <button class="btn reject" (click)="rejectApplication(member.id)">
+                Reject
+              </button>
             </td>
           </tr>
         </tbody>
@@ -36,5 +48,47 @@
     </div>
   </div>
 </div>
+<!-- <app-footer></app-footer> -->
 
-<app-footer></app-footer>
+<!-- Modal Overlay -->
+<!-- <div class="modal-overlay" *ngIf="showDocumentsModal">
+  <div class="member-modal">
+    <div class="modal-header">
+      <h3>Documents for {{ selectedApplication?.name }} {{ selectedApplication?.surname }}</h3>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+  
+
+    <div class="modal-overlay" *ngIf="showDocumentsModal">
+      <div class="member-modal">
+        <div class="modal-header">
+          <h3>Documents for {{ selectedApplication?.name }} {{ selectedApplication?.surname }}</h3>
+          <button class="modal-close" (click)="closeModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+          <ng-container *ngFor="let doc of selectedApplication?.documents">
+            <div *ngIf="isPdf(doc)">
+              <iframe [src]="getDocumentUrl(doc) | safeUrl" width="100%" height="500px"></iframe>
+            </div>
+            <div *ngIf="isImage(doc)">
+              <img [src]="getDocumentUrl(doc) | safeUrl" alt="Document Image" style="max-width: 100%; margin-bottom: 1rem;" />
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn cancel" (click)="closeModal()">Close</button>
+          <button class="btn accept" (click)="approveApplication(selectedApplication?.id)">Approve</button>
+          <button class="btn reject" (click)="rejectApplication(selectedApplication?.id)">Reject</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn cancel" (click)="closeModal()">Close</button>
+      <button class="btn accept" (click)="approveApplication(selectedApplication?.id)">Approve</button>
+      <button class="btn reject" (click)="rejectApplication(selectedApplication?.id)">Reject</button>
+    </div>
+  </div>
+</div> -->

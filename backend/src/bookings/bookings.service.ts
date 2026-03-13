@@ -103,5 +103,18 @@ export class BookingsService {
     if (!booking) throw new NotFoundException();
     return this.bookingRepo.remove(booking);
   }
+
+  async findByEmail(email: string): Promise<BookingEntity[]> {
+    const bookings = await this.bookingRepo.find({
+      where: { email },
+      order: { bookingDate: 'DESC', bookingTime: 'DESC' },
+    });
+
+    if (!bookings.length) {
+      throw new NotFoundException(`No bookings found for email ${email}`);
+    }
+
+    return bookings;
+  }
 }
   

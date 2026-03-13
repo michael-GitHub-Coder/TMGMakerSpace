@@ -14,15 +14,17 @@ export class SidebarComponent implements OnInit {
   role: string | null = null;
   isSidebarOpen = false;
 
+  
   constructor(private router: Router) {}
 
   ngOnInit() {
     this.role = localStorage.getItem('role');
+    console.log('User role in sidebar ke:', this.role);
   }
 
   navigate(route: string) {
     this.router.navigate([route]);
-    this.isSidebarOpen = false; // close sidebar after navigation on mobile
+    this.isSidebarOpen = false; 
   }
 
   toggleSidebar() {
