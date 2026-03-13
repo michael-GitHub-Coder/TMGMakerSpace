@@ -16,7 +16,7 @@ interface User {
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent],
+  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent, FooterComponent],
   templateUrl: './account.html',
   styleUrls: ['./account.css']
 })

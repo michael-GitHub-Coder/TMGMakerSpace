@@ -1,0 +1,269 @@
+<app-header></app-header>
+
+<div class="dashboard-wrapper">
+  <div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+      <h2>Key Management</h2>
+      <p>Manage equipment keys and track their status</p>
+    </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card primary">
+      <div class="stat-icon">
+        <i class="bi bi-key-fill"></i>
+      </div>
+      <div class="stat-value">{{ getStats().total }}</div>
+      <div class="stat-label">Total Keys</div>
+    </div>
+    
+    <div class="stat-card success">
+      <div class="stat-icon">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="stat-value">{{ getStats().available }}</div>
+      <div class="stat-label">Available</div>
+    </div>
+    
+    <div class="stat-card accent">
+      <div class="stat-icon">
+        <i class="bi bi-key-fill"></i>
+      </div>
+      <div class="stat-value">{{ getStats().issued }}</div>
+      <div class="stat-label">Issued</div>
+    </div>
+    
+    <div class="stat-card secondary">
+      <div class="stat-icon">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </div>
+      <div class="stat-value">{{ getStats().returned }}</div>
+      <div class="stat-label">Returned</div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-section">
+    <div class="search-box">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Search by equipment name or member..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        />
+      </div>
+    </div>
+    
+    <div class="filter-box">
+      <select class="form-select" [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+        <option value="all">All Status</option>
+        <option value="available">Available</option>
+        <option value="issued">Issued</option>
+        <option value="returned">Returned</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Keys Table -->
+  <div class="table-section">
+    <div class="table-responsive">
+      <table class="table key-table">
+        <thead class="table-header">
+          <tr>
+            <th>Equipment Name</th>
+            <th>Member Name</th>
+            <th>Booking Date/Time</th>
+            <th>Key Status</th>
+            <th>Issued By</th>
+            <th>Issue Time</th>
+            <th>Return Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let key of filteredKeys" class="table-row">
+            <td class="equipment-cell">
+              <div class="equipment-info">
+                <i class="bi bi-tools equipment-icon"></i>
+                <span>{{ key.equipmentName }}</span>
+              </div>
+            </td>
+            <td class="member-cell">
+              <div class="member-info">
+                <i class="bi bi-person-circle member-icon"></i>
+                <span>{{ key.memberName }}</span>
+              </div>
+            </td>
+            <td class="booking-time">{{ key.bookingDateTime }}</td>
+            <td>
+              <span [class]="getStatusBadgeClass(key.keyStatus)">
+                <i class="bi" [ngClass]="getStatusIcon(key.keyStatus)"></i>
+                {{ key.keyStatus | titlecase }}
+              </span>
+            </td>
+            <td>{{ key.issuedBy || '-' }}</td>
+            <td>{{ key.issuedDateTime || '-' }}</td>
+            <td>{{ key.returnedDateTime || '-' }}</td>
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <button 
+                  class="btn btn-sm btn-issue"
+                  [disabled]="!canIssueKey(key)"
+                  (click)="openIssueKeyModal(issueKeyModal, key)"
+                  title="Issue Key"
+                >
+                  <i class="bi bi-key-fill"></i>
+                  Issue
+                </button>
+                
+                <button 
+                  class="btn btn-sm btn-return"
+                  [disabled]="!canReturnKey(key)"
+                  (click)="openReturnKeyModal(returnKeyModal, key)"
+                  title="Return Key"
+                >
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                  Return
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Empty State -->
+      <div *ngIf="filteredKeys.length === 0" class="empty-state">
+        <i class="bi bi-key"></i>
+        <h4>No keys found</h4>
+        <p>Try adjusting your search or filter criteria</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue Key Modal -->
+  <ng-template #issueKeyModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Issue Key</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="issue-form">
+        <div class="key-info">
+          <h6>Key Details</h6>
+          <div class="key-details">
+            <strong>Equipment:</strong> {{ selectedKey?.equipmentName }}<br>
+            <strong>Current Status:</strong> {{ selectedKey?.keyStatus }}
+          </div>
+        </div>
+        
+        <form (ngSubmit)="issueKey(modal)" #issueForm="ngForm">
+          <div class="form-section">
+            <h6>Person Information</h6>
+            <div class="form-group">
+              <label for="memberName">Full Name *</label>
+              <input 
+                type="text" 
+                id="memberName" 
+                name="memberName" 
+                class="form-control" 
+                [(ngModel)]="issueFormData.memberName" 
+                required
+                placeholder="Enter member's full name">
+            </div>
+            
+            <div class="form-group">
+              <label for="memberEmail">Email *</label>
+              <input 
+                type="email" 
+                id="memberEmail" 
+                name="memberEmail" 
+                class="form-control" 
+                [(ngModel)]="issueFormData.memberEmail" 
+                required
+                placeholder="Enter member's email">
+            </div>
+            
+            <div class="form-group">
+              <label for="memberPhone">Phone Number *</label>
+              <input 
+                type="tel" 
+                id="memberPhone" 
+                name="memberPhone" 
+                class="form-control" 
+                [(ngModel)]="issueFormData.memberPhone" 
+                required
+                placeholder="Enter member's phone number">
+            </div>
+            
+            <div class="form-group">
+              <label for="bookingDateTime">Booking Date & Time *</label>
+              <input 
+                type="datetime-local" 
+                id="bookingDateTime" 
+                name="bookingDateTime" 
+                class="form-control" 
+                [(ngModel)]="issueFormData.bookingDateTime" 
+                required>
+            </div>
+            
+                      </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
+              <i class="bi bi-x-circle"></i>
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="!issueForm.valid">
+              <i class="bi bi-check-circle"></i>
+              Issue Key
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Return Key Modal -->
+  <ng-template #returnKeyModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Return Key</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="confirmation-content">
+        <div class="confirmation-icon return">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </div>
+        <h6>Confirm Key Return</h6>
+        <p>Are you sure you want to mark the key as returned for:</p>
+        <div class="key-details">
+          <strong>Equipment:</strong> {{ selectedKey?.equipmentName }}<br>
+          <strong>Member:</strong> {{ selectedKey?.memberName }}<br>
+          <strong>Issued:</strong> {{ selectedKey?.issuedDateTime }}
+        </div>
+        <p class="warning-text">This action will mark the key as "Returned" and record the return timestamp.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="returnKey(modal)">
+        <i class="bi bi-check-circle"></i>
+        Confirm Return
+      </button>
+    </div>
+  </ng-template>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
