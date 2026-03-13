@@ -30,8 +30,7 @@ export class KeyManagementComponent implements OnInit {
     memberName: '',
     memberEmail: '',
     memberPhone: '',
-    bookingDateTime: '',
-    notes: ''
+    bookingDateTime: ''
   };
 
   constructor(
@@ -123,8 +122,7 @@ export class KeyManagementComponent implements OnInit {
       memberName: '',
       memberEmail: '',
       memberPhone: '',
-      bookingDateTime: '',
-      notes: ''
+      bookingDateTime: ''
     };
     
     this.modalService.open(content, {
@@ -155,8 +153,7 @@ export class KeyManagementComponent implements OnInit {
         memberName: this.issueFormData.memberName,
         memberEmail: this.issueFormData.memberEmail,
         memberPhone: this.issueFormData.memberPhone,
-        bookingDateTime: this.issueFormData.bookingDateTime,
-        notes: this.issueFormData.notes
+        bookingDateTime: this.issueFormData.bookingDateTime
       };
       
       // Call the service to issue the key with person details
