@@ -21,7 +21,7 @@ import { KeysModule } from './keys/keys.module';
       database: 'TMGMakerSpace',
 
       autoLoadEntities: true,
-      synchronize: true, // ❗ turn OFF in production
+      synchronize: true, //turn OFF in production
       ssl: false, // PostgreSQL does NOT use encrypt/trustServerCertificate
     }),
     BookingsModule,

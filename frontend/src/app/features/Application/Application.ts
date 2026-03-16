@@ -57,7 +57,7 @@ export class ApplicationComponent {
         this.selectedFiles
       );
 
-      this.successMessage = 'Application submitted successfully 🎉';
+      this.successMessage = 'Application submitted successfully ';
       this.applicationForm.reset();
       this.selectedFiles = [];
     } catch (error) {
