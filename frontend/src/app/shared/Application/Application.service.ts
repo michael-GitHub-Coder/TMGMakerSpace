@@ -67,6 +67,7 @@ export interface Application {
   phone: string;
   documents?: string[];
   status?: 'pending' | 'approved' | 'rejected';
+  createdAt?: string;
 }
 
 @Injectable({

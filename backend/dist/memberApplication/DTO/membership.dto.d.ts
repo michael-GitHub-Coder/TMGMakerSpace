@@ -8,4 +8,5 @@ export declare class CreateMembershipDto {
 export declare class UpdateMembershipDto {
     status?: 'approved' | 'rejected' | 'more_info_required';
     adminComment?: string;
+    rejectionReason?: string;
 }

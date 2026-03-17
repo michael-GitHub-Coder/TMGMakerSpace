@@ -16,9 +16,12 @@ import { KeysModule } from './keys/keys.module';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres',
-      password: 'Ntokz@084',
-      database: 'TMGMakerSpace',
+
+      username: 'postgres',              
+      password: 'password',    
+      database: 'TMGMakerSpace',    
+
+     
 
       autoLoadEntities: true,
       synchronize: true, //turn OFF in production

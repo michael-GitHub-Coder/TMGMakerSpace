@@ -29,7 +29,7 @@ exports.AppModule = AppModule = __decorate([
                 host: 'localhost',
                 port: 5432,
                 username: 'postgres',
-                password: 'Ntokz@084',
+                password: 'password',
                 database: 'TMGMakerSpace',
                 autoLoadEntities: true,
                 synchronize: true,

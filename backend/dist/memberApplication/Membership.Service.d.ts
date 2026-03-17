@@ -12,6 +12,6 @@ export declare class MembershipService {
     adminUpdate(id: number, dto: UpdateMembershipDto): Promise<MembershipApplicationEntity>;
     getAllApplications(): Promise<MembershipApplicationEntity[]>;
     approveApplication(id: number): Promise<MembershipApplicationEntity>;
-    rejectApplication(id: number, reason: string): Promise<MembershipApplicationEntity>;
+    rejectApplication(id: number, reason?: string): Promise<MembershipApplicationEntity>;
     private generateRandomPassword;
 }

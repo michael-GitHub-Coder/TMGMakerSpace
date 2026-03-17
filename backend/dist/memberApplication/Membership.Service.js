@@ -42,6 +42,7 @@ const typeorm_2 = require("typeorm");
 const MembershipApplication_Entity_1 = require("./MembershipApplication.Entity");
 const crypto = __importStar(require("crypto"));
 const user_entity_1 = require("../users/user.entity");
+const bcrypt = __importStar(require("bcrypt"));
 let MembershipService = class MembershipService {
     membershipRepo;
     userRepo;
@@ -85,15 +86,29 @@ let MembershipService = class MembershipService {
             throw new common_1.NotFoundException('Application not found');
         if (application.status !== 'pending')
             throw new common_1.BadRequestException('Application already processed');
+        const existingUser = await this.userRepo.findOne({
+            where: { email: application.email }
+        });
+        if (existingUser) {
+            console.log(`User with email ${application.email} already exists, skipping user creation`);
+            application.status = 'approved';
+            application.oneTimePassword = crypto.randomBytes(4).toString('hex');
+            return this.membershipRepo.save(application);
+        }
+        const plainPassword = this.generateRandomPassword();
+        console.log("Generated password:", plainPassword);
+        const hashedPassword = await bcrypt.hash(plainPassword, 10);
         const user = this.userRepo.create({
             firstName: application.name,
             lastName: application.surname,
             email: application.email,
             role: 'member',
-            password: this.generateRandomPassword(),
+            password: hashedPassword,
         });
+        console.log(`Creating user for email ${application.email} with name ${application.name} ${application.surname}`);
         await this.userRepo.save(user);
         application.status = 'approved';
+        application.oneTimePassword = crypto.randomBytes(4).toString('hex');
         return this.membershipRepo.save(application);
     }
     async rejectApplication(id, reason) {
@@ -103,7 +118,7 @@ let MembershipService = class MembershipService {
         if (application.status !== 'pending')
             throw new common_1.BadRequestException('Application already processed');
         application.status = 'rejected';
-        application.rejectionReason = reason;
+        application.rejectionReason = reason || 'No reason provided';
         return this.membershipRepo.save(application);
     }
     generateRandomPassword(length = 8) {
