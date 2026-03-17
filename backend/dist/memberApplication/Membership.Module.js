@@ -18,9 +18,15 @@ let MembershipModule = class MembershipModule {
 exports.MembershipModule = MembershipModule;
 exports.MembershipModule = MembershipModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([MembershipApplication_Entity_1.MembershipApplicationEntity, user_entity_1.User,])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([
+                MembershipApplication_Entity_1.MembershipApplicationEntity,
+                user_entity_1.User,
+            ])
+        ],
         providers: [Membership_Service_1.MembershipService],
         controllers: [MembershipController_1.MembershipController],
+        exports: [Membership_Service_1.MembershipService],
     })
 ], MembershipModule);
 //# sourceMappingURL=Membership.Module.js.map

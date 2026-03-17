@@ -22,9 +22,9 @@ let MembershipApplicationEntity = class MembershipApplicationEntity {
     oneTimePassword;
     rejectionReason;
     applicationCode;
+    adminComment;
     createdAt;
     updatedAt;
-    adminComment;
 };
 exports.MembershipApplicationEntity = MembershipApplicationEntity;
 __decorate([
@@ -67,6 +67,10 @@ __decorate([
     (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], MembershipApplicationEntity.prototype, "applicationCode", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], MembershipApplicationEntity.prototype, "adminComment", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

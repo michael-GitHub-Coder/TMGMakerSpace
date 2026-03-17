@@ -1,135 +1,259 @@
 <app-header></app-header>
-
 <div class="dashboard-layout">
   <app-sidebar></app-sidebar>
 
   <div class="dashboard-content">
-
     <div class="dashboard-header">
-      <h2>Membership Applications</h2>
-      <p>View, approve, or reject applications</p>
+      <!-- <h2>Membership Applications</h2> -->
+   
     </div>
 
-    <div *ngIf="loading">Loading applications...</div>
-    <div *ngIf="error" class="error">{{ error }}</div>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p style="margin-left: 1rem;">Loading applications...</p>
+    </div>
 
-    <div class="table-responsive" *ngIf="!loading && members.length">
+    <!-- Error State -->
+    <div *ngIf="error" class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ error }}
+    </div>
 
-      <table class="dashboard-table">
-
+    <!-- Members Table -->
+    <div class="members-table-container" *ngIf="!loading && members.length > 0">
+      <table class="members-table">
         <thead>
           <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
             <th>Status</th>
+            <th>Applied Date</th>
             <th>Documents</th>
             <th>Actions</th>
           </tr>
         </thead>
-
         <tbody>
-
-          <tr *ngFor="let member of members">
-
-            <td>{{ member.name }} {{ member.surname }}</td>
+          <tr *ngFor="let member of paginatedMembers">
+            <td>
+              <div class="member-info">
+                <div class="member-avatar">
+                  {{ member.name?.charAt(0) }}{{ member.surname?.charAt(0) }}
+                </div>
+                <div class="member-details">
+                  <h4>{{ member.name }} {{ member.surname }}</h4>
+                </div>
+              </div>
+            </td>
             <td>{{ member.email }}</td>
             <td>{{ member.phone }}</td>
-
-            <td>{{ member.status || 'pending' }}</td>
-
             <td>
-              <button class="btn view" (click)="viewDocuments(member)">
-                View Documents
+              <span [class]="getStatusClass(member.status)">
+                {{ member.status || 'pending' }}
+              </span>
+            </td>
+            <td>{{ formatDate(member.createdAt) }}</td>
+            <td>
+              <button 
+                class="action-btn view" 
+                (click)="viewDocuments(member)"
+                title="View Documents">
+                <i class="fas fa-file-alt"></i>
+                {{ member.documents?.length || 0 }}
               </button>
             </td>
-
             <td>
-
-              <button
-                class="btn approve"
-                (click)="approveApplication(member)">
-                Approve
-              </button>
-
-              <button
-                class="btn reject"
-                (click)="rejectApplication(member)">
-                Reject
-              </button>
-
+              <div class="action-buttons">
+                <button 
+                  class="action-btn edit"
+                  (click)="approveApplication(member.id)"
+                  [disabled]="member.status === 'approved'"
+                  title="Approve Application">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button 
+                  class="action-btn delete"
+                  (click)="viewDocuments(member); openRejectModal(member.id)"
+                  [disabled]="member.status === 'rejected'"
+                  title="Reject Application">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </td>
-
           </tr>
-
         </tbody>
-
       </table>
 
+      <!-- Pagination Controls -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Showing {{ getStartIndex() }} to {{ getEndIndex() }} of {{ filteredMembers.length }} entries
+        </div>
+        
+        <div class="pagination">
+          <button 
+            class="pagination-btn" 
+            (click)="previousPage()"
+            [disabled]="currentPage === 1">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          
+          <button 
+            *ngFor="let page of pages"
+            class="pagination-btn"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+          
+          <button 
+            class="pagination-btn" 
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && members.length === 0">
+      <i class="fas fa-inbox"></i>
+      <h4>No Applications Found</h4>
+      <p>There are no membership applications to display at the moment.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Document Preview Modal -->
+<div class="modal-overlay" *ngIf="showDocumentsModal && selectedApplication" (click)="closeModal()">
+  <div class="document-preview-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <h3>Documents - {{ selectedApplication.name }} {{ selectedApplication.surname }}</h3>
+        <p class="doc-counter">
+          Document {{ currentDocumentIndex + 1 }} of {{ selectedApplication.documents?.length || 0 }}
+        </p>
+      </div>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+
+    <!-- Document Info Bar -->
+    <div class="document-info-bar">
+      <div class="file-details">
+        <span class="file-name">📄 {{ getCurrentDocumentName() }}</span>
+      </div>
+      <span class="status-badge" [class]="selectedApplication.status || 'pending'">
+        {{ selectedApplication.status || 'pending' }}
+      </span>
+    </div>
+
+    <!-- Document Viewer -->
+    <div class="modal-body document-viewer">
+      
+      <!-- Image Preview -->
+      <div class="preview-container" *ngIf="currentDocumentType === 'image'">
+        <img [src]="currentDocumentUrl" alt="Document preview" />
+      </div>
+
+      <!-- PDF Preview -->
+      <div class="preview-container pdf-container" *ngIf="currentDocumentType === 'pdf'">
+        <iframe [src]="currentDocumentUrl" frameborder="0"></iframe>
+      </div>
+
+      <!-- Unsupported File Type -->
+      <div class="preview-container unsupported" *ngIf="currentDocumentType === 'other'">
+        <div class="unsupported-message">
+          <div class="icon">📄</div>
+          <h3>{{ getCurrentDocumentName() }}</h3>
+          <p>Preview not available for this file type</p>
+          <a [href]="currentDocumentUrl" target="_blank" class="btn-download">
+            <i class="fas fa-download"></i> Download File
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Footer -->
+    <div class="modal-footer navigation-footer">
+      <button 
+        class="btn-nav" 
+        (click)="previousDocument()" 
+        [disabled]="currentDocumentIndex === 0">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      
+      <div class="page-indicators">
+        <span 
+          *ngFor="let doc of selectedApplication.documents; let i = index" 
+          class="page-dot" 
+          [class.active]="i === currentDocumentIndex"
+          (click)="loadDocument(i)"
+          [title]="'Document ' + (i + 1)">
+        </span>
+      </div>
+
+      <button 
+        class="btn-nav" 
+        (click)="nextDocument()" 
+        [disabled]="currentDocumentIndex >= (selectedApplication.documents?.length || 1) - 1">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Action Footer -->
+    <div class="modal-footer action-footer">
+      <button class="btn btn-cancel" (click)="closeModal()">
+        <i class="fas fa-times"></i> Close
+      </button>
+      <button 
+        class="btn btn-approve" 
+        (click)="approveApplication(selectedApplication.id)"
+        [disabled]="selectedApplication.status === 'approved'">
+        <i class="fas fa-check"></i> Approve Application
+      </button>
+      <button 
+        class="btn btn-reject" 
+        (click)="openRejectModal(selectedApplication.id)"
+        [disabled]="selectedApplication.status === 'rejected'">
+        <i class="fas fa-ban"></i> Reject Application
+      </button>
     </div>
 
   </div>
 </div>
 
-
-<!-- DOCUMENT MODAL -->
-
-<div class="modal-overlay" *ngIf="showDocumentsModal">
-
-  <div class="member-modal">
-
+<!-- Rejection Reason Modal -->
+<div class="modal-overlay" *ngIf="showRejectModal" (click)="closeRejectModal()">
+  <div class="rejection-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-
-      <h3>
-        Documents for
-        {{ selectedApplication?.name }}
-        {{ selectedApplication?.surname }}
-      </h3>
-
-      <button class="modal-close" (click)="closeModal()">×</button>
-
+      <h3>Reject Application</h3>
+      <button class="modal-close" (click)="closeRejectModal()">×</button>
     </div>
 
     <div class="modal-body">
-
-      <ng-container *ngFor="let doc of selectedApplication?.documents">
-
-        <div *ngIf="isPdf(doc)">
-          <iframe
-            [src]="getDocumentUrl(doc) | safeUrl"
-            width="100%"
-            height="500">
-          </iframe>
-        </div>
-
-        <div *ngIf="isImage(doc)">
-          <img
-            [src]="getDocumentUrl(doc) | safeUrl"
-            style="max-width:100%">
-        </div>
-
-      </ng-container>
-
+      <p class="rejection-instruction">
+        Please provide a reason for rejecting this application:
+      </p>
+      <textarea 
+        [(ngModel)]="rejectionReason" 
+        placeholder="Enter rejection reason..."
+        rows="5"
+        class="form-control">
+      </textarea>
     </div>
 
     <div class="modal-footer">
-
-      <button class="btn cancel" (click)="closeModal()">Close</button>
-
-      <button
-        class="btn approve"
-        (click)="approveApplication(selectedApplication)">
-        Approve
+      <button class="btn btn-cancel" (click)="closeRejectModal()">
+        Cancel
       </button>
-
-      <button
-        class="btn reject"
-        (click)="rejectApplication(selectedApplication)">
-        Reject
+      <button class="btn btn-reject" (click)="confirmRejection()">
+        Confirm Rejection
       </button>
-
     </div>
-
   </div>
-
 </div>

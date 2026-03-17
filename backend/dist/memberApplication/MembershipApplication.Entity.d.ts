@@ -9,7 +9,7 @@ export declare class MembershipApplicationEntity {
     oneTimePassword?: string;
     rejectionReason?: string;
     applicationCode: string;
+    adminComment?: string;
     createdAt: Date;
     updatedAt: Date;
-    adminComment: string;
 }
