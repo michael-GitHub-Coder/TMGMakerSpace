@@ -30,9 +30,15 @@ export class KeysController {
     @Param('id') id: string,
     @Body() issueRequest: { issuedBy: string; memberName: string; memberEmail: string; memberPhone: string; bookingDateTime: string; notes?: string }
   ): Promise<Key> {
+    console.log(`[CONTROLLER] Received key issuance request for key ID: ${id}`);
+    console.log(`[CONTROLLER] Request body:`, issueRequest);
+    
     try {
-      return await this.keysService.issueKey(id, issueRequest);
+      const result = await this.keysService.issueKey(id, issueRequest);
+      console.log(`[CONTROLLER] Key issuance successful for key ${id}`);
+      return result;
     } catch (error) {
+      console.error(`[CONTROLLER] Key issuance failed for key ${id}:`, error);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

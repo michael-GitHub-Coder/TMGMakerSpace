@@ -8,6 +8,8 @@ export declare class BookingsController {
     findByEmail(email: string): Promise<import("./booking.entity").BookingEntity[]>;
     findOne(id: string): Promise<import("./booking.entity").BookingEntity>;
     update(id: string, updateBookingDto: UpdateBookingDto): Promise<import("./booking.entity").BookingEntity>;
+    cancel(id: string): Promise<import("./booking.entity").BookingEntity>;
+    updateStatus(id: string, updateData: UpdateBookingDto): Promise<import("./booking.entity").BookingEntity>;
     delete(id: string): {
         message: string;
     };

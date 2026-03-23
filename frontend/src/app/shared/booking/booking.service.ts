@@ -28,6 +28,7 @@ export class BookingService implements OnDestroy {
   private bookingsSubject = new BehaviorSubject<Booking[]>([]);
   public bookings$ = this.bookingsSubject.asObservable();
   private refreshInterval: any;
+  private localUpdates = new Map<string, Partial<Booking>>(); // Track local changes
 
   constructor(private http: HttpClient) {
     this.loadBookings();
@@ -65,8 +66,11 @@ export class BookingService implements OnDestroy {
       const typedBookings = response.map(booking => {
         console.log('Processing booking:', booking);
         
+        // Apply any local updates we have tracked
+        const localUpdate = this.localUpdates.get(booking.id);
+        
         // Normalize booking data with fallback values
-        return {
+        const normalizedBooking = {
           id: booking.id || '',
           // role: booking.role || 'user',
           name: booking.name || '',
@@ -84,6 +88,13 @@ export class BookingService implements OnDestroy {
             : 'pending') as 'pending' | 'confirmed' | 'cancelled',
           createdAt: booking.createdAt || new Date().toISOString()
         };
+        
+        // Apply local update if exists
+        if (localUpdate) {
+          Object.assign(normalizedBooking, localUpdate);
+        }
+        
+        return normalizedBooking;
       });
       
       // Sort bookings by date and time (newest first)
@@ -213,6 +224,8 @@ export class BookingService implements OnDestroy {
       await firstValueFrom(
         this.http.patch<Booking>(`${this.apiUrl}/${id}`, { status: 'cancelled' as const })
       );
+      // Track the local update
+      this.localUpdates.set(id, { status: 'cancelled' as const });
       // Update the local state
       const currentBookings = this.bookingsSubject.value;
       const updatedBookings = currentBookings.map(booking => 

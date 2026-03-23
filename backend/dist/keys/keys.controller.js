@@ -34,10 +34,15 @@ let KeysController = class KeysController {
         return key;
     }
     async issueKey(id, issueRequest) {
+        console.log(`[CONTROLLER] Received key issuance request for key ID: ${id}`);
+        console.log(`[CONTROLLER] Request body:`, issueRequest);
         try {
-            return await this.keysService.issueKey(id, issueRequest);
+            const result = await this.keysService.issueKey(id, issueRequest);
+            console.log(`[CONTROLLER] Key issuance successful for key ${id}`);
+            return result;
         }
         catch (error) {
+            console.error(`[CONTROLLER] Key issuance failed for key ${id}:`, error);
             throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
         }
     }

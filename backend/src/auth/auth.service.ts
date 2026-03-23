@@ -1,5 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { MembershipApplicationEntity } from '../memberApplication/MembershipApplication.Entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ChangePasswordDto } from './DTO/ChangePasswordDto';
@@ -22,22 +25,62 @@ export interface RegisterDto {
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService, 
+    private jwtService: JwtService,
+    @InjectRepository(MembershipApplicationEntity)
+    private membershipApplicationRepo: Repository<MembershipApplicationEntity>,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
+    console.log(`[AUTH] Validating user: ${email}`);
+    
     const user = await this.usersService.findByEmail(email);
-    if (!user) return null;
+    if (!user) {
+      console.log(`[AUTH] User not found: ${email}`);
+      return null;
+    }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return null;
+    console.log(`[AUTH] User found: ${user.email}, role: ${user.role}`);
+
+    // For members, validate against OTP from membership application
+    if (user.role === 'member') {
+      console.log(`[AUTH] Member login detected for: ${email}`);
+      const membershipApplication = await this.membershipApplicationRepo.findOne({
+        where: { email: email, status: 'approved' }
+      });
+      
+      if (!membershipApplication) {
+        console.log(`[AUTH] No approved membership application found for: ${email}`);
+        return null;
+      }
+      
+      if (!membershipApplication.oneTimePassword) {
+        console.log(`[AUTH] No OTP found for member: ${email}`);
+        return null;
+      }
+      
+      console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
+      console.log(`[AUTH] Comparing input password: ${password} with OTP`);
+      
+      // Compare password with OTP (case-insensitive)
+      const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
+      console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
+      
+      if (!isOtpValid) return null;
+    } else {
+      // For non-members, validate against regular password
+      console.log(`[AUTH] Non-member login detected for: ${email}`);
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log(`[AUTH] Password validation result: ${isPasswordValid}`);
+      if (!isPasswordValid) return null;
+    }
 
     const { password: pwd, ...result } = user;
+    console.log(`[AUTH] Login successful for: ${email}`);
     return result;
   }
 
   // Create JWT token
-  private generateToken(user: any) {
+  generateToken(user: any) {
     const payload = { sub: user.id, email: user.email, role: user.role };
     return this.jwtService.sign(payload);
   }

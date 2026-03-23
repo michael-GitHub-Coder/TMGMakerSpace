@@ -1,41 +1,37 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { BookingEntity } from './booking.entity';
-import { CreateBookingDto,UpdateBookingDto } from './DTO/Booking.dto';
-
+import { CreateBookingDto } from './DTO/Booking.dto';
+import { BookingEmailService } from './booking-email.service';
 
 @Injectable()
 export class BookingsService {
+  private readonly logger = new Logger(BookingsService.name);
+  
   constructor(
     @InjectRepository(BookingEntity)
-    private readonly bookingRepo: Repository<BookingEntity>
+    private readonly bookingRepo: Repository<BookingEntity>,
+    private readonly bookingEmailService: BookingEmailService
   ) {}
 
   async create(createBookingDto: CreateBookingDto): Promise<BookingEntity> {
-    const startTime = new Date(`${createBookingDto.bookingDate}T${createBookingDto.bookingTime}`);
-    const endTime = new Date(startTime);
-    endTime.setHours(endTime.getHours() + createBookingDto.duration);
+    this.logger.log(`[BOOKING] Creating booking for ${createBookingDto.email}`);
+    this.logger.log(`[BOOKING] Booking data:`, createBookingDto);
 
-    const conflict = await this.bookingRepo
-      .createQueryBuilder('booking')
-      .where('booking.machineType = :machineType', { machineType: createBookingDto.machineType })
-      .andWhere('booking.status != :cancelled', { cancelled: 'cancelled' })
-      .andWhere('booking.bookingDate = :bookingDate', { bookingDate: createBookingDto.bookingDate })
-      .andWhere(
-        `(
-          (booking.bookingTime <= :newStartTime AND DATEADD(hour, booking.duration, booking.bookingTime) > :newStartTime)
-          OR
-          (booking.bookingTime < :newEndTime AND DATEADD(hour, booking.duration, booking.bookingTime) >= :newEndTime)
-          OR
-          (booking.bookingTime >= :newStartTime AND DATEADD(hour, booking.duration, booking.bookingTime) <= :newEndTime)
-        )`,
-        { newStartTime: createBookingDto.bookingTime, newEndTime: endTime.toTimeString().slice(0,5) }
-      )
-      .getOne();
+    // Simple conflict check - just check exact time slot for now
+    const conflict = await this.bookingRepo.findOne({
+      where: {
+        machineType: createBookingDto.machineType,
+        bookingDate: createBookingDto.bookingDate,
+        bookingTime: createBookingDto.bookingTime,
+        status: Not('cancelled')
+      }
+    });
 
     if (conflict) {
-      throw new ConflictException('This slot overlaps with an existing booking.');
+      this.logger.warn(`[BOOKING] Conflict detected for slot ${createBookingDto.bookingDate} ${createBookingDto.bookingTime}`);
+      throw new ConflictException('This slot is already booked.');
     }
 
     const newBooking = this.bookingRepo.create({
@@ -44,77 +40,84 @@ export class BookingsService {
       status: 'pending'
     });
 
-    return this.bookingRepo.save(newBooking);
+    try {
+      const savedBooking = await this.bookingRepo.save(newBooking);
+      this.logger.log(`[BOOKING] Booking saved successfully: ${savedBooking.id}`);
+      
+      // Send booking confirmation email
+      if (this.bookingEmailService) {
+        try {
+          await this.bookingEmailService.sendBookingConfirmation(savedBooking);
+          this.logger.log(`[BOOKING] Confirmation email sent for booking ${savedBooking.id}`);
+        } catch (emailError) {
+          this.logger.error(`[BOOKING] Failed to send confirmation email:`, emailError);
+          // Don't fail the booking if email fails
+        }
+      } else {
+        this.logger.warn(`[BOOKING] BookingEmailService not available - skipping email`);
+      }
+
+      return savedBooking;
+    } catch (saveError) {
+      this.logger.error(`[BOOKING] Failed to save booking:`, saveError);
+      throw saveError;
+    }
   }
-
-  // async create(createBookingDto: CreateBookingDto): Promise<BookingEntity> {
-  //   // Check conflicts
-  //   console.log('CreateBookingDto:', createBookingDto);
-
-  //   const conflict = await this.bookingRepo.findOne({
-  //     where: {
-  //       bookingDate: createBookingDto.bookingDate,
-  //       bookingTime: createBookingDto.bookingTime,
-  //       machineType: createBookingDto.machineType,
-  //       status: Not('cancelled')
-  //     }
-  //   });
-
-  //   if (conflict) {
-  //     throw new ConflictException('This slot is already booked.');
-  //   }
-
-  //   const newBooking = this.bookingRepo.create({
-  //     ...createBookingDto,
-  //     id: `BK${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-  //     status: 'pending'
-  //   });
-
-  //   return this.bookingRepo.save(newBooking);
-  // }
 
   findAll(): Promise<BookingEntity[]> {
-    return this.bookingRepo.find({ order: { bookingDate: 'DESC', bookingTime: 'DESC' } });
+    return this.bookingRepo.find({
+      order: { bookingDate: 'DESC', bookingTime: 'DESC' }
+    });
   }
 
-  // findOne(id: string): Promise<BookingEntity> {
-  //   return this.bookingRepo.findOne({ where: { id } });
-  // }
   async findOne(id: string): Promise<BookingEntity> {
     const booking = await this.bookingRepo.findOne({ where: { id } });
-
     if (!booking) {
-      throw new NotFoundException(`Booking with id ${id} not found`);
+      throw new Error('Booking not found');
     }
-
     return booking;
   }
 
-  async update(id: string, dto: UpdateBookingDto): Promise<BookingEntity> {
+  async update(id: string, updateBookingDto: Partial<CreateBookingDto>): Promise<BookingEntity> {
     const booking = await this.findOne(id);
-    if (!booking) throw new NotFoundException();
-
-    Object.assign(booking, dto);
+    Object.assign(booking, updateBookingDto);
     return this.bookingRepo.save(booking);
   }
 
-  async delete(id: string) {
+  async remove(id: string): Promise<void> {
     const booking = await this.findOne(id);
-    if (!booking) throw new NotFoundException();
-    return this.bookingRepo.remove(booking);
+    await this.bookingRepo.remove(booking);
   }
 
   async findByEmail(email: string): Promise<BookingEntity[]> {
-    const bookings = await this.bookingRepo.find({
+    return this.bookingRepo.find({ 
       where: { email },
-      order: { bookingDate: 'DESC', bookingTime: 'DESC' },
+      order: { bookingDate: 'DESC', bookingTime: 'DESC' }
     });
+  }
 
-    if (!bookings.length) {
-      throw new NotFoundException(`No bookings found for email ${email}`);
+  async delete(id: string): Promise<void> {
+    await this.remove(id);
+  }
+
+  async cancel(id: string): Promise<BookingEntity> {
+    const booking = await this.findOne(id);
+    
+    // Only allow cancellation of pending or confirmed bookings
+    if (booking.status === 'cancelled') {
+      throw new Error('Booking is already cancelled');
     }
-
-    return bookings;
+    
+    // Update the booking status to cancelled
+    booking.status = 'cancelled';
+    
+    try {
+      const cancelledBooking = await this.bookingRepo.save(booking);
+      this.logger.log(`[BOOKING] Booking ${id} cancelled successfully`);
+      return cancelledBooking;
+    } catch (error) {
+      this.logger.error(`[BOOKING] Failed to cancel booking ${id}:`, error);
+      throw new Error('Failed to cancel booking');
+    }
   }
 }
-  

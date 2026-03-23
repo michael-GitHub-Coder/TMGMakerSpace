@@ -209,9 +209,6 @@
             </td>
             <td class="text-end pe-4">
               <div class="btn-group btn-group-sm" dropdown>
-                <button type="button" class="btn btn-outline-primary" [routerLink]="['/admin/bookings', booking.id]" title="View Details">
-                  <i class="bi bi-eye"></i>
-                </button>
                 <button type="button" class="btn btn-outline-secondary" (click)="editBooking(booking)" title="Edit Booking">
                   <i class="bi bi-pencil"></i>
                 </button>
@@ -295,7 +292,7 @@
               <div>
                 <h6 class="text-uppercase text-muted small mb-1">Avg. Booking</h6>
                 <h3 class="mb-0">
-                  {{ filteredBookings.length > 0 ? 'R' + (getTotalRevenue() / filteredBookings.length | number:'1.2-2') : 'R0.00' }}
+                  {{ getConfirmedBookingsCount() > 0 ? 'R' + (getTotalRevenue() / getConfirmedBookingsCount() | number:'1.2-2') : 'R0.00' }}
                 </h3>
               </div>
               <div class="bg-info bg-opacity-10 p-3 rounded-circle">

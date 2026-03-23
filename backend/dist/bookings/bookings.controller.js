@@ -36,6 +36,15 @@ let BookingsController = class BookingsController {
     update(id, updateBookingDto) {
         return this.bookingsService.update(id, updateBookingDto);
     }
+    cancel(id) {
+        return this.bookingsService.cancel(id);
+    }
+    updateStatus(id, updateData) {
+        if (updateData.status === 'cancelled') {
+            return this.bookingsService.cancel(id);
+        }
+        return this.bookingsService.update(id, updateData);
+    }
     delete(id) {
         this.bookingsService.delete(id);
         return { message: 'Booking deleted successfully' };
@@ -77,6 +86,21 @@ __decorate([
     __metadata("design:paramtypes", [String, Booking_dto_1.UpdateBookingDto]),
     __metadata("design:returntype", void 0)
 ], BookingsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Put)(':id/cancel'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], BookingsController.prototype, "cancel", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Booking_dto_1.UpdateBookingDto]),
+    __metadata("design:returntype", void 0)
+], BookingsController.prototype, "updateStatus", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

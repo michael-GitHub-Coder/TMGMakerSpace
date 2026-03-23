@@ -3,10 +3,53 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+// South African timezone utility
+class SouthAfricanDateUtil {
+  private static readonly SA_TIMEZONE = 'Africa/Johannesburg';
+  
+  static now(): string {
+    const now = new Date();
+    // Convert to South African time and format cleanly
+    const saTime = new Date(now.toLocaleString("en-US", { timeZone: this.SA_TIMEZONE }));
+    return this.formatClean(saTime);
+  }
+  
+  static formatForDisplay(date: Date | string): string {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleString("en-ZA", { 
+      timeZone: this.SA_TIMEZONE,
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  
+  static formatForBooking(date: Date | string): string {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const saTime = new Date(dateObj.toLocaleString("en-US", { timeZone: this.SA_TIMEZONE }));
+    return this.formatClean(saTime);
+  }
+  
+  private static formatClean(date: Date): string {
+    // Format: YYYY-MM-DD HH:MM (clean format without seconds, milliseconds and timezone)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  }
+}
+
 export interface KeyManagement {
   id: string;
   equipmentName: string;
   memberName: string;
+  memberEmail?: string;
+  memberPhone?: string;
   bookingDateTime: string;
   keyStatus: 'available' | 'issued' | 'returned';
   issuedBy?: string;

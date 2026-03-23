@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const bookings_service_1 = require("./bookings.service");
 const bookings_controller_1 = require("./bookings.controller");
 const booking_entity_1 = require("./booking.entity");
+const booking_email_service_1 = require("./booking-email.service");
 let BookingsModule = class BookingsModule {
 };
 exports.BookingsModule = BookingsModule;
@@ -20,7 +21,7 @@ exports.BookingsModule = BookingsModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forFeature([booking_entity_1.BookingEntity]),
         ],
-        providers: [bookings_service_1.BookingsService],
+        providers: [bookings_service_1.BookingsService, booking_email_service_1.BookingEmailService],
         controllers: [bookings_controller_1.BookingsController],
     })
 ], BookingsModule);

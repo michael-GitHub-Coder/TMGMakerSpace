@@ -11,82 +11,116 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var BookingsService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const booking_entity_1 = require("./booking.entity");
-let BookingsService = class BookingsService {
+const booking_email_service_1 = require("./booking-email.service");
+let BookingsService = BookingsService_1 = class BookingsService {
     bookingRepo;
-    constructor(bookingRepo) {
+    bookingEmailService;
+    logger = new common_1.Logger(BookingsService_1.name);
+    constructor(bookingRepo, bookingEmailService) {
         this.bookingRepo = bookingRepo;
+        this.bookingEmailService = bookingEmailService;
     }
     async create(createBookingDto) {
-        const startTime = new Date(`${createBookingDto.bookingDate}T${createBookingDto.bookingTime}`);
-        const endTime = new Date(startTime);
-        endTime.setHours(endTime.getHours() + createBookingDto.duration);
-        const conflict = await this.bookingRepo
-            .createQueryBuilder('booking')
-            .where('booking.machineType = :machineType', { machineType: createBookingDto.machineType })
-            .andWhere('booking.status != :cancelled', { cancelled: 'cancelled' })
-            .andWhere('booking.bookingDate = :bookingDate', { bookingDate: createBookingDto.bookingDate })
-            .andWhere(`(
-          (booking.bookingTime <= :newStartTime AND DATEADD(hour, booking.duration, booking.bookingTime) > :newStartTime)
-          OR
-          (booking.bookingTime < :newEndTime AND DATEADD(hour, booking.duration, booking.bookingTime) >= :newEndTime)
-          OR
-          (booking.bookingTime >= :newStartTime AND DATEADD(hour, booking.duration, booking.bookingTime) <= :newEndTime)
-        )`, { newStartTime: createBookingDto.bookingTime, newEndTime: endTime.toTimeString().slice(0, 5) })
-            .getOne();
+        this.logger.log(`[BOOKING] Creating booking for ${createBookingDto.email}`);
+        this.logger.log(`[BOOKING] Booking data:`, createBookingDto);
+        const conflict = await this.bookingRepo.findOne({
+            where: {
+                machineType: createBookingDto.machineType,
+                bookingDate: createBookingDto.bookingDate,
+                bookingTime: createBookingDto.bookingTime,
+                status: (0, typeorm_2.Not)('cancelled')
+            }
+        });
         if (conflict) {
-            throw new common_1.ConflictException('This slot overlaps with an existing booking.');
+            this.logger.warn(`[BOOKING] Conflict detected for slot ${createBookingDto.bookingDate} ${createBookingDto.bookingTime}`);
+            throw new common_1.ConflictException('This slot is already booked.');
         }
         const newBooking = this.bookingRepo.create({
             ...createBookingDto,
             id: `BK${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
             status: 'pending'
         });
-        return this.bookingRepo.save(newBooking);
+        try {
+            const savedBooking = await this.bookingRepo.save(newBooking);
+            this.logger.log(`[BOOKING] Booking saved successfully: ${savedBooking.id}`);
+            if (this.bookingEmailService) {
+                try {
+                    await this.bookingEmailService.sendBookingConfirmation(savedBooking);
+                    this.logger.log(`[BOOKING] Confirmation email sent for booking ${savedBooking.id}`);
+                }
+                catch (emailError) {
+                    this.logger.error(`[BOOKING] Failed to send confirmation email:`, emailError);
+                }
+            }
+            else {
+                this.logger.warn(`[BOOKING] BookingEmailService not available - skipping email`);
+            }
+            return savedBooking;
+        }
+        catch (saveError) {
+            this.logger.error(`[BOOKING] Failed to save booking:`, saveError);
+            throw saveError;
+        }
     }
     findAll() {
-        return this.bookingRepo.find({ order: { bookingDate: 'DESC', bookingTime: 'DESC' } });
+        return this.bookingRepo.find({
+            order: { bookingDate: 'DESC', bookingTime: 'DESC' }
+        });
     }
     async findOne(id) {
         const booking = await this.bookingRepo.findOne({ where: { id } });
         if (!booking) {
-            throw new common_1.NotFoundException(`Booking with id ${id} not found`);
+            throw new Error('Booking not found');
         }
         return booking;
     }
-    async update(id, dto) {
+    async update(id, updateBookingDto) {
         const booking = await this.findOne(id);
-        if (!booking)
-            throw new common_1.NotFoundException();
-        Object.assign(booking, dto);
+        Object.assign(booking, updateBookingDto);
         return this.bookingRepo.save(booking);
     }
-    async delete(id) {
+    async remove(id) {
         const booking = await this.findOne(id);
-        if (!booking)
-            throw new common_1.NotFoundException();
-        return this.bookingRepo.remove(booking);
+        await this.bookingRepo.remove(booking);
     }
     async findByEmail(email) {
-        const bookings = await this.bookingRepo.find({
+        return this.bookingRepo.find({
             where: { email },
-            order: { bookingDate: 'DESC', bookingTime: 'DESC' },
+            order: { bookingDate: 'DESC', bookingTime: 'DESC' }
         });
-        if (!bookings.length) {
-            throw new common_1.NotFoundException(`No bookings found for email ${email}`);
+    }
+    async delete(id) {
+        await this.remove(id);
+    }
+    async cancel(id) {
+        const booking = await this.findOne(id);
+        if (booking.status === 'cancelled') {
+            throw new Error('Booking is already cancelled');
         }
-        return bookings;
+        booking.status = 'cancelled';
+        try {
+            const cancelledBooking = await this.bookingRepo.save(booking);
+            this.logger.log(`[BOOKING] Booking ${id} cancelled successfully`);
+            return cancelledBooking;
+        }
+        catch (error) {
+            this.logger.error(`[BOOKING] Failed to cancel booking ${id}:`, error);
+            throw new Error('Failed to cancel booking');
+        }
     }
 };
 exports.BookingsService = BookingsService;
-exports.BookingsService = BookingsService = __decorate([
+exports.BookingsService = BookingsService = BookingsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(booking_entity_1.BookingEntity)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        booking_email_service_1.BookingEmailService])
 ], BookingsService);
 //# sourceMappingURL=bookings.service.js.map

@@ -45,10 +45,7 @@ export class BookingsManagementComponent implements OnInit {
         // Use the bookings as they are, since the service now handles normalization
         this.bookings = [...bookings];
         
-        // Initialize filteredBookings with all bookings
-        this.filteredBookings = [...bookings];
-        
-        // Apply any active filters
+        // Apply any active filters (don't reset filteredBookings first)
         this.applyFilters();
         this.isLoading = false;
       },
@@ -302,7 +299,13 @@ export class BookingsManagementComponent implements OnInit {
   }
 
   getTotalRevenue(): number {
-    return this.filteredBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+    // Only calculate revenue from confirmed bookings
+    const confirmedBookings = this.filteredBookings.filter(b => b.status === 'confirmed');
+    return confirmedBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+  }
+
+  getConfirmedBookingsCount(): number {
+    return this.filteredBookings.filter(b => b.status === 'confirmed').length;
   }
 
   resetFilters(): void {

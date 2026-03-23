@@ -31,27 +31,64 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const MembershipApplication_Entity_1 = require("../memberApplication/MembershipApplication.Entity");
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    constructor(usersService, jwtService) {
+    membershipApplicationRepo;
+    constructor(usersService, jwtService, membershipApplicationRepo) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.membershipApplicationRepo = membershipApplicationRepo;
     }
     async validateUser(email, password) {
+        console.log(`[AUTH] Validating user: ${email}`);
         const user = await this.usersService.findByEmail(email);
-        if (!user)
+        if (!user) {
+            console.log(`[AUTH] User not found: ${email}`);
             return null;
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid)
-            return null;
+        }
+        console.log(`[AUTH] User found: ${user.email}, role: ${user.role}`);
+        if (user.role === 'member') {
+            console.log(`[AUTH] Member login detected for: ${email}`);
+            const membershipApplication = await this.membershipApplicationRepo.findOne({
+                where: { email: email, status: 'approved' }
+            });
+            if (!membershipApplication) {
+                console.log(`[AUTH] No approved membership application found for: ${email}`);
+                return null;
+            }
+            if (!membershipApplication.oneTimePassword) {
+                console.log(`[AUTH] No OTP found for member: ${email}`);
+                return null;
+            }
+            console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
+            console.log(`[AUTH] Comparing input password: ${password} with OTP`);
+            const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
+            console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
+            if (!isOtpValid)
+                return null;
+        }
+        else {
+            console.log(`[AUTH] Non-member login detected for: ${email}`);
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            console.log(`[AUTH] Password validation result: ${isPasswordValid}`);
+            if (!isPasswordValid)
+                return null;
+        }
         const { password: pwd, ...result } = user;
+        console.log(`[AUTH] Login successful for: ${email}`);
         return result;
     }
     generateToken(user) {
@@ -110,7 +147,9 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, typeorm_1.InjectRepository)(MembershipApplication_Entity_1.MembershipApplicationEntity)),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        typeorm_2.Repository])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

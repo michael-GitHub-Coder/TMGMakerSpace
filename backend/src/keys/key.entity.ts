@@ -17,6 +17,12 @@ export class KeyEntity {
   @Column()
   memberName: string;
 
+  @Column({ nullable: true })
+  memberEmail?: string;
+
+  @Column({ nullable: true })
+  memberPhone?: string;
+
   @Column()
   bookingDateTime: string;
 
@@ -43,6 +49,8 @@ export interface Key {
   id: string;
   equipmentName: string;
   memberName: string;
+  memberEmail?: string;
+  memberPhone?: string;
   bookingDateTime: string;
   keyStatus: 'available' | 'issued' | 'returned';
   issuedBy?: string;

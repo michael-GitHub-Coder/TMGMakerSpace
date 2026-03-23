@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const keys_controller_1 = require("./keys.controller");
 const keys_service_1 = require("./keys.service");
+const key_notification_service_1 = require("./key-notification.service");
 const key_entity_1 = require("./key.entity");
 let KeysModule = class KeysModule {
 };
@@ -19,7 +20,7 @@ exports.KeysModule = KeysModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([key_entity_1.KeyEntity])],
         controllers: [keys_controller_1.KeysController],
-        providers: [keys_service_1.KeysService],
+        providers: [keys_service_1.KeysService, key_notification_service_1.KeyNotificationService],
         exports: [keys_service_1.KeysService],
     })
 ], KeysModule);

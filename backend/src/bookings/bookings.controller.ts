@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -58,10 +59,18 @@ export class BookingsController {
     return this.bookingsService.update(id, updateBookingDto);
   }
 
-  // @Put(':id/cancel')
-  // cancel(@Param('id') id: string) {
-  //   return this.bookingsService.cancel(id);
-  // }
+  @Put(':id/cancel')
+  cancel(@Param('id') id: string) {
+    return this.bookingsService.cancel(id);
+  }
+
+  @Patch(':id')
+  updateStatus(@Param('id') id: string, @Body() updateData: UpdateBookingDto) {
+    if (updateData.status === 'cancelled') {
+      return this.bookingsService.cancel(id);
+    }
+    return this.bookingsService.update(id, updateData);
+  }
 
   @Delete(':id')
   delete(@Param('id') id: string) {

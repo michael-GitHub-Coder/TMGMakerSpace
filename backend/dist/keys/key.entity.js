@@ -15,6 +15,8 @@ let KeyEntity = class KeyEntity {
     id;
     equipmentName;
     memberName;
+    memberEmail;
+    memberPhone;
     bookingDateTime;
     keyStatus;
     issuedBy;
@@ -36,6 +38,14 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], KeyEntity.prototype, "memberName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], KeyEntity.prototype, "memberEmail", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], KeyEntity.prototype, "memberPhone", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)

@@ -1,4 +1,6 @@
 import { UsersService } from '../users/users.service';
+import { Repository } from 'typeorm';
+import { MembershipApplicationEntity } from '../memberApplication/MembershipApplication.Entity';
 import { JwtService } from '@nestjs/jwt';
 import { ChangePasswordDto } from './DTO/ChangePasswordDto';
 export interface LoginDto {
@@ -16,9 +18,10 @@ export interface RegisterDto {
 export declare class AuthService {
     private usersService;
     private jwtService;
-    constructor(usersService: UsersService, jwtService: JwtService);
+    private membershipApplicationRepo;
+    constructor(usersService: UsersService, jwtService: JwtService, membershipApplicationRepo: Repository<MembershipApplicationEntity>);
     validateUser(email: string, password: string): Promise<any>;
-    private generateToken;
+    generateToken(user: any): string;
     login(loginDto: LoginDto): Promise<{
         status: string;
         message: string;

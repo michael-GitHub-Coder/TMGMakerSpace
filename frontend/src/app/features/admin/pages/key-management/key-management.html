@@ -104,7 +104,7 @@
                 <span>{{ key.memberName }}</span>
               </div>
             </td>
-            <td class="booking-time">{{ key.bookingDateTime }}</td>
+            <td class="booking-time">{{ formatCleanDate(key.bookingDateTime) }}</td>
             <td>
               <span [class]="getStatusBadgeClass(key.keyStatus)">
                 <i class="bi" [ngClass]="getStatusIcon(key.keyStatus)"></i>
@@ -112,8 +112,8 @@
               </span>
             </td>
             <td>{{ key.issuedBy || '-' }}</td>
-            <td>{{ key.issuedDateTime || '-' }}</td>
-            <td>{{ key.returnedDateTime || '-' }}</td>
+            <td>{{ key.keyStatus === 'issued' ? formatCleanDate(key.issuedDateTime) : '-' }}</td>
+            <td>{{ key.keyStatus === 'returned' ? formatCleanDate(key.returnedDateTime) : '-' }}</td>
             <td class="actions-cell">
               <div class="action-buttons">
                 <button 
@@ -249,7 +249,7 @@
         <div class="key-details">
           <strong>Equipment:</strong> {{ selectedKey?.equipmentName }}<br>
           <strong>Member:</strong> {{ selectedKey?.memberName }}<br>
-          <strong>Issued:</strong> {{ selectedKey?.issuedDateTime }}
+          <strong>Issued:</strong> {{ formatCleanDate(selectedKey?.issuedDateTime) }}
         </div>
         <p class="warning-text">This action will mark the key as "Returned" and record the return timestamp.</p>
       </div>
