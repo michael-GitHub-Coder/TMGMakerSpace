@@ -17,12 +17,17 @@ const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const Membership_Module_1 = require("./memberApplication/Membership.Module");
 const MembershipAdmin_Module_1 = require("./memberAdmin/MembershipAdmin.Module");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: 'config.env',
+            }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mssql',
                 host: 'localhost',

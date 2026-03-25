@@ -37,8 +37,16 @@
 
     <div class="form-group">
       <label>Supporting Documents</label>
-      <input type="file" multiple (change)="onFileChange($event)" />
+      <input type="file" multiple (change)="onFileChange($event)" accept="image/*,.pdf" />
       <small>You can upload multiple files (PDF, images, etc.)</small>
+      
+      <!-- Show uploaded files count and view button -->
+      <div class="documents-info" *ngIf="selectedFiles.length > 0">
+        <p class="files-count">{{ selectedFiles.length }} file(s) selected</p>
+        <button type="button" class="btn-view-docs" (click)="openDocumentModal()">
+          👁️ View Documents
+        </button>
+      </div>
     </div>
 
     <button type="submit" [disabled]="isSubmitting">
@@ -49,4 +57,87 @@
     <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
 
   </form>
+</div>
+
+<!-- Document Preview Modal -->
+<div class="modal-overlay" *ngIf="showDocumentModal" (click)="closeDocumentModal()">
+  <div class="modal-content document-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <h2>Preview Documents</h2>
+        <p class="doc-counter">
+          Document {{ currentDocumentIndex + 1 }} of {{ selectedFiles.length }}
+        </p>
+      </div>
+      <button class="close-btn" (click)="closeDocumentModal()">✕</button>
+    </div>
+
+    <!-- Document Info Bar -->
+    <div class="document-info-bar">
+      <div class="file-details">
+        <span class="file-name">📄 {{ getCurrentFileName() }}</span>
+        <span class="file-size">{{ getCurrentFileSize() }}</span>
+      </div>
+      <button 
+        class="btn-remove" 
+        (click)="removeDocument(currentDocumentIndex)"
+        title="Remove this document">
+        🗑️ Remove
+      </button>
+    </div>
+
+    <!-- Document Viewer -->
+    <div class="modal-body document-viewer">
+      
+      <!-- Image Preview -->
+      <div class="preview-container" *ngIf="currentDocumentType === 'image'">
+        <img [src]="currentDocumentUrl" alt="Document preview" />
+      </div>
+
+      <!-- PDF Preview -->
+      <div class="preview-container pdf-container" *ngIf="currentDocumentType === 'pdf'">
+        <iframe [src]="currentDocumentUrl" frameborder="0"></iframe>
+      </div>
+
+      <!-- Unsupported File Type -->
+      <div class="preview-container unsupported" *ngIf="currentDocumentType === 'other'">
+        <div class="unsupported-message">
+          <div class="icon">📄</div>
+          <h3>{{ getCurrentFileName() }}</h3>
+          <p>Preview not available for this file type</p>
+          <p class="file-info">Size: {{ getCurrentFileSize() }}</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Footer -->
+    <div class="modal-footer">
+      <button 
+        class="btn-nav" 
+        (click)="previousDocument()" 
+        [disabled]="currentDocumentIndex === 0">
+        ← Previous
+      </button>
+      
+      <div class="page-indicators">
+        <span 
+          *ngFor="let file of selectedFiles; let i = index" 
+          class="page-dot" 
+          [class.active]="i === currentDocumentIndex"
+          (click)="loadDocument(i)">
+        </span>
+      </div>
+
+      <button 
+        class="btn-nav" 
+        (click)="nextDocument()" 
+        [disabled]="currentDocumentIndex === selectedFiles.length - 1">
+        Next →
+      </button>
+    </div>
+
+  </div>
 </div>

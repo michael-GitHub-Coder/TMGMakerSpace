@@ -10,9 +10,15 @@ import { User } from './users/user.entity';
 import { BookingEntity } from './models/Booking.model';
 import { MembershipModule } from './memberApplication/Membership.Module';
 import { MembershipAdminModule } from './memberAdmin/MembershipAdmin.Module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+     ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: 'config.env', 
+    }),
+
     TypeOrmModule.forRoot({
       type: 'mssql',
       host: 'localhost',            

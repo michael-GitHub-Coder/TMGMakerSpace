@@ -44,6 +44,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MembershipService = void 0;
 const common_1 = require("@nestjs/common");
@@ -52,6 +55,8 @@ const typeorm_2 = require("typeorm");
 const MembershipApplication_Entity_1 = require("./MembershipApplication.Entity");
 const crypto = __importStar(require("crypto"));
 const user_entity_1 = require("../users/user.entity");
+const bcrypt = __importStar(require("bcrypt"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
 let MembershipService = class MembershipService {
     membershipRepo;
     userRepo;
@@ -95,15 +100,49 @@ let MembershipService = class MembershipService {
             throw new common_1.NotFoundException('Application not found');
         if (application.status !== 'pending')
             throw new common_1.BadRequestException('Application already processed');
+        const existingUser = await this.userRepo.findOne({ where: { email: application.email } });
+        if (existingUser) {
+            console.log(`User with email ${application.email} already exists, skipping user creation`);
+            application.status = 'approved';
+            application.oneTimePassword = crypto.randomBytes(4).toString('hex');
+            return this.membershipRepo.save(application);
+        }
+        const plainPassword = this.generateRandomPassword();
+        const hashedPassword = await bcrypt.hash(plainPassword, 10);
         const user = this.userRepo.create({
             firstName: application.name,
             lastName: application.surname,
             email: application.email,
             role: 'member',
-            password: this.generateRandomPassword(),
+            password: hashedPassword,
         });
         await this.userRepo.save(user);
+        const transporter = nodemailer_1.default.createTransport({
+            service: "gmail",
+            auth: {
+                user: "motlokwa.thulare@gmail.com",
+                pass: "fxpdctntknhjtdjp",
+            },
+        });
+        await transporter.sendMail({
+            from: `"TMG" <motlokwa.thulare@gmail.com>`,
+            to: application.email,
+            subject: "Welcome to Tshimoverse!",
+            html: `
+          <p>Hello ${application.name},</p>
+          <p>Congratulations! You’ve officially become a member of <strong>TMG</strong>. We’re thrilled to have you on board!</p>
+          <p>Here are your login credentials:</p>
+          <ul>
+            <li><strong>Email:</strong> ${application.email}</li>
+            <li><strong>Password:</strong> ${plainPassword}</li>
+          </ul>
+          <p>Please log in and change your password to keep your account secure.</p>
+          <p>Welcome to the community, and we can’t wait to see you get involved!</p>
+          <p>Best regards,<br/><strong>TMG Team</strong></p>
+        `,
+        });
         application.status = 'approved';
+        application.oneTimePassword = crypto.randomBytes(4).toString('hex');
         return this.membershipRepo.save(application);
     }
     async rejectApplication(id, reason) {
@@ -113,7 +152,7 @@ let MembershipService = class MembershipService {
         if (application.status !== 'pending')
             throw new common_1.BadRequestException('Application already processed');
         application.status = 'rejected';
-        application.rejectionReason = reason;
+        application.rejectionReason = reason || 'No reason provided';
         return this.membershipRepo.save(application);
     }
     generateRandomPassword(length = 8) {

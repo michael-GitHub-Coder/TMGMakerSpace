@@ -22,20 +22,9 @@ export declare class AuthService {
     login(loginDto: LoginDto): Promise<{
         status: string;
         message: string;
-        data: {
-            userId: any;
-            email: any;
-            user?: undefined;
-        };
-        token?: undefined;
-    } | {
-        status: string;
-        message: string;
         token: string;
         data: {
             user: any;
-            userId?: undefined;
-            email?: undefined;
         };
     }>;
     register(registerDto: RegisterDto): Promise<{

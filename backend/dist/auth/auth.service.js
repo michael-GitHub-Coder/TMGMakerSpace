@@ -72,13 +72,6 @@ let AuthService = class AuthService {
         const user = await this.validateUser(loginDto.email, loginDto.password);
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
-        if (user.mustChangePassword) {
-            return {
-                status: 'pending',
-                message: 'Password change required',
-                data: { userId: user.id, email: user.email },
-            };
-        }
         const token = this.generateToken(user);
         return {
             status: 'success',
