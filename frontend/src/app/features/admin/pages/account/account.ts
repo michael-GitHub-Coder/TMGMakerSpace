@@ -58,7 +58,6 @@ export class AccountComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('currentUser');
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

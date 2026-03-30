@@ -9,7 +9,7 @@ import { isPlatformBrowser } from '@angular/common';
 export class AuthInterceptor implements HttpInterceptor {
   private readonly tokenKey: string;
   private readonly userKey: string;
-  private readonly loginUrl = '/sign-in';
+  private readonly loginUrl = '/signin';
 
   constructor(
     private router: Router,
@@ -95,7 +95,7 @@ export class AuthInterceptor implements HttpInterceptor {
         if (!this.router.url.includes(this.loginUrl)) {
           this.router.navigate([this.loginUrl], {
             queryParams: { 
-              returnUrl: this.router.routerState.snapshot.url === '/sign-in' 
+              returnUrl: this.router.routerState.snapshot.url === '/signin' 
                 ? '/' 
                 : this.router.routerState.snapshot.url 
             }

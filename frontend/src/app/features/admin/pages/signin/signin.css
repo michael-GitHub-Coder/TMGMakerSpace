@@ -145,19 +145,26 @@
 
 /* Back to Home Link */
 .back-to-home-link {
-  color: #495057;
+  color: #2c3e50;
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: rgba(44, 62, 80, 0.05);
 }
 
 .back-to-home-link:hover {
-  color: var(--color-primary, #5c5b5c);
+  color: #1a252f;
   text-decoration: none;
+  background: rgba(44, 62, 80, 0.1);
+  transform: translateY(-1px);
 }
 
 .back-to-home-link i {
   font-size: 0.85rem;
+  margin-right: 0.25rem;
 }

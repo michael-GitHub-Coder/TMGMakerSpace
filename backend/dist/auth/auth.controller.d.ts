@@ -8,6 +8,7 @@ export declare class AuthController {
         status: string;
         message: string;
         token: string;
+        expiresIn: string;
         data: {
             user: any;
         };
@@ -16,6 +17,7 @@ export declare class AuthController {
         status: string;
         message: string;
         token: string;
+        expiresIn: string;
         data: {
             user: {
                 id: number;
@@ -31,6 +33,7 @@ export declare class AuthController {
         status: string;
         message: string;
         token: string;
+        expiresIn: string;
         data: {
             user: import("../users/user.entity").User;
         };

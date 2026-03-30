@@ -95,19 +95,21 @@ let AuthService = class AuthService {
         console.log(`[AUTH] Login successful for: ${email}`);
         return result;
     }
-    generateToken(user) {
+    generateToken(user, rememberMe = false) {
+        const expiresIn = rememberMe ? '7d' : '1h';
         const payload = { sub: user.id, email: user.email, role: user.role };
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, { expiresIn });
     }
     async login(loginDto) {
         const user = await this.validateUser(loginDto.email, loginDto.password);
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
-        const token = this.generateToken(user);
+        const token = this.generateToken(user, loginDto.rememberMe);
         return {
             status: 'success',
             message: 'Login successful',
             token,
+            expiresIn: loginDto.rememberMe ? '7 days' : '1 hour',
             data: { user },
         };
     }
@@ -129,6 +131,7 @@ let AuthService = class AuthService {
             status: 'success',
             message: 'Registration successful',
             token,
+            expiresIn: '1 hour',
             data: { user: result },
         };
     }
@@ -144,6 +147,7 @@ let AuthService = class AuthService {
             status: 'success',
             message: 'Password changed successfully',
             token,
+            expiresIn: '1 hour',
             data: { user },
         };
     }

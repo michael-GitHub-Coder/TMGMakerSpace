@@ -87,21 +87,23 @@ export class AuthService {
   }
 
   // Create JWT token
-  generateToken(user: any) {
+  generateToken(user: any, rememberMe: boolean = false) {
+    const expiresIn = rememberMe ? '7d' : '1h'; // 7 days if remember me, 1 hour otherwise
     const payload = { sub: user.id, email: user.email, role: user.role };
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, { expiresIn });
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const token = this.generateToken(user);
+    const token = this.generateToken(user, loginDto.rememberMe);
 
     return {
       status: 'success',
       message: 'Login successful',
-      token, 
+      token,
+      expiresIn: loginDto.rememberMe ? '7 days' : '1 hour',
       data: { user },
     };
   }
@@ -148,7 +150,8 @@ export class AuthService {
     return {
       status: 'success',
       message: 'Registration successful',
-      token, 
+      token,
+      expiresIn: '1 hour',
       data: { user: result },
     };
   }
@@ -167,6 +170,7 @@ export class AuthService {
       status: 'success',
       message: 'Password changed successfully',
       token,
+      expiresIn: '1 hour',
       data: { user },
     };
   }

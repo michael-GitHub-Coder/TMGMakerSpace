@@ -24,7 +24,6 @@ exports.AuthModule = AuthModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([MembershipApplication_Entity_1.MembershipApplicationEntity]),
             jwt_1.JwtModule.register({
                 secret: 'your_jwt_secret',
-                signOptions: { expiresIn: '1h' },
             }),
         ],
         controllers: [auth_controller_1.AuthController],

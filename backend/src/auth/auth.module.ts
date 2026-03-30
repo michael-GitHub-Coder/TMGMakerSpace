@@ -11,8 +11,7 @@ import { MembershipApplicationEntity } from '../memberApplication/MembershipAppl
     UsersModule,
     TypeOrmModule.forFeature([MembershipApplicationEntity]),
     JwtModule.register({
-      secret: 'your_jwt_secret', 
-      signOptions: { expiresIn: '1h' },
+      secret: 'your_jwt_secret',
     }),
   ],
   controllers: [AuthController],

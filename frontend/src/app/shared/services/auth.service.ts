@@ -9,6 +9,7 @@ export interface LoginResponse {
   status: string;
   message: string;
   token: string;
+  expiresIn?: string;
   data: {
     user: any;
   };
@@ -206,7 +207,7 @@ export class AuthService {
     }
     this.user = null;
     this.loggedIn.next(false);
-    this.router.navigate(['/sign-in']);
+    this.router.navigate(['/signin']);
   }
 
   isLoggedIn(): boolean {

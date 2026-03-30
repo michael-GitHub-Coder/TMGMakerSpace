@@ -21,11 +21,12 @@ export declare class AuthService {
     private membershipApplicationRepo;
     constructor(usersService: UsersService, jwtService: JwtService, membershipApplicationRepo: Repository<MembershipApplicationEntity>);
     validateUser(email: string, password: string): Promise<any>;
-    generateToken(user: any): string;
+    generateToken(user: any, rememberMe?: boolean): string;
     login(loginDto: LoginDto): Promise<{
         status: string;
         message: string;
         token: string;
+        expiresIn: string;
         data: {
             user: any;
         };
@@ -34,6 +35,7 @@ export declare class AuthService {
         status: string;
         message: string;
         token: string;
+        expiresIn: string;
         data: {
             user: {
                 id: number;
@@ -49,6 +51,7 @@ export declare class AuthService {
         status: string;
         message: string;
         token: string;
+        expiresIn: string;
         data: {
             user: import("../users/user.entity").User;
         };
