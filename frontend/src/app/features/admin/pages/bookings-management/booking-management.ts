@@ -4,13 +4,12 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../../admin/shared/sidebar/sidebar';
 import { FooterComponent } from '../../../../shared/footer/footer';
-import { HeaderComponent } from '../../../../shared/header/header';
 import { BookingService, Booking } from '../../../../shared/booking/booking.service';
 
 @Component({
   selector: 'app-bookings-management',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, SidebarComponent],
   templateUrl: './bookings-management.html',
   styleUrls: ['./booking-management.css']
 })
@@ -71,9 +70,8 @@ export class BookingsManagementComponent implements OnInit {
   }
 
   editBooking(booking: Booking): void {
-    // Navigate to edit page or open edit modal
-    console.log('Edit booking:', booking.id);
-    // Implement edit functionality here
+    // Delete booking instead of editing
+    this.showDeleteConfirmation(booking);
   }
 
   showCancelConfirmation(booking: Booking): void {
@@ -83,6 +81,7 @@ export class BookingsManagementComponent implements OnInit {
   }
 
   showDeleteConfirmation(booking: Booking): void {
+    // Use direct confirmation instead of modal for now
     if (confirm(`Are you sure you want to delete the booking for ${booking.name}? This action cannot be undone.`)) {
       this.deleteBooking(booking.id);
     }

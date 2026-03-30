@@ -196,12 +196,17 @@ export class BookingComponent implements OnInit {
         bookingDate: formValue.bookingDate || '',
         bookingTime: formValue.bookingTime || '',
         duration: Number(formValue.duration) || 1,
-        totalPrice: this.getTotalPrice()
+        totalPrice: 0, // Will be calculated by SA pricing
+        totalCalculatedPrice: 0,
+        vatAmount: 0,
+        subtotal: 0,
+        discounts: 0,
+        surcharges: 0
       };
 
       console.log("booking data:"  ,bookingData);
 
-      await this.bookingService.createBooking(bookingData);
+      await this.bookingService.createBookingWithSAPricing(bookingData);
       this.showSuccess = true;
       this.bookingForm.reset({ duration: 1 });
       this.loadBookedSlots();

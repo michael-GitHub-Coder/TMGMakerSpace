@@ -1,11 +1,8 @@
-<app-header></app-header>
-
 <div class="dashboard-wrapper">
-  <div class="dashboard-layout">
-    <app-sidebar></app-sidebar>
+  <app-sidebar></app-sidebar>
 
-    <!-- Main Content -->
-    <div class="dashboard-content">
+  <!-- Main Content -->
+  <div class="main-content">
     <!-- Header Section -->
     <div class="dashboard-header">
       <h2>Key Management</h2>
@@ -76,77 +73,159 @@
 
   <!-- Keys Table -->
   <div class="table-section">
-    <div class="table-responsive">
-      <table class="table key-table">
-        <thead class="table-header">
-          <tr>
-            <th>Equipment Name</th>
-            <th>Member Name</th>
-            <th>Booking Date/Time</th>
-            <th>Key Status</th>
-            <th>Issued By</th>
-            <th>Issue Time</th>
-            <th>Return Time</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let key of filteredKeys" class="table-row">
-            <td class="equipment-cell">
-              <div class="equipment-info">
-                <i class="bi bi-tools equipment-icon"></i>
-                <span>{{ key.equipmentName }}</span>
-              </div>
-            </td>
-            <td class="member-cell">
-              <div class="member-info">
-                <i class="bi bi-person-circle member-icon"></i>
-                <span>{{ key.memberName }}</span>
-              </div>
-            </td>
-            <td class="booking-time">{{ formatCleanDate(key.bookingDateTime) }}</td>
-            <td>
-              <span [class]="getStatusBadgeClass(key.keyStatus)">
-                <i class="bi" [ngClass]="getStatusIcon(key.keyStatus)"></i>
-                {{ key.keyStatus | titlecase }}
-              </span>
-            </td>
-            <td>{{ key.issuedBy || '-' }}</td>
-            <td>{{ key.keyStatus === 'issued' ? formatCleanDate(key.issuedDateTime) : '-' }}</td>
-            <td>{{ key.keyStatus === 'returned' ? formatCleanDate(key.returnedDateTime) : '-' }}</td>
-            <td class="actions-cell">
-              <div class="action-buttons">
-                <button 
-                  class="btn btn-sm btn-issue"
-                  [disabled]="!canIssueKey(key)"
-                  (click)="openIssueKeyModal(issueKeyModal, key)"
-                  title="Issue Key"
-                >
-                  <i class="bi bi-key-fill"></i>
-                  Issue
-                </button>
-                
-                <button 
-                  class="btn btn-sm btn-return"
-                  [disabled]="!canReturnKey(key)"
-                  (click)="openReturnKeyModal(returnKeyModal, key)"
-                  title="Return Key"
-                >
-                  <i class="bi bi-arrow-counterclockwise"></i>
-                  Return
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <!-- Empty State -->
-      <div *ngIf="filteredKeys.length === 0" class="empty-state">
-        <i class="bi bi-key"></i>
-        <h4>No keys found</h4>
-        <p>Try adjusting your search or filter criteria</p>
+    <!-- Desktop Table View -->
+    <div class="desktop-view">
+      <div class="table-responsive">
+        <table class="table key-table">
+          <thead class="table-header">
+            <tr>
+              <th>Equipment Name</th>
+              <th>Member Name</th>
+              <th>Booking Date/Time</th>
+              <th>Key Status</th>
+              <th>Issued By</th>
+              <th>Issue Time</th>
+              <th>Return Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let key of filteredKeys" class="table-row">
+              <td class="equipment-cell">
+                <div class="equipment-info">
+                  <i class="bi bi-tools equipment-icon"></i>
+                  <span>{{ key.equipmentName }}</span>
+                </div>
+              </td>
+              <td class="member-cell">
+                <div class="member-info">
+                  <i class="bi bi-person-circle member-icon"></i>
+                  <span>{{ key.memberName }}</span>
+                </div>
+              </td>
+              <td class="booking-time">{{ formatCleanDate(key.bookingDateTime) }}</td>
+              <td>
+                <span [class]="getStatusBadgeClass(key.keyStatus)">
+                  <i class="bi" [ngClass]="getStatusIcon(key.keyStatus)"></i>
+                  {{ key.keyStatus | titlecase }}
+                </span>
+              </td>
+              <td>{{ key.issuedBy || '-' }}</td>
+              <td>{{ key.keyStatus === 'issued' ? formatCleanDate(key.issuedDateTime) : '-' }}</td>
+              <td>{{ key.keyStatus === 'returned' ? formatCleanDate(key.returnedDateTime) : '-' }}</td>
+              <td class="actions-cell">
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-sm btn-issue"
+                    [disabled]="!canIssueKey(key)"
+                    (click)="openIssueKeyModal(issueKeyModal, key)"
+                    title="Issue Key"
+                  >
+                    <i class="bi bi-key-fill"></i>
+                    Issue
+                  </button>
+                  
+                  <button 
+                    class="btn btn-sm btn-return"
+                    [disabled]="!canReturnKey(key)"
+                    (click)="openReturnKeyModal(returnKeyModal, key)"
+                    title="Return Key"
+                  >
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Return
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-view">
+      <div class="key-cards">
+        <div *ngFor="let key of filteredKeys" class="key-card">
+          <div class="key-card-header">
+            <div class="equipment-info">
+              <i class="bi bi-tools equipment-icon"></i>
+              <span>{{ key.equipmentName }}</span>
+            </div>
+            <span [class]="getStatusBadgeClass(key.keyStatus)" class="status-badge-mobile">
+              <i class="bi" [ngClass]="getStatusIcon(key.keyStatus)"></i>
+              {{ key.keyStatus | titlecase }}
+            </span>
+          </div>
+          
+          <div class="key-card-body">
+            <div class="key-detail">
+              <i class="bi bi-person-circle"></i>
+              <div class="detail-content">
+                <span class="detail-label">Member</span>
+                <span class="detail-value">{{ key.memberName }}</span>
+              </div>
+            </div>
+            
+            <div class="key-detail">
+              <i class="bi bi-calendar-event"></i>
+              <div class="detail-content">
+                <span class="detail-label">Booking</span>
+                <span class="detail-value">{{ formatCleanDate(key.bookingDateTime) }}</span>
+              </div>
+            </div>
+            
+            <div class="key-detail" *ngIf="key.issuedBy">
+              <i class="bi bi-person-badge"></i>
+              <div class="detail-content">
+                <span class="detail-label">Issued By</span>
+                <span class="detail-value">{{ key.issuedBy }}</span>
+              </div>
+            </div>
+            
+            <div class="key-detail" *ngIf="key.keyStatus === 'issued'">
+              <i class="bi bi-clock-history"></i>
+              <div class="detail-content">
+                <span class="detail-label">Issue Time</span>
+                <span class="detail-value">{{ formatCleanDate(key.issuedDateTime) }}</span>
+              </div>
+            </div>
+            
+            <div class="key-detail" *ngIf="key.keyStatus === 'returned'">
+              <i class="bi bi-check-circle"></i>
+              <div class="detail-content">
+                <span class="detail-label">Return Time</span>
+                <span class="detail-value">{{ formatCleanDate(key.returnedDateTime) }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="key-card-actions">
+            <button 
+              class="btn btn-issue-mobile"
+              [disabled]="!canIssueKey(key)"
+              (click)="openIssueKeyModal(issueKeyModal, key)"
+            >
+              <i class="bi bi-key-fill"></i>
+              Issue Key
+            </button>
+            
+            <button 
+              class="btn btn-return-mobile"
+              [disabled]="!canReturnKey(key)"
+              (click)="openReturnKeyModal(returnKeyModal, key)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Return Key
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>  
+    <!-- Empty State -->
+    <div *ngIf="filteredKeys.length === 0" class="empty-state">
+      <i class="bi bi-key"></i>
+      <h4>No keys found</h4>
+      <p>Try adjusting your search or filter criteria</p>
     </div>
   </div>
 
@@ -262,8 +341,3 @@
       </button>
     </div>
   </ng-template>
-    </div>
-  </div>
-</div>
-
-<app-footer></app-footer>

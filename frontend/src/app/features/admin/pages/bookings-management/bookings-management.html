@@ -1,9 +1,8 @@
-<app-header></app-header>
 
-<div class="dashboard-layout">
+<div class="dashboard-wrapper">
   <app-sidebar></app-sidebar>
 
-  <div class="dashboard-content">
+  <div class="main-content">
     <!-- Loading State -->
     <div *ngIf="isLoading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
@@ -108,7 +107,7 @@
       </div>
     </div>
 
-    <!-- Bookings Table -->
+    <!-- Bookings Table - Desktop View -->
     <div class="table-responsive">
       <table class="table table-hover align-middle">
         <thead>
@@ -209,8 +208,8 @@
             </td>
             <td class="text-end pe-4">
               <div class="btn-group btn-group-sm" dropdown>
-                <button type="button" class="btn btn-outline-secondary" (click)="editBooking(booking)" title="Edit Booking">
-                  <i class="bi bi-pencil"></i>
+                <button type="button" class="btn btn-outline-danger" (click)="editBooking(booking)" title="Delete Booking">
+                  <i class="bi bi-trash"></i>
                 </button>
                 <button type="button" class="btn btn-outline-danger" (click)="showCancelConfirmation(booking)" 
                         [disabled]="booking.status === 'cancelled'" [title]="booking.status === 'cancelled' ? 'Already cancelled' : 'Cancel Booking'">
@@ -236,8 +235,6 @@
               </div>
             </td>
           </tr>
-          
-          <!-- Empty State -->
           <tr *ngIf="filteredBookings.length === 0 && !isLoading">
             <td colspan="8" class="text-center py-5">
               <i class="bi bi-inbox" style="font-size: 3rem; color: #e9ecef;"></i>
@@ -250,7 +247,149 @@
         </tbody>
       </table>
     </div>
-    
+
+    <!-- Compact Card View - Default for All Bookings -->
+    <div class="bookings-list-desktop" *ngIf="filteredBookings.length > 0">
+      <div class="booking-card-desktop" *ngFor="let booking of filteredBookings">
+        <div class="booking-card-desktop-header">
+          <div class="booking-date-desktop">
+            <i class="bi bi-calendar-event"></i>
+            <span>{{ formatDate(booking.bookingDate) || 'N/A' }}</span>
+            <small>{{ formatTime(booking.bookingTime) || 'N/A' }}</small>
+          </div>
+          <div class="booking-status-desktop" [ngClass]="getStatusClass(booking.status)">
+            {{ (booking.status || 'N/A') | titlecase }}
+          </div>
+        </div>
+        
+        <div class="booking-details-desktop">
+          <div class="booking-detail-row-desktop">
+            <i class="bi bi-person"></i>
+            <span class="booking-detail-label-desktop">User:</span>
+            <span class="booking-detail-value-desktop">{{ (booking.name || '') + ' ' + (booking.surname || '') || 'N/A' }}</span>
+          </div>
+          <div class="booking-detail-row-desktop">
+            <i class="bi bi-envelope"></i>
+            <span class="booking-detail-label-desktop">Email:</span>
+            <span class="booking-detail-value-desktop">{{ booking.email || 'N/A' }}</span>
+          </div>
+          <div class="booking-detail-row-desktop">
+            <i class="bi bi-pc-display"></i>
+            <span class="booking-detail-label-desktop">Machine:</span>
+            <span class="booking-detail-value-desktop">{{ booking.machineType || 'N/A' }}</span>
+          </div>
+          <div class="booking-detail-row-desktop">
+            <i class="bi bi-clock-history"></i>
+            <span class="booking-detail-label-desktop">Duration:</span>
+            <span class="booking-detail-value-desktop">{{ booking.duration || 0 }} {{ (booking.duration === 1 ? 'hour' : 'hours') }}</span>
+          </div>
+          <div class="booking-detail-row-desktop">
+            <i class="bi bi-currency-dollar"></i>
+            <span class="booking-detail-label-desktop">Price:</span>
+            <span class="booking-detail-value-desktop">{{ booking.totalPrice ? (booking.totalPrice | currency:'ZAR':'symbol':'1.2-2') : 'N/A' }}</span>
+          </div>
+        </div>
+        
+        <div class="booking-actions-desktop">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="showCancelConfirmation(booking)" 
+                  [disabled]="booking.status === 'cancelled'" [title]="booking.status === 'cancelled' ? 'Already cancelled' : 'Cancel Booking'">
+            <i class="bi bi-x-circle"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="sendReminder(booking)">
+            <i class="bi bi-send"></i> Send Reminder
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="showDeleteConfirmation(booking)">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Bookings Message -->
+    <div class="bookings-list-desktop" *ngIf="filteredBookings.length === 0 && !isLoading">
+      <div class="booking-card-desktop">
+        <div class="booking-card-desktop-header">
+          <div class="booking-date-desktop">
+            <i class="bi bi-calendar-x"></i>
+            <span>No Bookings Found</span>
+          </div>
+        </div>
+        
+        <div class="booking-details-desktop">
+          <div class="booking-detail-row-desktop">
+            <i class="bi bi-info-circle"></i>
+            <span class="booking-detail-value-desktop" style="text-align: center; grid-column: 1 / -1;">
+              No bookings found matching your criteria. Try adjusting your filters or search terms.
+            </span>
+          </div>
+        </div>
+        
+        <div class="booking-actions-desktop">
+          <button type="button" class="btn btn-outline-primary btn-sm" (click)="resetFilters()" style="flex: 1;">
+            <i class="bi bi-funnel"></i> Clear All Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="bookings-list-mobile" *ngIf="filteredBookings.length > 0">
+      <div class="booking-card-mobile" *ngFor="let booking of filteredBookings">
+        <div class="booking-card-mobile-header">
+          <div class="booking-date-mobile">
+            <i class="bi bi-calendar-event"></i>
+            <span>{{ formatDate(booking.bookingDate) || 'N/A' }}</span>
+          </div>
+          <div class="booking-status-mobile" [ngClass]="getStatusClass(booking.status)">
+            {{ (booking.status || 'N/A') | titlecase }}
+          </div>
+        </div>
+        
+        <div class="booking-details-mobile">
+          <div class="booking-detail-row">
+            <span class="booking-detail-label">User:</span>
+            <span class="booking-detail-value">{{ (booking.name || '') + ' ' + (booking.surname || '') || 'N/A' }}</span>
+          </div>
+          <div class="booking-detail-row">
+            <span class="booking-detail-label">Machine:</span>
+            <span class="booking-detail-value">{{ booking.machineType || 'N/A' }}</span>
+          </div>
+          <div class="booking-detail-row">
+            <span class="booking-detail-label">Duration:</span>
+            <span class="booking-detail-value">{{ booking.duration || 0 }} {{ (booking.duration === 1 ? 'hour' : 'hours') }}</span>
+          </div>
+          <div class="booking-detail-row">
+            <span class="booking-detail-label">Price:</span>
+            <span class="booking-detail-value">{{ booking.totalPrice ? (booking.totalPrice | currency:'ZAR':'symbol':'1.2-2') : 'N/A' }}</span>
+          </div>
+          <div class="booking-detail-row">
+            <span class="booking-detail-label">Contact:</span>
+            <span class="booking-detail-value">{{ booking.phone || 'N/A' }}</span>
+          </div>
+        </div>
+        
+        <div class="booking-actions-mobile">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="showCancelConfirmation(booking)" 
+                  [disabled]="booking.status === 'cancelled'">
+            <i class="bi bi-x-circle"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="sendReminder(booking)">
+            <i class="bi bi-send"></i> Remind
+          </button>
+        </div>
+      </div>
+      
+      <!-- No bookings message for mobile -->
+      <div class="booking-card-mobile" *ngIf="filteredBookings.length === 0">
+        <div class="text-center py-4">
+          <div class="text-muted">
+            <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+            <p class="mt-2 mb-0">No bookings found</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Summary Cards -->
     <div class="row mt-4 g-3">
       <div class="col-md-4">

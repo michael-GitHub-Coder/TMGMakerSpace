@@ -1,10 +1,9 @@
-<app-header></app-header>
-<div class="dashboard-layout">
+<div class="dashboard-wrapper">
   <app-sidebar></app-sidebar>
 
-  <div class="dashboard-content">
+  <div class="main-content">
     <div class="dashboard-header">
-      <!-- <h2>Membership Applications</h2> -->
+      <h2>Membership Applications</h2>
    
     </div>
 
@@ -22,68 +21,70 @@
 
     <!-- Members Table -->
     <div class="members-table-container" *ngIf="!loading && members.length > 0">
-      <table class="members-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Applied Date</th>
-            <th>Documents</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let member of paginatedMembers">
-            <td>
-              <div class="member-info">
-                <div class="member-avatar">
-                  {{ member.name.charAt(0) }}{{ member.surname.charAt(0) }}
+      <div class="table-responsive">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Applied Date</th>
+              <th>Documents</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of paginatedMembers">
+              <td>
+                <div class="member-info">
+                  <div class="member-avatar">
+                    {{ member.name.charAt(0) }}{{ member.surname.charAt(0) }}
+                  </div>
+                  <div class="member-details">
+                    <h4>{{ member.name }} {{ member.surname }}</h4>
+                  </div>
                 </div>
-                <div class="member-details">
-                  <h4>{{ member.name }} {{ member.surname }}</h4>
+              </td>
+              <td>{{ member.email }}</td>
+              <td>{{ member.phone }}</td>
+              <td>
+                <span [class]="getStatusClass(member.status)">
+                  {{ member.status || 'pending' }}
+                </span>
+              </td>
+              <td>{{ formatDate(member.createdAt) }}</td>
+              <td>
+                <button 
+                  class="action-btn view" 
+                  (click)="viewDocuments(member)"
+                  title="View Documents">
+                  <i class="fas fa-file-alt"></i>
+                  {{ member.documents?.length || 0 }}
+                </button>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="action-btn edit"
+                    (click)="approveApplication(member.id)"
+                    [disabled]="member.status === 'approved'"
+                    title="Approve Application">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button 
+                    class="action-btn delete"
+                    (click)="viewDocuments(member); openRejectModal(member.id)"
+                    [disabled]="member.status === 'rejected'"
+                    title="Reject Application">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
-              </div>
-            </td>
-            <td>{{ member.email }}</td>
-            <td>{{ member.phone }}</td>
-            <td>
-              <span [class]="getStatusClass(member.status)">
-                {{ member.status || 'pending' }}
-              </span>
-            </td>
-            <td>{{ formatDate(member.createdAt) }}</td>
-            <td>
-              <button 
-                class="action-btn view" 
-                (click)="viewDocuments(member)"
-                title="View Documents">
-                <i class="fas fa-file-alt"></i>
-                {{ member.documents?.length || 0 }}
-              </button>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button 
-                  class="action-btn edit"
-                  (click)="approveApplication(member.id)"
-                  [disabled]="member.status === 'approved'"
-                  title="Approve Application">
-                  <i class="fas fa-check"></i>
-                </button>
-                <button 
-                  class="action-btn delete"
-                  (click)="viewDocuments(member); openRejectModal(member.id)"
-                  [disabled]="member.status === 'rejected'"
-                  title="Reject Application">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Pagination Controls -->
       <div class="pagination-container">
@@ -127,7 +128,7 @@
 </div>
 
 <!-- Document Preview Modal -->
-<div class="modal-overlay" *ngIf="showDocumentsModal && selectedApplication" (click)="closeModal()">
+<div class="modal-overlay" [class.fullscreen]="isFullscreen" *ngIf="showDocumentsModal && selectedApplication" (click)="closeModal()">
   <div class="document-preview-modal" (click)="$event.stopPropagation()">
     
     <!-- Modal Header -->
@@ -154,25 +155,33 @@
     <!-- Document Viewer -->
     <div class="modal-body document-viewer">
       
-      <!-- Image Preview -->
-      <div class="preview-container" *ngIf="currentDocumentType === 'image'">
-        <img [src]="currentDocumentUrl" alt="Document preview" />
-      </div>
+      <!-- Fullscreen Toggle -->
+      <button class="fullscreen-btn" (click)="toggleFullscreen()" title="Toggle Fullscreen">
+        <i class="fas" [class]="isFullscreen ? 'fa-compress' : 'fa-expand'"></i>
+      </button>
+      
+      <!-- Document Display - Full Size -->
+      <div class="document-container">
+        <!-- Image Preview -->
+        <div class="document-content" *ngIf="currentDocumentType === 'image'">
+          <img [src]="currentDocumentUrl" alt="Document" class="full-document" />
+        </div>
 
-      <!-- PDF Preview -->
-      <div class="preview-container pdf-container" *ngIf="currentDocumentType === 'pdf'">
-        <iframe [src]="currentDocumentUrl" frameborder="0"></iframe>
-      </div>
+        <!-- PDF Preview -->
+        <div class="document-content" *ngIf="currentDocumentType === 'pdf'">
+          <iframe [src]="currentDocumentUrl" class="full-document" frameborder="0"></iframe>
+        </div>
 
-      <!-- Unsupported File Type -->
-      <div class="preview-container unsupported" *ngIf="currentDocumentType === 'other'">
-        <div class="unsupported-message">
-          <div class="icon">📄</div>
-          <h3>{{ getCurrentDocumentName() }}</h3>
-          <p>Preview not available for this file type</p>
-          <a [href]="currentDocumentUrl" target="_blank" class="btn-download">
-            <i class="fas fa-download"></i> Download File
-          </a>
+        <!-- Unsupported File Type -->
+        <div class="document-content unsupported" *ngIf="currentDocumentType === 'other'">
+          <div class="unsupported-message">
+            <div class="icon">📄</div>
+            <h3>{{ getCurrentDocumentName() }}</h3>
+            <p>Preview not available for this file type</p>
+            <a [href]="currentDocumentUrl" target="_blank" class="btn-download">
+              <i class="fas fa-download"></i> Download File
+            </a>
+          </div>
         </div>
       </div>
 

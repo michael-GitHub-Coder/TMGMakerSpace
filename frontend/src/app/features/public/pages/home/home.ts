@@ -50,12 +50,12 @@ export class HomeComponent implements OnInit {
     return cols;
   }
 
-  // Owl Carousel options
+  // Owl Carousel options - optimized for performance
   carouselOptions: OwlOptions = {
     loop: true,
-    margin: 20,
-    autoplay: true,
-    autoplayTimeout: 3000,
+    margin: 15,              // Reduced margin
+    autoplay: false,           // Disabled for better performance
+    autoplayTimeout: 4000,    // Slower timeout if enabled
     autoplayHoverPause: true,
     dots: false,
     nav: true,
@@ -65,5 +65,14 @@ export class HomeComponent implements OnInit {
       768: { items: 2 },
       1200: { items: 5 }, // show 5 columns at full width
     },
+    lazyLoad: true,          // Enable lazy loading
+    lazyLoadEager: 0,        // Load current and next items
+    mouseDrag: true,          // Enable touch/drag
+    touchDrag: true,
+    pullDrag: false,          // Disable pull drag for better performance
+    freeDrag: false,          // Disable free drag for better performance
+    stagePadding: 0,          // No padding for cleaner look
+    merge: false,             // No merging for better performance
+    autoWidth: false,          // Fixed width for better control
   };
 }

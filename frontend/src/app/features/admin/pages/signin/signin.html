@@ -1,6 +1,10 @@
 <div class="signin-page">
   <div class="signin-card">
     <div class="text-center mb-4">
+      <!-- TMG Makerspace Logo -->
+      <div class="logo-container mb-3">
+        <img src="/images/Tmg-makerspace-Logo.png" alt="TMG Makerspace Logo" class="signin-logo">
+      </div>
       <h2>Portal</h2>
       <!-- <p class="text-muted">Please sign in with your admin credentials</p> -->
     </div>
@@ -79,5 +83,12 @@
         <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       </button>
     </form>
+    
+    <!-- Back to Home Link -->
+    <div class="text-center mt-3">
+      <a href="#" (click)="goToHome()" class="back-to-home-link">
+        <i class="bi bi-arrow-left me-1"></i>Back to Home
+      </a>
+    </div>
   </div>
 </div>

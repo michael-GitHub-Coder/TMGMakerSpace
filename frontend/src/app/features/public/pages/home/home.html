@@ -27,13 +27,13 @@
     <div class="col-lg-6 d-none d-lg-block" data-aos="fade-up">
       <section class="hexagon-gallery">
         <div class="hexagon-gallery-top">
-          <div class="hex"><img src="./images/Home_Pic 1.jpg" alt="Hero image 1"/></div>
-          <div class="hex"><img src="./images/Home_Pic 2.png" alt="Hero image 2"/></div>
+          <div class="hex"><img src="./images/Home_Pic 1.jpg" alt="Hero image 1" loading="lazy"/></div>
+          <div class="hex"><img src="./images/Home_Pic 2.png" alt="Hero image 2" loading="lazy"/></div>
         </div>
         <div class="hexagon-gallery-bottom">
-          <div class="hex"><img src="./images/Home_Pic 3.png" alt="Hero image 3"/></div>
-          <div class="hex"><img src="./images/Homepage 4.jpg" alt="Hero image 4"/></div>
-          <div class="hex"><img src="./images/Homepage 5.jpg" alt="Hero image 5"/></div>
+          <div class="hex"><img src="./images/Home_Pic 3.png" alt="Hero image 3" loading="lazy"/></div>
+          <div class="hex"><img src="./images/Homepage 4.jpg" alt="Hero image 4" loading="lazy"/></div>
+          <div class="hex"><img src="./images/Homepage 5.jpg" alt="Hero image 5" loading="lazy"/></div>
         </div>
       </section>
     </div>
@@ -50,7 +50,7 @@
         <ng-template carouselSlide>
           <div class="partner-column">
             <div class="partner-item" *ngFor="let logo of col">
-              <img [src]="logo" [alt]="'Partner'" />
+              <img [src]="logo" [alt]="'Partner'" loading="lazy" />
             </div>
           </div>
         </ng-template>

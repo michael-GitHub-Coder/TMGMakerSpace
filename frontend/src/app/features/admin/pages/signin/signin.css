@@ -4,8 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background-color: var(--color-secondary, #cadbea);
-  background-image: linear-gradient(135deg, var(--color-secondary, #cadbea) 0%, #f8f9fa 100%);
+  background-color: var(--color-primary, #5c5b5c);
 }
 
 .signin-card {
@@ -24,6 +23,20 @@
   color: var(--color-primary, #5c5b5c);
   font-weight: 700;
   font-size: 1.75rem;
+}
+
+/* Logo Styles */
+.logo-container {
+  text-align: center;
+}
+
+.signin-logo {
+  max-width: 180px;
+  max-height: 180px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 1rem;
 }
 
 .signin-card .text-muted {
@@ -117,10 +130,34 @@
   }
   
   .signin-page {
-    padding: 1rem 0;
+    padding: 2rem 0;
   }
   
   .signin-card h2 {
     font-size: 1.5rem;
   }
+  
+  .signin-logo {
+    max-width: 140px;
+    max-height: 140px;
+  }
+}
+
+/* Back to Home Link */
+.back-to-home-link {
+  color: #495057;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.back-to-home-link:hover {
+  color: var(--color-primary, #5c5b5c);
+  text-decoration: none;
+}
+
+.back-to-home-link i {
+  font-size: 0.85rem;
 }

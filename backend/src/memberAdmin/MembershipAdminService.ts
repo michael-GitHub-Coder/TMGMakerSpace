@@ -27,8 +27,14 @@ export class MembershipAdminService {
       throw new BadRequestException('Application already processed');
     }
 
-    // Generate one-time password
-    const otp = Math.random().toString(36).slice(-8);
+    // Generate one-time password using alphanumeric characters only
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let otp = '';
+    for (let i = 0; i < 8; i++) {
+      otp += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    console.log(`[MEMBER_ADMIN] Generated OTP: ${otp} for email: ${application.email}`);
 
     // Create user
     const user = this.userRepo.create({

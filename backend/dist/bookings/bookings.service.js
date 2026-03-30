@@ -97,7 +97,16 @@ let BookingsService = BookingsService_1 = class BookingsService {
         });
     }
     async delete(id) {
-        await this.remove(id);
+        try {
+            await this.remove(id);
+        }
+        catch (error) {
+            if (error instanceof Error && error.message === 'Booking not found') {
+                this.logger.log(`[BOOKING] Booking ${id} not found, may have already been deleted`);
+                return;
+            }
+            throw error;
+        }
     }
     async cancel(id) {
         const booking = await this.findOne(id);

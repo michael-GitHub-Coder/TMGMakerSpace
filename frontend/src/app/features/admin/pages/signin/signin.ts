@@ -126,4 +126,8 @@ export class SigninComponent {
   //     }
   //   });
   // }
+
+  goToHome() {
+    this.router.navigate(['/']);
+  }
 }

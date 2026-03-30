@@ -258,7 +258,7 @@ header{
     font-size: 1.2vw;
 }
 .navbar .nav-menu .nav-item:nth-child(6) a{
-    /* border: 3px solid var(--color-fourth); */
+    border: none;
 }
 
 .navbar .nav-menu .nav-item a:hover {
@@ -342,16 +342,19 @@ header{
         margin-bottom: 10px;
     }
     .navbar a.logo {
-        /* margin-top: 10px; */
+        margin-top: 10px;
     }
     .navbar .nav-menu .nav-item a {
         font-size: 14px;
     }
     .navbar a.logo img {
         margin-top: 8px;
-        margin-left: -20px;
-        width: 260px;
+        margin-left: 0;
+        width: 180px;
         height: auto;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 

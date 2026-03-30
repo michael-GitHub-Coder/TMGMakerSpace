@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { HeaderComponent } from '../../../../shared/header/header';
-import { FooterComponent } from '../../../../shared/footer/footer';
-import { SidebarComponent } from '../../../admin/shared/sidebar/sidebar';
+import { SidebarComponent } from '../../shared/sidebar/sidebar';
 import { BookingService, Booking } from '../../../../shared/booking/booking.service';
 import { AuthService } from '../../../../shared/services/auth.service';
 
@@ -16,7 +14,7 @@ interface User {
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent, FooterComponent],
+  imports: [CommonModule, RouterModule, SidebarComponent],
   templateUrl: './account.html',
   styleUrls: ['./account.css']
 })
@@ -29,7 +27,11 @@ export class AccountComponent implements OnInit {
   role: string | null = null;
  
 
-  constructor(private router: Router, private bookingService: BookingService,private authService: AuthService) {}
+  constructor(
+    private router: Router, 
+    private bookingService: BookingService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
 

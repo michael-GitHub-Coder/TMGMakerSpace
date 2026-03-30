@@ -167,16 +167,21 @@ export class BookingComponent implements OnInit {
       const formValue = this.bookingForm.getRawValue();
 
       const bookingData = {
-        name: (formValue.name || '').trim(),
-        surname: (formValue.surname || '').trim(),
-        email: (formValue.email || '').trim().toLowerCase(),
-        phone: (formValue.phone || '').trim(),
-        machineType: formValue.machineType || '',
-        pricePerHour: this.getSelectedMachinePrice(),
-        bookingDate: formValue.bookingDate || '',
-        bookingTime: formValue.bookingTime || '',
-        duration: Number(formValue.duration) || 1,
-        totalPrice: this.getTotalPrice()
+        name: this.bookingForm.value.name,
+        surname: this.bookingForm.value.surname,
+        email: this.bookingForm.value.email,
+        phone: this.bookingForm.value.phone,
+        machineType: this.bookingForm.value.machineType,
+        pricePerHour: this.bookingForm.value.pricePerHour,
+        bookingDate: this.bookingForm.value.bookingDate,
+        bookingTime: this.bookingForm.value.bookingTime,
+        duration: this.bookingForm.value.duration,
+        totalPrice: 0, // Will be calculated by SA pricing
+        totalCalculatedPrice: 0,
+        vatAmount: 0,
+        subtotal: 0,
+        discounts: 0,
+        surcharges: 0
       };
 
       // Basic validation
@@ -184,8 +189,8 @@ export class BookingComponent implements OnInit {
         throw new Error('Please fill in all required fields');
       }
 
-      // Submit booking
-      const newBooking = await this.bookingService.createBooking(bookingData);
+      // Submit booking with SA pricing
+      const newBooking = await this.bookingService.createBookingWithSAPricing(bookingData);
 
       if (!newBooking) throw new Error('Failed to create booking');
 

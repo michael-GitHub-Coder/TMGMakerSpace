@@ -6,6 +6,9 @@
   <img src="./images/Tmg-makerspace-Logo.png" alt="TMG Logo" class="mobile-logo" />
 </div>
 
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay" [class.active]="isSidebarOpen" (click)="closeSidebar()"></div>
+
 <!-- Sidebar Navigation -->
 <nav class="sidebar" [class.open]="isSidebarOpen">
   <div class="sidebar-header">

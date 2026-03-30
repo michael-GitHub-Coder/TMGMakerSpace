@@ -30,4 +30,8 @@ export class SidebarComponent implements OnInit {
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
 }

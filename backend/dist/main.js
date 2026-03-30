@@ -27,9 +27,13 @@ const dotenv = __importStar(require("dotenv"));
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
+const path_1 = require("path");
 dotenv.config();
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.useStaticAssets((0, path_1.join)(__dirname, '..', 'uploads'), {
+        prefix: '/uploads/',
+    });
     app.enableCors({
         origin: ['http://localhost:4200', 'http://localhost:51581', 'http://localhost:62378'],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

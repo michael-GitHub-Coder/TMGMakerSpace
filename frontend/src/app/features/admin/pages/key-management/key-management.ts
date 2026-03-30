@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SidebarComponent } from '../../../admin/shared/sidebar/sidebar';
-import { FooterComponent } from '../../../../shared/footer/footer';
-import { HeaderComponent } from '../../../../shared/header/header';
 import { KeyManagementService, KeyManagement } from '../../../../shared/key-management/key-management.service';
 import { AuthService } from '../../../../shared/services/auth.service';
 
@@ -52,7 +50,7 @@ class SouthAfricanDateUtil {
 @Component({
   selector: 'app-key-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, FooterComponent, HeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent],
   templateUrl: './key-management.html',
   styleUrls: ['./key-management.css']
 })

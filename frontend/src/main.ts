@@ -17,7 +17,13 @@ bootstrapApplication(App, {
   ]
 })
   .then(() => {
-    // Initialize AOS animations
-    AOS.init({ duration: 1000, once: true });
+    // Initialize AOS animations with optimized settings
+    AOS.init({ 
+      duration: 800,           // Faster animations
+      once: true,             // Only animate once
+      offset: 100,            // Start animation earlier
+      throttleDelay: 50,      // Reduce throttle delay
+      disable: 'mobile'        // Disable on mobile for better performance
+    });
   })
   .catch(err => console.error('Bootstrap error:', err));

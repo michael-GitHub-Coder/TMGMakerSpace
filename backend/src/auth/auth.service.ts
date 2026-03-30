@@ -58,14 +58,21 @@ export class AuthService {
         return null;
       }
       
-      console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
-      console.log(`[AUTH] Comparing input password: ${password} with OTP`);
+      // Trim and normalize both values for comparison
+      const storedOtp = membershipApplication.oneTimePassword.trim().toUpperCase();
+      const inputOtp = password.trim().toUpperCase();
       
-      // Compare password with OTP (case-insensitive)
-      const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
+      console.log(`[AUTH] Stored OTP: "${storedOtp}" (length: ${storedOtp.length})`);
+      console.log(`[AUTH] Input OTP: "${inputOtp}" (length: ${inputOtp.length})`);
+      
+      // Direct string comparison after normalization
+      const isOtpValid = storedOtp === inputOtp;
       console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
       
-      if (!isOtpValid) return null;
+      if (!isOtpValid) {
+        console.log(`[AUTH] OTP mismatch - expected: "${storedOtp}", received: "${inputOtp}"`);
+        return null;
+      }
     } else {
       // For non-members, validate against regular password
       console.log(`[AUTH] Non-member login detected for: ${email}`);

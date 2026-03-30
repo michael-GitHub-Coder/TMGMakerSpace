@@ -68,7 +68,7 @@ let KeyNotificationService = KeyNotificationService_1 = class KeyNotificationSer
       • Contact Phone: ${data.memberPhone}
       
       ⚠️ Important Information:
-      • Please return the key promptly after use
+      • Please return the key promptly after use 
       • You will receive a reminder email if the key is not returned within 30 minutes
       • Handle the equipment with care
       
@@ -99,14 +99,14 @@ let KeyNotificationService = KeyNotificationService_1 = class KeyNotificationSer
         const emailContent = `
       Dear ${data.memberName},
       
-      ⏰ REMINDER: You have had a key for ${data.equipmentName} for over 30 minutes.
+      ⏰ REMINDER: Its almost time to return the key for ${data.equipmentName}. Please return it soon.
       
       📋 Issuance Details:
       • Equipment: ${data.equipmentName}
       • Issued by: ${data.issuedBy}
       • Issued at: ${data.issuedDateTime}
       
-      🔑 Please return the key immediately to:
+      🔑 Please return the key to:
       • TMG Makerspace Admin Desk
       • During operating hours
       
@@ -161,7 +161,7 @@ let KeyNotificationService = KeyNotificationService_1 = class KeyNotificationSer
       We look forward to seeing you again at TMG Makerspace.
       
       Best regards,
-      TMG Makerspace Team
+      TMG Makerspace Team.
     `;
         try {
             await this.transporter.sendMail({

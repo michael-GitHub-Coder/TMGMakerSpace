@@ -1,52 +1,151 @@
-<div class="application-container">
-  <h2>Membership Application</h2>
+<div class="application-page">
+  <!-- Background Elements -->
+  <div class="background-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
 
-  <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()">
+  <!-- Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <button class="back-btn" (click)="goHome()" title="Back to Home">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Home</span>
+      </button>
+      <div class="logo-section">
+        <img src="/images/Tmg-makerspace-Logo.png" alt="TMG Makerspace" class="logo-image">
+      </div>
+    </div>
+  </header>
 
-    <div class="form-group">
-      <label>Name</label>
-      <input type="text" formControlName="name" />
-      <small *ngIf="applicationForm.get('name')?.touched && applicationForm.get('name')?.invalid">
-        Name is required
-      </small>
+  <!-- Main Application Container -->
+  <main class="application-container">
+    <div class="application-header">
+      <h2>
+        <i class="bi bi-person-plus"></i>
+        Membership Application
+      </h2>
+      <p class="application-subtitle">Join our creative community and access cutting-edge equipment</p>
     </div>
 
-    <div class="form-group">
-      <label>Surname</label>
-      <input type="text" formControlName="surname" />
-      <small *ngIf="applicationForm.get('surname')?.touched && applicationForm.get('surname')?.invalid">
-        Surname is required
-      </small>
-    </div>
+    <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()" class="application-form">
 
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" formControlName="email" />
-      <small *ngIf="applicationForm.get('email')?.touched && applicationForm.get('email')?.invalid">
-        Enter a valid email
-      </small>
-    </div>
+      <div class="form-section">
+        <h3 class="section-title">Personal Information</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">First Name</label>
+            <input type="text" id="name" formControlName="name" placeholder="Enter your first name" />
+            <small *ngIf="applicationForm.get('name')?.touched && applicationForm.get('name')?.invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              First name is required
+            </small>
+          </div>
 
-    <div class="form-group">
-      <label>Phone</label>
-      <input type="text" formControlName="phone" />
-      <small *ngIf="applicationForm.get('phone')?.touched && applicationForm.get('phone')?.invalid">
-        Phone number is required
-      </small>
-    </div>
+          <div class="form-group">
+            <label for="surname">Last Name</label>
+            <input type="text" id="surname" formControlName="surname" placeholder="Enter your last name" />
+            <small *ngIf="applicationForm.get('surname')?.touched && applicationForm.get('surname')?.invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              Last name is required
+            </small>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Supporting Documents</label>
-      <input type="file" multiple (change)="onFileChange($event)" />
-      <small>You can upload multiple files (PDF, images, etc.)</small>
-    </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" formControlName="email" placeholder="your.email@example.com" />
+            <small *ngIf="applicationForm.get('email')?.touched && applicationForm.get('email')?.invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              Enter a valid email address
+            </small>
+          </div>
 
-    <button type="submit" [disabled]="isSubmitting">
-      {{ isSubmitting ? 'Submitting...' : 'Submit Application' }}
-    </button>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" formControlName="phone" placeholder="+27 12 345 6789" />
+            <small *ngIf="applicationForm.get('phone')?.touched && applicationForm.get('phone')?.invalid">
+              <i class="bi bi-exclamation-circle"></i>
+              Phone number is required
+            </small>
+          </div>
+        </div>
+      </div>
 
-    <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
-    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <div class="form-section">
+        <h3 class="section-title">Supporting Documents</h3>
+        
+        <div class="form-group full-width">
+          <label for="documents">Upload Documents</label>
+          <div class="file-upload-area" [class.has-files]="selectedFiles.length > 0">
+            <input type="file" id="documents" #documents multiple (change)="onFileChange($event)" />
+            
+            <!-- Upload prompt (shown when no files) -->
+            <div class="file-upload-label" *ngIf="selectedFiles.length === 0">
+              <i class="bi bi-cloud-upload"></i>
+              <span>Click to upload or drag and drop</span>
+              <small>PDF, JPG, PNG files (Max 10MB each)</small>
+            </div>
 
-  </form>
+            <!-- Files list (shown when files are uploaded) -->
+            <div class="uploaded-files" *ngIf="selectedFiles.length > 0">
+              <div class="files-header">
+                <i class="bi bi-file-earmark-check"></i>
+                <span>{{ selectedFiles.length }} file(s) uploaded</span>
+              </div>
+              <div class="files-list">
+                <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+                  <div class="file-info">
+                    <i class="bi bi-file-earmark" [ngClass]="{
+                      'bi-file-earmark-pdf': file.type.includes('pdf'),
+                      'bi-file-earmark-image': file.type.includes('image')
+                    }"></i>
+                    <div class="file-details">
+                      <span class="file-name">{{ file.name }}</span>
+                      <span class="file-size">{{ formatFileSize(file.size) }}</span>
+                    </div>
+                  </div>
+                  <button type="button" class="remove-file" (click)="removeFile(i)" title="Remove file">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="add-more-files">
+                <button type="button" class="add-files-btn" (click)="triggerFileInput()">
+                  <i class="bi bi-plus-circle"></i>
+                  Add more files
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="goHome()">
+          <i class="bi bi-x-circle"></i>
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+          <i class="bi" [ngClass]="isSubmitting ? 'bi-hourglass-split' : 'bi-send'"></i>
+          {{ isSubmitting ? 'Submitting...' : 'Submit Application' }}
+        </button>
+      </div>
+
+      <div class="form-messages">
+        <div class="success-message" *ngIf="successMessage">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+        <div class="error-message" *ngIf="errorMessage">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      </div>
+
+    </form>
+  </main>
 </div>

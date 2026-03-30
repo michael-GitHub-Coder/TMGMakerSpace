@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { MembershipModule } from './memberApplication/Membership.Module';
 import { MembershipAdminModule } from './memberAdmin/MembershipAdmin.Module';
 import { KeysModule } from './keys/keys.module';
+import { BlogsModule } from './blogs/blogs.module';
 import { DebugController } from './debug.controller';
 import { TestController } from './test.controller';
 import { TestMemberController } from './test-member.controller';
@@ -48,6 +49,7 @@ import { User } from './users/user.entity';
     MembershipModule,
     MembershipAdminModule,
     KeysModule,
+    BlogsModule,
   ],
   controllers: [AppController, DebugController, TestController, TestMemberController, EmailTestController],
   providers: [AppService, BookingEmailService, KeyNotificationService],

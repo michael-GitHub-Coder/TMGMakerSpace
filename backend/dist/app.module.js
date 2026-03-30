@@ -19,6 +19,7 @@ const users_module_1 = require("./users/users.module");
 const Membership_Module_1 = require("./memberApplication/Membership.Module");
 const MembershipAdmin_Module_1 = require("./memberAdmin/MembershipAdmin.Module");
 const keys_module_1 = require("./keys/keys.module");
+const blogs_module_1 = require("./blogs/blogs.module");
 const debug_controller_1 = require("./debug.controller");
 const test_controller_1 = require("./test.controller");
 const test_member_controller_1 = require("./test-member.controller");
@@ -56,6 +57,7 @@ exports.AppModule = AppModule = __decorate([
             Membership_Module_1.MembershipModule,
             MembershipAdmin_Module_1.MembershipAdminModule,
             keys_module_1.KeysModule,
+            blogs_module_1.BlogsModule,
         ],
         controllers: [app_controller_1.AppController, debug_controller_1.DebugController, test_controller_1.TestController, test_member_controller_1.TestMemberController, email_test_controller_1.EmailTestController],
         providers: [app_service_1.AppService, booking_email_service_1.BookingEmailService, key_notification_service_1.KeyNotificationService],

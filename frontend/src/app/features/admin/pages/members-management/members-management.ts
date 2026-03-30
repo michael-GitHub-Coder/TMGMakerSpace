@@ -311,13 +311,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SidebarComponent } from '../../../admin/shared/sidebar/sidebar';
-import { HeaderComponent } from '../../../../shared/header/header';
 import { ApplicationService, Application } from '../../../../shared/Application/Application.service';
 
 @Component({
   selector: 'app-members-management',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, SidebarComponent],
   templateUrl: './members-management.html',
   styleUrls: ['./members-management.css']
 })
@@ -345,6 +344,9 @@ export class MembersManagement implements OnInit {
   // Rejection modal
   showRejectModal = false;
   rejectionReason = '';
+
+  // Fullscreen functionality
+  isFullscreen = false;
 
   constructor(
     private router: Router,
@@ -571,5 +573,10 @@ export class MembersManagement implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  // Fullscreen functionality
+  toggleFullscreen(): void {
+    this.isFullscreen = !this.isFullscreen;
   }
 }

@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SidebarComponent } from '../../../admin/shared/sidebar/sidebar';
-import { FooterComponent } from '../../../../shared/footer/footer';
-import { HeaderComponent } from '../../../../shared/header/header';
 import { BookingService, Booking } from '../../../../shared/booking/booking.service';
 import { AuthService } from '../../../../shared/services/auth.service';
 
@@ -28,7 +26,7 @@ interface Admin {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent, FooterComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule, SidebarComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })

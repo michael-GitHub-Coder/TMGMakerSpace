@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApplicationService } from '../../shared/Application/Application.service';
 
 @Component({
@@ -19,10 +20,13 @@ export class ApplicationComponent {
   isSubmitting = false;
   successMessage = '';
   errorMessage = '';
+  
+  @ViewChild('documents') documentsInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private fb: FormBuilder,
-    private applicationService: ApplicationService
+    private applicationService: ApplicationService,
+    private router: Router
   ) {
     this.applicationForm = this.fb.group({
       name: ['', Validators.required],
@@ -36,6 +40,26 @@ export class ApplicationComponent {
     if (event.target.files?.length) {
       this.selectedFiles = Array.from(event.target.files);
     }
+  }
+
+  removeFile(index: number) {
+    this.selectedFiles.splice(index, 1);
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  triggerFileInput(): void {
+    this.documentsInput.nativeElement.click();
+  }
+
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 
   async onSubmit() {

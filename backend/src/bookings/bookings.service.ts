@@ -97,7 +97,17 @@ export class BookingsService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.remove(id);
+    try {
+      await this.remove(id);
+    } catch (error) {
+      // If booking is not found, it might have already been deleted
+      if (error instanceof Error && error.message === 'Booking not found') {
+        this.logger.log(`[BOOKING] Booking ${id} not found, may have already been deleted`);
+        return; // Don't throw error for already deleted booking
+      }
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   async cancel(id: string): Promise<BookingEntity> {
