@@ -37,12 +37,7 @@ let MembershipAdminService = class MembershipAdminService {
         if (application.status !== 'pending') {
             throw new common_1.BadRequestException('Application already processed');
         }
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let otp = '';
-        for (let i = 0; i < 8; i++) {
-            otp += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        console.log(`[MEMBER_ADMIN] Generated OTP: ${otp} for email: ${application.email}`);
+        const otp = Math.random().toString(36).slice(-8);
         const user = this.userRepo.create({
             firstName: application.name,
             lastName: application.surname,

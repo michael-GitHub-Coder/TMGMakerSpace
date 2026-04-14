@@ -73,16 +73,12 @@ let AuthService = class AuthService {
                 console.log(`[AUTH] No OTP found for member: ${email}`);
                 return null;
             }
-            const storedOtp = membershipApplication.oneTimePassword.trim().toUpperCase();
-            const inputOtp = password.trim().toUpperCase();
-            console.log(`[AUTH] Stored OTP: "${storedOtp}" (length: ${storedOtp.length})`);
-            console.log(`[AUTH] Input OTP: "${inputOtp}" (length: ${inputOtp.length})`);
-            const isOtpValid = storedOtp === inputOtp;
+            console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
+            console.log(`[AUTH] Comparing input password: ${password} with OTP`);
+            const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
             console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
-            if (!isOtpValid) {
-                console.log(`[AUTH] OTP mismatch - expected: "${storedOtp}", received: "${inputOtp}"`);
+            if (!isOtpValid)
                 return null;
-            }
         }
         else {
             console.log(`[AUTH] Non-member login detected for: ${email}`);
@@ -95,21 +91,19 @@ let AuthService = class AuthService {
         console.log(`[AUTH] Login successful for: ${email}`);
         return result;
     }
-    generateToken(user, rememberMe = false) {
-        const expiresIn = rememberMe ? '7d' : '1h';
+    generateToken(user) {
         const payload = { sub: user.id, email: user.email, role: user.role };
-        return this.jwtService.sign(payload, { expiresIn });
+        return this.jwtService.sign(payload);
     }
     async login(loginDto) {
         const user = await this.validateUser(loginDto.email, loginDto.password);
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
-        const token = this.generateToken(user, loginDto.rememberMe);
+        const token = this.generateToken(user);
         return {
             status: 'success',
             message: 'Login successful',
             token,
-            expiresIn: loginDto.rememberMe ? '7 days' : '1 hour',
             data: { user },
         };
     }
@@ -131,7 +125,6 @@ let AuthService = class AuthService {
             status: 'success',
             message: 'Registration successful',
             token,
-            expiresIn: '1 hour',
             data: { user: result },
         };
     }
@@ -147,7 +140,6 @@ let AuthService = class AuthService {
             status: 'success',
             message: 'Password changed successfully',
             token,
-            expiresIn: '1 hour',
             data: { user },
         };
     }

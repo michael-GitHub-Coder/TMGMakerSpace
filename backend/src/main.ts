@@ -3,19 +3,15 @@ import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { join } from 'path';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import * as express from 'express';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { SerializationInterceptor } from './interceptors/serialization.interceptor';
 
 // Load environment variables from .env file
 dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
-  // Enable static file serving for uploads directory
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  });
+  const app = await NestFactory.create(AppModule);
   
   // Enable CORS for frontend
   app.enableCors({
@@ -24,11 +20,25 @@ async function bootstrap() {
     credentials: true,
   });
   
+  // Increase payload size limits for image uploads
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
+  
   // Enable validation
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true,
+    forbidNonWhitelisted: false,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
   }));
+  
+  // Apply global exception filter
+  app.useGlobalFilters(new HttpExceptionFilter());
+  
+  // Apply global serialization interceptor
+  app.useGlobalInterceptors(new SerializationInterceptor());
   
   await app.listen(process.env.PORT ?? 3000);
   console.log('Backend server running on http://localhost:3000');

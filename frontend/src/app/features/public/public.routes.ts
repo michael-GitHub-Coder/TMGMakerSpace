@@ -18,6 +18,10 @@ export const PUBLIC_ROUTES: Routes = [
         loadComponent: () => import('./pages/members/members').then(m => m.MembersComponent)
     },
     {
+        path: 'blog/:id',
+        loadComponent: () => import('./pages/blog-detail/blog-detail').then(m => m.BlogDetailComponent)
+    },
+    {
         path: 'blog',
         loadComponent: () => import('./pages/blog/blog').then(m => m.BlogComponent)
     },

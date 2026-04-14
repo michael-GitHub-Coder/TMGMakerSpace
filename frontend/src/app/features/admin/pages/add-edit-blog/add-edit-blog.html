@@ -11,6 +11,12 @@
     </div>
 
     <form (ngSubmit)="saveBlog()" class="blog-form">
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="isLoading" class="loading-indicator">
+        Loading...
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label for="title">Title</label>
@@ -40,10 +46,10 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-          {{ isEditMode ? 'Update Blog' : 'Add Blog' }}
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Saving...' : (isEditMode ? 'Update Blog' : 'Add Blog') }}
         </button>
-        <button type="button" class="btn btn-secondary" routerLink="/admin/blogs-management">Cancel</button>
+        <button type="button" class="btn btn-secondary" routerLink="/admin/blogs-management" [disabled]="isLoading">Cancel</button>
       </div>
     </form>
   </div>

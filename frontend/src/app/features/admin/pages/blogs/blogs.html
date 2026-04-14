@@ -3,38 +3,68 @@
 <section class="add-blog-section">
   <div class="add-blog-card">
     <h2>Add New Blog</h2>
-    <form (ngSubmit)="addBlog()">
+    <form (ngSubmit)="addBlog()" [class.loading]="isLoading">
       <div class="form-group">
         <label>Title</label>
         <input type="text" placeholder="Blog Title" [(ngModel)]="newBlog.title" name="title" required />
       </div>
 
       <div class="form-group">
-        <label>Subtitle</label>
-        <input type="text" placeholder="Blog Subtitle" [(ngModel)]="newBlog.subtitle" name="subtitle" required />
+        <label>Subtitle </label>
+        <input type="text" placeholder="Blog Subtitle" [(ngModel)]="newBlog.subtitle" name="subtitle" />
       </div>
 
       <div class="form-group">
         <label>Description</label>
-        <textarea placeholder="Blog Description" [(ngModel)]="newBlog.description" name="description" required></textarea>
+        <textarea placeholder="Brief description (appears on homepage/blog listing)" [(ngModel)]="newBlog.description" name="description" required rows="3"></textarea>
       </div>
 
       <div class="form-group">
-        <label>Date & Time</label>
-        <input type="datetime-local" [(ngModel)]="newBlog.dateTime" name="dateTime" required />
+        <label>Full Content</label>
+        <textarea placeholder="Full blog content (appears on 'Read More' page )" [(ngModel)]="newBlog.content" name="content" rows="8"></textarea>
+        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+          Use this for the complete blog content.)
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Author (Optional)</label>
+        <input type="text" placeholder="Author Name" [(ngModel)]="newBlog.author" name="author" />
+      </div>
+
+      <div class="form-group">
+        <label>Tags (Optional)</label>
+        <input type="text" placeholder="Tags (comma separated)" [(ngModel)]="tagsString" name="tags" />
       </div>
 
       <div class="form-group">
         <label>Image</label>
-        <input type="file" (change)="onImageUpload($event)" />
+        <input type="file" (change)="onImageUpload($event)" accept="image/*" />
+        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+          Maximum file size: 5MB. Images will be automatically compressed and optimized. Supported formats: JPG, PNG, GIF, WebP
+        </small>
       </div>
 
       <div class="form-buttons">
-        <button type="submit" class="btn btn-danger">Save Blog</button>
-       <a routerlink="/admin/dashboard" class="btn btn-secondary w-50" href="/admin/dashboard">Cancel</a>
+        <button type="submit" class="btn btn-danger" [disabled]="isLoading">
+          {{ isLoading ? 'Saving...' : 'Save Blog' }}
+        </button>
+       <a routerLink="/admin/dashboard" class="btn btn-secondary w-50">Cancel</a>
+      </div>
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+        <div class="success-actions">
+          <a routerLink="/" class="btn btn-primary">View on Homepage</a>
+          <button (click)="resetForm()" class="btn btn-secondary">Add Another Blog</button>
+        </div>
       </div>
     </form>
   </div>
 </section>
+
+
 
 <app-footer></app-footer>

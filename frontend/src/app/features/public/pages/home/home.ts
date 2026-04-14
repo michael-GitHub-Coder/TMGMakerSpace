@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
 import { HeaderComponent } from '../../../../shared/header/header';
 import { FooterComponent } from '../../../../shared/footer/footer';
+import { BlogApiService, Blog } from '../../../../services/blog-api.service';
+import { BlogRefreshService } from '../../../../services/blog-refresh.service';
+import { Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +15,8 @@ import { FooterComponent } from '../../../../shared/footer/footer';
   templateUrl: './home.html',
   imports: [CommonModule, RouterModule, CarouselModule, HeaderComponent, FooterComponent],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   logos: string[] = [
     './images/patners/Wits-University-Logo.jpeg',
     './images/patners/City_of_Johannesburg_logo.png',
@@ -37,9 +42,83 @@ export class HomeComponent implements OnInit {
 
   // Split into 5 columns (4 logos per column)
   columns: string[][] = [];
+  latestBlogs: Blog[] = [];
+  blogsLoading = false;
+  blogsError = '';
+
+  constructor(private blogApiService: BlogApiService, private router: Router, private blogRefreshService: BlogRefreshService) {}
 
   ngOnInit(): void {
     this.columns = this.createColumns(this.logos, 4); // 4 logos per column
+    // Load blogs immediately
+    this.loadLatestBlogs();
+    
+    // Listen for blog refresh events (when new blogs are created)
+    this.blogRefreshService.refreshBlogs$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      console.log('[HOME COMPONENT] Blog refresh event received, reloading blogs...');
+      this.loadLatestBlogs();
+    });
+    
+    // Listen for router events to refresh blogs when returning to homepage
+    this.router.events.pipe(
+      takeUntil(this.destroy$),
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      if (event.urlAfterRedirects === '/' || event.urlAfterRedirects === '/home') {
+        // Add small delay to prevent rapid successive calls
+        setTimeout(() => {
+          this.loadLatestBlogs();
+        }, 500);
+      }
+    });
+  }
+
+  refreshBlogs(): void {
+    console.log('Manually refreshing blogs...');
+    // Clear current data first
+    this.latestBlogs = [];
+    this.blogsError = '';
+    this.loadLatestBlogs();
+  }
+
+  forceRefreshBlogs(): void {
+    console.log('Force refreshing blogs - clearing all cache...');
+    // Clear all data and reload
+    this.latestBlogs = [];
+    this.blogsError = '';
+    this.blogsLoading = false;
+    
+    // Small delay to ensure clear
+    setTimeout(() => {
+      this.loadLatestBlogs();
+    }, 100);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadLatestBlogs(): void {
+    console.log('Starting to load latest blogs...');
+    this.blogsLoading = true;
+    this.blogsError = '';
+    this.blogApiService.getLatestBlogs(3).subscribe({
+      next: (blogs: Blog[]) => {
+        console.log('Successfully loaded blogs:', blogs);
+        console.log('Number of blogs:', blogs.length);
+        console.log('First blog:', blogs[0]);
+        this.latestBlogs = blogs;
+        this.blogsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading latest blogs:', error);
+        this.blogsError = 'Failed to load latest blogs';
+        this.blogsLoading = false;
+      }
+    });
   }
 
   createColumns(arr: string[], perCol: number): string[][] {

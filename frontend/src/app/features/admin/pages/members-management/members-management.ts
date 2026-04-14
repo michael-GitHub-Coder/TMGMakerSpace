@@ -345,9 +345,6 @@ export class MembersManagement implements OnInit {
   showRejectModal = false;
   rejectionReason = '';
 
-  // Fullscreen functionality
-  isFullscreen = false;
-
   constructor(
     private router: Router,
     private applicationService: ApplicationService,
@@ -573,10 +570,5 @@ export class MembersManagement implements OnInit {
       month: 'short',
       day: 'numeric'
     });
-  }
-
-  // Fullscreen functionality
-  toggleFullscreen(): void {
-    this.isFullscreen = !this.isFullscreen;
   }
 }

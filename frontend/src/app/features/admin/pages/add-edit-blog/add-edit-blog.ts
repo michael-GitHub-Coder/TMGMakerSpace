@@ -5,15 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../../../shared/header/header';
 import { FooterComponent } from '../../../../shared/footer/footer';
 import { SidebarComponent } from '../../../admin/shared/sidebar/sidebar';
-
-interface BlogPost {
-  id: number;
-  title: string;
-  subtitle?: string;
-  description?: string;
-  image?: string;
-  dateTime: string;
-}
+import { BlogApiService, CreateBlogRequest, Blog } from '../../../../services/blog-api.service';
 
 @Component({
   selector: 'app-add-edit-blog',
@@ -23,27 +15,59 @@ interface BlogPost {
   styleUrls: ['./add-edit-blog.css']
 })
 export class AddEditBlogComponent implements OnInit {
-  blog: BlogPost = {
-    id: Date.now(),
+  blog: CreateBlogRequest = {
     title: '',
     subtitle: '',
     description: '',
     image: '',
-    dateTime: new Date().toISOString(),
+    author: '',
+    tags: [],
+    content: '',
+    published: true,
   };
 
   isEditMode = false;
+  blogId?: number;
+  isLoading = false;
+  errorMessage = '';
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router,
+    private blogApiService: BlogApiService
+  ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
-      const blogs = JSON.parse(localStorage.getItem('blogs') || '[]');
-      const existing = blogs.find((b: BlogPost) => b.id === Number(id));
-      if (existing) this.blog = existing;
+      this.blogId = Number(id);
+      this.loadBlog(this.blogId);
     }
+  }
+
+  loadBlog(id: number) {
+    this.isLoading = true;
+    this.blogApiService.getBlogById(id).subscribe({
+      next: (blog: Blog) => {
+        this.blog = {
+          title: blog.title,
+          subtitle: blog.subtitle,
+          description: blog.description,
+          image: blog.image,
+          author: blog.author,
+          tags: blog.tags,
+          content: blog.content,
+          published: blog.published,
+        };
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to load blog post';
+        this.isLoading = false;
+        console.error('Error loading blog:', error);
+      }
+    });
   }
 
   onImageUpload(event: Event) {
@@ -56,22 +80,38 @@ export class AddEditBlogComponent implements OnInit {
   }
 
   saveBlog() {
-    if (!this.blog.title) {
-      alert('Please enter a blog title.');
+    if (!this.blog.title || this.blog.title.trim() === '') {
+      this.errorMessage = 'Please enter a blog title.';
       return;
     }
 
-    const blogs = JSON.parse(localStorage.getItem('blogs') || '[]');
+    this.isLoading = true;
+    this.errorMessage = '';
 
-    if (this.isEditMode) {
-      const index = blogs.findIndex((b: BlogPost) => b.id === this.blog.id);
-      if (index !== -1) blogs[index] = this.blog;
+    if (this.isEditMode && this.blogId) {
+      this.blogApiService.updateBlog(this.blogId, this.blog).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/admin/blogs-management']);
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to update blog post';
+          this.isLoading = false;
+          console.error('Error updating blog:', error);
+        }
+      });
     } else {
-      blogs.unshift(this.blog);
+      this.blogApiService.createBlog(this.blog).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/admin/blogs-management']);
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to create blog post';
+          this.isLoading = false;
+          console.error('Error creating blog:', error);
+        }
+      });
     }
-
-    localStorage.setItem('blogs', JSON.stringify(blogs));
-    alert(`✅ Blog ${this.isEditMode ? 'updated' : 'added'} successfully!`);
-    this.router.navigate(['/admin/blogs-management']);
   }
 }

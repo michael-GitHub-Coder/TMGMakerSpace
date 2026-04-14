@@ -6,60 +6,51 @@ import {
   Patch,
   Param,
   Delete,
-  HttpCode,
-  HttpStatus,
+  ValidationPipe,
+  Query,
 } from '@nestjs/common';
-import { BlogsService, CreateBlogDto, UpdateBlogDto } from './blogs.service';
+import { BlogsService } from './blogs.service';
+import { CreateBlogDto } from './dto/create-blog.dto';
+import { UpdateBlogDto } from './dto/update-blog.dto';
 
-@Controller('blogs')
+@Controller('api/blogs')
 export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
+  @Post()
+  create(@Body(ValidationPipe) createBlogDto: CreateBlogDto) {
+    console.log('[BLOGS CONTROLLER] Received blog creation request:', createBlogDto);
+    return this.blogsService.create(createBlogDto);
+  }
+
   @Get()
-  @HttpCode(HttpStatus.OK)
-  async getPublishedBlogs() {
-    return await this.blogsService.getAllBlogs();
+  findAll() {
+    return this.blogsService.findAll();
   }
 
   @Get('admin/all')
-  @HttpCode(HttpStatus.OK)
-  async getAllBlogs() {
-    return await this.blogsService.getAllBlogsAdmin();
+  findAllAdmin() {
+    return this.blogsService.findAllAdmin();
+  }
+
+  @Get('latest')
+  getLatestBlogs(@Query('limit') limit?: string) {
+    const blogLimit = limit ? parseInt(limit, 10) : 3;
+    return this.blogsService.getLatestBlogs(blogLimit);
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  async getBlogById(@Param('id') id: string) {
-    return await this.blogsService.getBlogById(id);
-  }
-
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() createBlogDto: CreateBlogDto) {
-    return await this.blogsService.createBlog(createBlogDto);
+  findOne(@Param('id') id: string) {
+    return this.blogsService.findOne(+id);
   }
 
   @Patch(':id')
-  @HttpCode(HttpStatus.OK)
-  async updateBlog(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    return await this.blogsService.updateBlog(id, updateBlogDto);
-  }
-
-  @Patch(':id/publish')
-  @HttpCode(HttpStatus.OK)
-  async publishBlog(@Param('id') id: string) {
-    return await this.blogsService.publishBlog(id);
-  }
-
-  @Patch(':id/unpublish')
-  @HttpCode(HttpStatus.OK)
-  async unpublishBlog(@Param('id') id: string) {
-    return await this.blogsService.unpublishBlog(id);
+  update(@Param('id') id: string, @Body(ValidationPipe) updateBlogDto: UpdateBlogDto) {
+    return this.blogsService.update(+id, updateBlogDto);
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param('id') id: string) {
-    await this.blogsService.deleteBlog(id);
+  remove(@Param('id') id: string) {
+    return this.blogsService.remove(+id);
   }
 }

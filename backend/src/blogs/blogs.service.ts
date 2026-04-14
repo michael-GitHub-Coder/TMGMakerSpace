@@ -1,90 +1,82 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BlogEntity } from './blog.entity';
+import { Blog } from './blog.entity';
+import { CreateBlogDto } from './dto/create-blog.dto';
+import { UpdateBlogDto } from './dto/update-blog.dto';
 
 @Injectable()
 export class BlogsService {
   constructor(
-    @InjectRepository(BlogEntity)
-    private readonly blogRepository: Repository<BlogEntity>,
+    @InjectRepository(Blog)
+    private readonly blogRepository: Repository<Blog>,
   ) {}
 
-  async createBlog(createBlogDto: CreateBlogDto): Promise<BlogEntity> {
+  async create(createBlogDto: CreateBlogDto): Promise<Blog> {
     try {
+      console.log('[BLOGS SERVICE] Creating blog with DTO:', createBlogDto);
       const blog = this.blogRepository.create(createBlogDto);
-      
-      if (blog.published && !blog.publishedAt) {
-        blog.publishedAt = new Date();
-      }
-      
-      return await this.blogRepository.save(blog);
+      const result = await this.blogRepository.save(blog);
+      console.log('[BLOGS SERVICE] Blog created successfully:', result);
+      return result;
     } catch (error) {
-      throw new BadRequestException('Failed to create blog post');
+      console.error('[BLOGS SERVICE] Error creating blog:', error);
+      throw new InternalServerErrorException('Failed to create blog post');
     }
   }
 
-  async getAllBlogs(): Promise<BlogEntity[]> {
+  async findAll(): Promise<Blog[]> {
     try {
       return await this.blogRepository.find({
         where: { published: true },
         order: { createdAt: 'DESC' },
       });
     } catch (error) {
-      throw new NotFoundException('Failed to retrieve blog posts');
+      throw new InternalServerErrorException('Failed to fetch blog posts');
     }
   }
 
-  async getBlogById(id: string): Promise<BlogEntity> {
-    try {
-      const blog = await this.blogRepository.findOne({ where: { id } });
-      
-      if (!blog) {
-        throw new NotFoundException(`Blog post with ID ${id} not found`);
-      }
-      
-      return blog;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to retrieve blog post');
-    }
-  }
-
-  async getAllBlogsAdmin(): Promise<BlogEntity[]> {
+  async findAllAdmin(): Promise<Blog[]> {
     try {
       return await this.blogRepository.find({
         order: { createdAt: 'DESC' },
       });
     } catch (error) {
-      throw new NotFoundException('Failed to retrieve blog posts');
+      throw new InternalServerErrorException('Failed to fetch blog posts');
     }
   }
 
-  async updateBlog(id: string, updateBlogDto: UpdateBlogDto): Promise<BlogEntity> {
+  async findOne(id: number): Promise<Blog> {
     try {
-      const blog = await this.getBlogById(id);
-      
-      Object.assign(blog, updateBlogDto);
-      
-      if (blog.published && !blog.publishedAt) {
-        blog.publishedAt = new Date();
+      const blog = await this.blogRepository.findOne({ where: { id } });
+      if (!blog) {
+        throw new NotFoundException(`Blog post with ID ${id} not found`);
       }
-      
+      return blog;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to fetch blog post');
+    }
+  }
+
+  async update(id: number, updateBlogDto: UpdateBlogDto): Promise<Blog> {
+    try {
+      const blog = await this.findOne(id);
+      Object.assign(blog, updateBlogDto);
       return await this.blogRepository.save(blog);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      throw new BadRequestException('Failed to update blog post');
+      throw new InternalServerErrorException('Failed to update blog post');
     }
   }
 
-  async deleteBlog(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     try {
       const result = await this.blogRepository.delete(id);
-      
       if (result.affected === 0) {
         throw new NotFoundException(`Blog post with ID ${id} not found`);
       }
@@ -92,61 +84,19 @@ export class BlogsService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      throw new BadRequestException('Failed to delete blog post');
+      throw new InternalServerErrorException('Failed to delete blog post');
     }
   }
 
-  async publishBlog(id: string): Promise<BlogEntity> {
+  async getLatestBlogs(limit: number = 3): Promise<Blog[]> {
     try {
-      const blog = await this.getBlogById(id);
-      
-      blog.published = true;
-      blog.publishedAt = new Date();
-      
-      return await this.blogRepository.save(blog);
+      return await this.blogRepository.find({
+        where: { published: true },
+        order: { createdAt: 'DESC' },
+        take: limit,
+      });
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to publish blog post');
+      throw new InternalServerErrorException('Failed to fetch latest blog posts');
     }
   }
-
-  async unpublishBlog(id: string): Promise<BlogEntity> {
-    try {
-      const blog = await this.getBlogById(id);
-      
-      blog.published = false;
-      blog.publishedAt = null;
-      
-      return await this.blogRepository.save(blog);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to unpublish blog post');
-    }
-  }
-}
-
-export class CreateBlogDto {
-  title: string;
-  content: string;
-  author?: string;
-  summary?: string;
-  imageUrl?: string;
-  category?: string;
-  tags?: string[];
-  published?: boolean;
-}
-
-export class UpdateBlogDto {
-  title?: string;
-  content?: string;
-  author?: string;
-  summary?: string;
-  imageUrl?: string;
-  category?: string;
-  tags?: string[];
-  published?: boolean;
 }

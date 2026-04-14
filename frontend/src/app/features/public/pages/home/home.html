@@ -59,38 +59,55 @@
   </div>
 </section>
 
-
-  <!-- Partners Section -->
-  <!-- <section id="partners">
-  <div class="container"> -->
-    <!-- Title above logos -->
-    <!-- <div class="row">
-      <div class="col-12">
-        <p class="our-clients-title">Our Clients</p>
+<!-- Latest Blogs Section -->
+<section id="latest-blogs" class="latest-blogs-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <h2>Latest Blogs</h2>
+      <p>Discover the latest insights, updates, and stories from our makerspace community</p>
+      <button (click)="forceRefreshBlogs()" class="btn btn-primary mb-3">Force Refresh Blogs</button>
+    </div>
+    
+    <div *ngIf="blogsLoading" class="blogs-loading">
+      <div class="loading-spinner"></div>
+      <p>Loading latest blogs...</p>
+    </div>
+    
+    <div *ngIf="blogsError" class="blogs-error">
+      {{ blogsError }}
+    </div>
+    
+    <div *ngIf="!blogsLoading && !blogsError" class="blogs-grid">
+      <div *ngIf="latestBlogs.length === 0" class="no-blogs">
+        <p>No blog posts available yet.</p>
       </div>
-    </div> -->
-    <!-- Swiper Container for Partner Logos -->
-    <!-- <swiper-container
-      #partnersSwiper
-      class="partners-swiper"
-      slides-per-view="5"          
-      slides-per-group="1"          
-      space-between="20"
-      loop="true"
-      loop-fill-group-with-blank="true"
-      speed="800"
-      navigation="true"
-      pagination='{"clickable": true}'
-      autoplay='{"delay":1000,"disableOnInteraction":false}' 
-    >
-      <swiper-slide *ngFor="let col of logos; let colIndex = index">
-        <div class="partner-column">
-          <div class="partner-wrap" *ngFor="let logo of col; let i = index">
-            <img [src]="logo" [alt]="'Partner ' + (colIndex*4 + i + 1)" loading="lazy" />
+      
+      <div *ngFor="let blog of latestBlogs; let i = index" class="blog-card" data-aos="fade-up" [attr.data-new-blog]="i === 0 ? 'true' : null">
+        <div class="blog-image" *ngIf="blog.image">
+          <img [src]="blog.image" [alt]="blog.title" loading="lazy" />
+        </div>
+        <div class="blog-content">
+          <div class="blog-meta">
+            <span class="blog-date">{{ blog.createdAt | date:'mediumDate' }}</span>
+            <span class="blog-author" *ngIf="blog.author">{{ blog.author }}</span>
+          </div>
+          <h3 class="blog-title">{{ blog.title }}</h3>
+          <p class="blog-subtitle" *ngIf="blog.subtitle">{{ blog.subtitle }}</p>
+          <p class="blog-description" *ngIf="blog.description">{{ blog.description.length > 150 ? (blog.description | slice:0:150) + '...' : blog.description }}</p>
+          <div class="blog-tags" *ngIf="blog.tags && blog.tags.length > 0">
+            <span *ngFor="let tag of blog.tags.slice(0, 3)" class="blog-tag">{{ tag }}</span>
+          </div>
+          <div class="blog-actions">
+            <a [routerLink]="['/blog', blog.id]" class="read-more-btn">Read More</a>
           </div>
         </div>
-      </swiper-slide>
-    </swiper-container>
+      </div>
+    </div>
+    
+    <div class="view-all-blogs" *ngIf="latestBlogs.length > 0">
+      <a routerLink="/blog" class="btn btn-outline-primary">View All Blogs</a>
+    </div>
   </div>
-</section> -->
+</section>
+
 <app-footer></app-footer>

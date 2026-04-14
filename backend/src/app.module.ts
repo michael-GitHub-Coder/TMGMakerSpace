@@ -10,7 +10,6 @@ import { UsersModule } from './users/users.module';
 import { MembershipModule } from './memberApplication/Membership.Module';
 import { MembershipAdminModule } from './memberAdmin/MembershipAdmin.Module';
 import { KeysModule } from './keys/keys.module';
-import { BlogsModule } from './blogs/blogs.module';
 import { DebugController } from './debug.controller';
 import { TestController } from './test.controller';
 import { TestMemberController } from './test-member.controller';
@@ -19,6 +18,7 @@ import { BookingEmailService } from './bookings/booking-email.service';
 import { KeyNotificationService } from './keys/key-notification.service';
 import { MembershipApplicationEntity } from './memberApplication/MembershipApplication.Entity';
 import { User } from './users/user.entity';
+import { BlogsModule } from './blogs/blogs.module';
 
 @Module({
   imports: [

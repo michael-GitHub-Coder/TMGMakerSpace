@@ -1,40 +1,37 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('blogs')
-export class BlogEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Blog {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'text' })
-  content: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  subtitle: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ type: 'text', nullable: true })
+  image: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
   author: string;
 
-  @Column({ length: 500, nullable: true })
-  summary: string;
-
-  @Column({ length: 255, nullable: true })
-  imageUrl: string;
-
-  @Column({ length: 100, nullable: true })
-  category: string;
-
-  @Column({ type: 'text', array: true, nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   tags: string[];
 
-  @Column({ default: true })
+  @Column({ type: 'text', nullable: true })
+  content: string;
+
+  @Column({ type: 'boolean', default: true })
   published: boolean;
 
-  @Column({ type: 'timestamp', nullable: true })
-  publishedAt: Date | null;
-
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 }

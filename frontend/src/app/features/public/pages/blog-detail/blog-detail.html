@@ -1,0 +1,117 @@
+<app-header></app-header>
+
+<!-- Hero Section with Background -->
+<div class="blog-hero-section" *ngIf="!isLoading && !errorMessage && blog">
+  <div class="hero-background" [style.background-image]="'url(' + (blog.image || '/assets/images/default-blog-hero.jpg') + ')'">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="container">
+      <button (click)="goBack()" class="back-button">
+        <i class="bi bi-arrow-left"></i> Back to Latest Blogs
+      </button>
+      <div class="hero-text">
+        <div class="blog-category">Featured Article</div>
+        <h1 class="hero-title">{{ blog.title }}</h1>
+        <p class="hero-subtitle" *ngIf="blog.subtitle">{{ blog.subtitle }}</p>
+        <div class="hero-meta">
+          <div class="meta-item">
+            <i class="bi bi-calendar3"></i>
+            <span>{{ formatDate(blog.createdAt) }}</span>
+          </div>
+          <div class="meta-item" *ngIf="blog.author">
+            <i class="bi bi-person-fill"></i>
+            <span>{{ blog.author }}</span>
+          </div>
+          <div class="meta-item">
+            <i class="bi bi-clock"></i>
+            <span>{{ getReadingTime() }} min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="blog-detail-container" *ngIf="!isLoading && !errorMessage && blog">
+  <div class="container">
+    <article class="blog-post">
+      <!-- Blog Content -->
+      <div class="blog-content">
+        <div class="blog-full-content">
+          <div [innerHTML]="getBlogContent()"></div>
+        </div>
+      </div>
+
+      <!-- Blog Footer -->
+      <footer class="blog-post-footer">
+        <!-- Tags Section -->
+        <div class="blog-tags" *ngIf="blog.tags && blog.tags.length > 0">
+          <h3 class="tags-title">
+            <i class="bi bi-tags-fill"></i>
+            Tags
+          </h3>
+          <div class="tags-list">
+            <span *ngFor="let tag of blog.tags" class="blog-tag">{{ tag }}</span>
+          </div>
+        </div>
+
+        <!-- Share Section -->
+        <div class="share-section">
+          <h3 class="share-title">
+            <i class="bi bi-share-fill"></i>
+            Share this article
+          </h3>
+          <div class="share-buttons">
+            <button class="share-btn twitter" (click)="shareOnTwitter()">
+              <i class="bi bi-twitter"></i>
+            </button>
+            <button class="share-btn facebook" (click)="shareOnFacebook()">
+              <i class="bi bi-facebook"></i>
+            </button>
+            <button class="share-btn linkedin" (click)="shareOnLinkedIn()">
+              <i class="bi bi-linkedin"></i>
+            </button>
+            <button class="share-btn copy" (click)="copyLink()">
+              <i class="bi bi-link-45deg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="blog-navigation">
+          <div class="nav-previous">
+            <i class="bi bi-arrow-left"></i>
+            <span>Previous Article</span>
+          </div>
+          <button (click)="scrollToTop()" class="back-to-top">
+            <i class="bi bi-arrow-up"></i>
+            Top
+          </button>
+          <div class="nav-next">
+            <span>Next Article</span>
+            <i class="bi bi-arrow-right"></i>
+          </div>
+        </div>
+      </footer>
+    </article>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+  <p>Loading blog post...</p>
+</div>
+
+<!-- Error State -->
+<div class="error-container" *ngIf="errorMessage">
+  <div class="error-message">
+    <i class="bi bi-exclamation-triangle"></i>
+    <p>{{ errorMessage }}</p>
+    <button (click)="goBack()" class="btn btn-primary">Go Back</button>
+  </div>
+</div>
+
+<app-footer></app-footer>

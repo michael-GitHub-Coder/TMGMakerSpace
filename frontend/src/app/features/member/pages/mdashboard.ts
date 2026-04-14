@@ -7,6 +7,7 @@ import { HeaderComponent } from '../../../shared/header/header';
 import { BookingComponent,Booking } from '../../public/pages/booking/booking';
 import { BookingService } from '../../../shared/booking/booking.service';
 import { AuthService } from '../../../shared/services/auth.service';
+import { BlogApiService, Blog } from '../../../services/blog-api.service';
 
 interface Member {
   name: string;
@@ -47,32 +48,40 @@ export class DashboardComponent2 implements OnInit {
   role: string | null = null;
   email: string | null = null;
   bookings: Booking[] = [];
+  blogs: Blog[] = [];
+  isMember: boolean = false;
 
   constructor(
     private router: Router,
     private bookingService: BookingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private blogApiService: BlogApiService
   ) {}
 
   ngOnInit() {
     const user = this.authService.getCurrentUser();
-
-    this.email = user?.email || null;
     this.name = user?.firstName || user?.name || 'Member';
-    this.role = user?.role || null;
-
-    if (this.email) {
-      this.loadMyBookings(this.email);
-    }
+    this.email = user?.email || 'member@example.com';
+    this.role = localStorage.getItem('role');
+    this.isMember = this.role?.toLowerCase() === 'member';
+    
+    // Load real blogs from API
+    this.loadBlogs();
+    
+    // Subscribe to bookings updates
+    this.bookingService.bookings$.subscribe(bookings => {
+      this.bookings = bookings;
+    });
   }
 
-  loadMyBookings(email: string) {
-    this.bookingService.findByEmail(email).subscribe({
-      next: (bookings: Booking[]) => {
-        this.bookings = bookings;
+  loadBlogs(): void {
+    this.blogApiService.getAllBlogs().subscribe({
+      next: (blogs: Blog[]) => {
+        this.blogs = blogs;
       },
-      error: () => {
-        this.bookings = [];
+      error: (error) => {
+        console.error('Error loading blogs for member dashboard:', error);
+        this.blogs = [];
       }
     });
   }

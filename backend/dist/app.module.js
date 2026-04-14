@@ -19,7 +19,6 @@ const users_module_1 = require("./users/users.module");
 const Membership_Module_1 = require("./memberApplication/Membership.Module");
 const MembershipAdmin_Module_1 = require("./memberAdmin/MembershipAdmin.Module");
 const keys_module_1 = require("./keys/keys.module");
-const blogs_module_1 = require("./blogs/blogs.module");
 const debug_controller_1 = require("./debug.controller");
 const test_controller_1 = require("./test.controller");
 const test_member_controller_1 = require("./test-member.controller");
@@ -28,6 +27,7 @@ const booking_email_service_1 = require("./bookings/booking-email.service");
 const key_notification_service_1 = require("./keys/key-notification.service");
 const MembershipApplication_Entity_1 = require("./memberApplication/MembershipApplication.Entity");
 const user_entity_1 = require("./users/user.entity");
+const blogs_module_1 = require("./blogs/blogs.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;

@@ -58,21 +58,14 @@ export class AuthService {
         return null;
       }
       
-      // Trim and normalize both values for comparison
-      const storedOtp = membershipApplication.oneTimePassword.trim().toUpperCase();
-      const inputOtp = password.trim().toUpperCase();
+      console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
+      console.log(`[AUTH] Comparing input password: ${password} with OTP`);
       
-      console.log(`[AUTH] Stored OTP: "${storedOtp}" (length: ${storedOtp.length})`);
-      console.log(`[AUTH] Input OTP: "${inputOtp}" (length: ${inputOtp.length})`);
-      
-      // Direct string comparison after normalization
-      const isOtpValid = storedOtp === inputOtp;
+      // Compare password with OTP (case-insensitive)
+      const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
       console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
       
-      if (!isOtpValid) {
-        console.log(`[AUTH] OTP mismatch - expected: "${storedOtp}", received: "${inputOtp}"`);
-        return null;
-      }
+      if (!isOtpValid) return null;
     } else {
       // For non-members, validate against regular password
       console.log(`[AUTH] Non-member login detected for: ${email}`);
@@ -87,23 +80,21 @@ export class AuthService {
   }
 
   // Create JWT token
-  generateToken(user: any, rememberMe: boolean = false) {
-    const expiresIn = rememberMe ? '7d' : '1h'; // 7 days if remember me, 1 hour otherwise
+  generateToken(user: any) {
     const payload = { sub: user.id, email: user.email, role: user.role };
-    return this.jwtService.sign(payload, { expiresIn });
+    return this.jwtService.sign(payload);
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const token = this.generateToken(user, loginDto.rememberMe);
+    const token = this.generateToken(user);
 
     return {
       status: 'success',
       message: 'Login successful',
-      token,
-      expiresIn: loginDto.rememberMe ? '7 days' : '1 hour',
+      token, 
       data: { user },
     };
   }
@@ -150,8 +141,7 @@ export class AuthService {
     return {
       status: 'success',
       message: 'Registration successful',
-      token,
-      expiresIn: '1 hour',
+      token, 
       data: { user: result },
     };
   }
@@ -170,7 +160,6 @@ export class AuthService {
       status: 'success',
       message: 'Password changed successfully',
       token,
-      expiresIn: '1 hour',
       data: { user },
     };
   }
