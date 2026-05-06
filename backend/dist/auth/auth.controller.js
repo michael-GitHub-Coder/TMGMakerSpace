@@ -16,6 +16,7 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const ChangePasswordDto_1 = require("./DTO/ChangePasswordDto");
+const jwt_auth_guard_1 = require("./jwt-auth.guard");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -29,6 +30,16 @@ let AuthController = class AuthController {
     }
     async changePassword(dto) {
         return this.authService.changePassword(dto);
+    }
+    async logout(req) {
+        console.log(`[AUTH] Logout request for user: ${req.user?.email}`);
+        return {
+            status: 'success',
+            message: 'Logout successful',
+            data: {
+                loggedOutAt: new Date().toISOString()
+            }
+        };
     }
 };
 exports.AuthController = AuthController;
@@ -54,6 +65,15 @@ __decorate([
     __metadata("design:paramtypes", [ChangePasswordDto_1.ChangePasswordDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "changePassword", null);
+__decorate([
+    (0, common_1.Post)('logout'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "logout", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('api/v1/auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

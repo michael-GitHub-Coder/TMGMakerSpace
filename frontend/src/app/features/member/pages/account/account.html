@@ -1,0 +1,154 @@
+<div class="account-container" [class.blurred]="showOtpNotification">
+  <div class="account-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h2>My Account</h2>
+        <p>Manage your personal information and settings</p>
+      </div>
+      <button class="back-btn" (click)="navigateToDashboard()">
+        <i class="bi bi-arrow-left"></i>
+        Back to Dashboard
+      </button>
+    </div>
+  </div>
+
+  <div class="account-content">
+    <div class="account-card">
+      <div class="card-header">
+        <h3>Personal Information</h3>
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <div class="card-body">
+        <div class="info-group">
+          <label>Full Name</label>
+          <p>{{ name || 'Member User' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Email Address</label>
+          <p>{{ email || 'member@example.com' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Role</label>
+          <p>{{ role || 'member' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Member Since</label>
+          <p>{{ joinedAt || 'Recent' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="account-card">
+      <div class="card-header">
+        <h3>Account Settings</h3>
+        <i class="bi bi-gear"></i>
+      </div>
+      <div class="card-body">
+        <div class="setting-item">
+          <label>Notification Preferences</label>
+          <button class="setting-btn">Configure</button>
+        </div>
+        <div class="setting-item">
+          <label>Privacy Settings</label>
+          <button class="setting-btn">Manage</button>
+        </div>
+        <div class="setting-item">
+          <label>Security</label>
+          <button class="setting-btn" (click)="showPasswordModal = true">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="account-card">
+      <div class="card-header">
+        <h3>Quick Actions</h3>
+        <i class="bi bi-lightning"></i>
+      </div>
+      <div class="card-body">
+        <button class="action-btn primary" (click)="navigateTo('/dashboard')">
+          <i class="bi bi-house"></i> View Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Password Update Modal -->
+<div class="password-modal-overlay" [class.active]="showPasswordModal" (click)="closePasswordModal()">
+  <div class="password-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Update Password</h3>
+      <button class="modal-close" (click)="closePasswordModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="updatePassword()">
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input 
+            type="password" 
+            id="newPassword" 
+            [(ngModel)]="passwordForm.newPassword" 
+            name="newPassword"
+            class="form-input"
+            placeholder="Enter new password"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            [(ngModel)]="passwordForm.confirmPassword" 
+            name="confirmPassword"
+            class="form-input"
+            placeholder="Confirm new password"
+            required
+          >
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="closePasswordModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="isUpdating">
+            <i class="bi bi-key-fill" *ngIf="!isUpdating"></i>
+            <i class="bi bi-hourglass-split" *ngIf="isUpdating"></i>
+            {{ isUpdating ? 'Updating...' : 'Update Password' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Password Change Notification -->
+<div class="notification-alert" [class.show]="showOtpNotification" *ngIf="showOtpNotification">
+  <div class="notification-content">
+    <div class="notification-icon">
+      <i class="bi bi-shield-exclamation"></i>
+    </div>
+    <div class="notification-text">
+      <h4>Security Notice</h4>
+      <p>You logged in with a temporary OTP. You must update your password to continue using the application.</p>
+    </div>
+    <div class="notification-actions">
+      <button class="btn-primary" (click)="showPasswordModal = true; showOtpNotification = false">
+        Update Password Now
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Password Change Overlay - Blocks interaction -->
+<div class="otp-overlay" [class.active]="showOtpNotification" *ngIf="showOtpNotification">
+  <div class="otp-overlay-content">
+    <div class="otp-lock-icon">
+      <i class="bi bi-lock-fill"></i>
+    </div>
+    <h3>Password Update Required</h3>
+    <p>For your security, you must set a permanent password before continuing.</p>
+    <button class="btn-primary" (click)="showPasswordModal = true; showOtpNotification = false">
+      Set Password Now
+    </button>
+  </div>
+</div>

@@ -24,13 +24,31 @@ let MembershipController = class MembershipController {
     constructor(membershipService) {
         this.membershipService = membershipService;
     }
-    async apply(files, body) {
-        const filePaths = files.map(file => file.path);
-        const dto = {
-            ...body,
-            documents: filePaths,
-        };
-        return this.membershipService.apply(dto);
+    async apply(req, files) {
+        try {
+            console.log('=== APPLICATION SUBMISSION DEBUG ===');
+            console.log('Received files:', files);
+            console.log('Received body:', req.body);
+            const filePaths = files ? files.map(file => file.path) : [];
+            if (!req.body.name || !req.body.surname || !req.body.email || !req.body.phone) {
+                throw new Error('Missing required fields: name, surname, email, phone');
+            }
+            const dto = {
+                name: String(req.body.name).trim(),
+                surname: String(req.body.surname).trim(),
+                email: String(req.body.email).trim().toLowerCase(),
+                phone: String(req.body.phone).trim(),
+                documents: filePaths,
+            };
+            console.log('Created DTO:', dto);
+            const result = await this.membershipService.apply(dto);
+            console.log('Application saved successfully:', result);
+            return result;
+        }
+        catch (error) {
+            console.error('Application submission error:', error);
+            throw error;
+        }
     }
     getAllApplications() {
         return this.membershipService.getAllApplications();
@@ -64,10 +82,10 @@ __decorate([
             },
         }),
     })),
-    __param(0, (0, common_1.UploadedFiles)()),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Array, Object]),
+    __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", Promise)
 ], MembershipController.prototype, "apply", null);
 __decorate([

@@ -1,50 +1,63 @@
-<app-header></app-header>
-
 <div class="dashboard-layout">
-  <app-sidebar ></app-sidebar>
-
+  <app-sidebar></app-sidebar>
 
   <!-- Main Content -->
   <div class="dashboard-content">
+    <!-- Loading Indicator -->
+    <div class="loading-indicator" *ngIf="isLoading">
+      <div class="loading-spinner"></div>
+      <p>Loading dashboard...</p>
+    </div>
+
+    <!-- Password Change Warning -->
+    <div class="password-change-warning" *ngIf="showPasswordChangeWarning">
+      <div class="warning-content">
+        <div class="warning-icon">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div class="warning-text">
+          <h3>⚠️ Password Change Required</h3>
+          <p>You logged in with a temporary password. For your security, you must set a permanent password before continuing to use the dashboard.</p>
+          <div class="warning-actions">
+            <button class="btn btn-warning" (click)="navigateToAccount()">
+              <i class="bi bi-key-fill"></i>
+              Change Password Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Header -->
-    <div class="dashboard-header">
+    <div class="dashboard-header" *ngIf="!isLoading && !showPasswordChangeWarning">
       <h2>Member Dashboard</h2>
       <p>Welcome back {{ name || 'Member' }}!</p>
     </div>
 
     <!-- Dashboard Cards -->
-    <div class="dashboard-cards">
+    <div class="dashboard-cards" *ngIf="!isLoading">
 
-      <!-- Bookings Card - Always visible -->
-      <div class="dashboard-card">
+      <!-- Laser Cutter Key Card - Only shows when laser cutter is booked -->
+      <div class="dashboard-card" *ngIf="memberKeys.length > 0">
         <div class="card-icon">
           <i class="fas fa-key"></i>
         </div>
-        <h3>Key Situation here</h3>
-        <!-- <p>{{ tot_bookings() }} Bookings</p> -->
-        <!-- <button
-          class="card-btn"
-          (click)="navigateTo('/booking'); $event.stopPropagation()"
-        >
-          Book 
-        </button> -->
-      </div>
-
-         <!-- Bookings Card - Always visible -->
-      <div class="dashboard-card">
-        <div class="card-icon">
-          <i class="fas fa-alarm-clock"></i>
+        <h3>Laser Cutter Key</h3>
+        <p>Your laser cutter access key</p>
+        <div class="key-list">
+          <div *ngFor="let key of memberKeys" class="key-item">
+            <span class="key-equipment">{{ key.equipmentName }}</span>
+            <span class="key-status status-issued">
+              🔑 Issued
+            </span>
+          </div>
         </div>
-        <h3>Feedback improvement </h3>
-        <!-- <p>{{ tot_bookings() }} Bookings</p> -->
-        <!-- <button
-          class="card-btn"
-          (click)="navigateTo('/booking'); $event.stopPropagation()"
-        >
-          Book 
-        </button> -->
+        <div class="key-note">
+          <small>Please return the key after use</small>
+        </div>
       </div>
 
+         
        <!-- Bookings Card - Always visible -->
       <div class="dashboard-card">
         <div class="card-icon">
@@ -60,11 +73,63 @@
         </button>
       </div>
 
+    <!-- Documents Card -->
+      <div class="dashboard-card">
+        <div class="card-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h3>My Documents</h3>
+        <p>View your uploaded documents</p>
+        <button
+          class="card-btn"
+          (click)="viewDocuments(); $event.stopPropagation()"
+        >
+          View 
+        </button>
+      </div>
+
     </div>
+
+    <!-- Marketplace Manager Section -->
+    <app-marketplace-manager></app-marketplace-manager>
+
   </div>
 
   <router-outlet></router-outlet>
   
 </div>
 
-<!-- <app-footer></app-footer>  -->
+<!-- Document Viewer Modal -->
+<div class="modal-overlay" *ngIf="showDocumentsModal" (click)="closeDocumentsModal()">
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <h3>My Documents</h3>
+        <p class="doc-counter">{{ documents.length }} documents</p>
+      </div>
+      <button class="modal-close" (click)="closeDocumentsModal()">×</button>
+    </div>
+
+    <!-- Document List -->
+    <div class="document-list">
+      <div class="document-item" *ngFor="let doc of documents; let i = index">
+        <div class="doc-icon">
+          <i class="fas" [ngClass]="getDocumentIcon(doc.type)"></i>
+        </div>
+        <div class="doc-info">
+          <h4>{{ doc.name }}</h4>
+          <p class="doc-type">{{ doc.type.toUpperCase() }}</p>
+        </div>
+        <div class="doc-actions">
+          <button class="download-btn" (click)="downloadDocument(doc); $event.stopPropagation()">
+            <i class="fas fa-download"></i> Download
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+  </div>
+</div>

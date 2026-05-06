@@ -14,7 +14,9 @@
             class="form-control" 
             formControlName="email" 
             placeholder="Enter your email or username" 
-            required>
+            required
+            autocomplete="off"
+            readonly>
           <span class="input-group-text"><i class="bi bi-person"></i></span>
         </div>
         <div class="form-text text-danger" *ngIf="signInForm.get('email')?.invalid && signInForm.get('email')?.touched">
@@ -33,7 +35,9 @@
             class="form-control"
             formControlName="password" 
             placeholder="Enter your password"
-            required>
+            required
+            autocomplete="new-password"
+            readonly>
           <button 
             type="button" 
             class="password-toggle" 

@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
 import { BookingEntity } from './booking.entity';
 export interface BookingConfirmationData {
     name: string;
@@ -15,7 +16,7 @@ export interface BookingConfirmationData {
 export declare class BookingEmailService {
     private configService;
     private readonly logger;
-    private transporter;
+    transporter: nodemailer.Transporter;
     constructor(configService: ConfigService);
     sendBookingConfirmation(booking: BookingEntity): Promise<void>;
     sendBookingReminder(booking: BookingEntity): Promise<void>;

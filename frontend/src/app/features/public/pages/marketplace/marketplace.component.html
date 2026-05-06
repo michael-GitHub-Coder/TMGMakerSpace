@@ -1,0 +1,139 @@
+<app-header></app-header>
+
+<app-banner 
+  [heading]="'Marketplace'" 
+  [route]="'/home'" 
+  [routeLabel]="'Home'">
+</app-banner>
+
+<div class="marketplace-page">
+  <!-- Success/Error Messages -->
+  <div class="container" *ngIf="success || error">
+    <div class="alert alert-success" *ngIf="success">
+      {{ success }}
+    </div>
+    <div class="alert alert-danger" *ngIf="error">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Marketplace Section -->
+<section id="marketplace">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 mb-3" data-aos="fade-up" data-aos-duration="1000">
+        <h2 class="about-title">Marketplace</h2>
+        <p class="about-subtitle">Discover products and services offered by our talented community members</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Loading State -->
+  <div class="container" *ngIf="loading && marketplaceItems.length === 0">
+    <div class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading marketplace items...</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="container" *ngIf="!loading && marketplaceItems.length === 0">
+    <div class="empty-state">
+      <i class="fas fa-store"></i>
+      <h4>No Items Available</h4>
+      <p>Check back soon as our members add their products and services to the marketplace</p>
+    </div>
+  </div>
+
+  <!-- Marketplace Carousel - Like Blog Component -->
+  <div id="marketplace-content" class="container" *ngIf="!loading && marketplaceItems.length > 0">
+    <owl-carousel-o *ngIf="!loading && !error" [options]="marketplaceOptions" class="w-100">
+      <ng-container *ngFor="let item of marketplaceItems">
+        <ng-template carouselSlide>
+          <div class="marketplace-card">
+            <div class="marketplace-card-image">
+              <img [src]="getMarketplaceImageUrl(item.image)" [alt]="item.title" />
+            </div>
+            <div class="marketplace-card-content">
+              <div class="marketplace-meta">
+                <span class="marketplace-date">{{ item.createdAt | date:'mediumDate' }}</span>
+                <span class="marketplace-cost">R {{ formatCost(item.cost) }}</span>
+              </div>
+              <h3 class="marketplace-title">{{ item.title }}</h3>
+              <p class="marketplace-subtitle">{{ item.description }}</p>
+              <div class="marketplace-member">
+                <i class="fas fa-user"></i>
+                Offered by {{ item.memberName }}
+              </div>
+              <button class="btn-enquire" (click)="openEnquiryForm(item); $event.stopPropagation()">Enquire Now</button>
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+    </owl-carousel-o>
+  </div>
+</div>
+
+<!-- Enquiry Modal -->
+<div class="enquiry-modal" *ngIf="showEnquiryForm && selectedItem">
+  <div class="modal-overlay" (click)="closeEnquiryForm()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Make an Enquiry</h4>
+      <button class="btn-close" (click)="closeEnquiryForm()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="item-summary">
+        <h5>{{ selectedItem.title }}</h5>
+        <p>{{ selectedItem.description }}</p>
+        <div class="item-cost">R {{ selectedItem.cost | number:'2.2-2' }}</div>
+        <div class="item-member">
+          <i class="fas fa-user"></i>
+          Contact: {{ selectedItem.memberName }}
+        </div>
+      </div>
+      
+      <form (ngSubmit)="submitEnquiry()">
+        <div class="form-group">
+          <label for="user_name">Your Name *</label>
+          <input type="text" id="user_name" class="form-control" 
+                 [(ngModel)]="enquiryForm.user_name" name="user_name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="user_email">Your Email *</label>
+          <input type="email" id="user_email" class="form-control" 
+                 [(ngModel)]="enquiryForm.user_email" name="user_email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="user_phone">Your Phone (Optional)</label>
+          <input type="tel" id="user_phone" class="form-control" 
+                 [(ngModel)]="enquiryForm.user_phone" name="user_phone">
+        </div>
+        
+        <div class="form-group">
+          <label for="enquiryMessage">Your Message *</label>
+          <textarea id="enquiryMessage" class="form-control" rows="4" 
+                    [(ngModel)]="enquiryForm.enquiryMessage" name="enquiryMessage" 
+                    placeholder="Please describe what you're interested in and any questions you have..."></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <i class="fas fa-paper-plane"></i> Send Enquiry
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="closeEnquiryForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

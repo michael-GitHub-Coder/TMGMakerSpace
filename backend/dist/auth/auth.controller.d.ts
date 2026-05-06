@@ -35,4 +35,11 @@ export declare class AuthController {
             user: import("../users/user.entity").User;
         };
     }>;
+    logout(req: any): Promise<{
+        status: string;
+        message: string;
+        data: {
+            loggedOutAt: string;
+        };
+    }>;
 }

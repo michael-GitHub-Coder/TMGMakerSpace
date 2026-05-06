@@ -10,6 +10,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
+const database_config_1 = require("./config/database.config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const bookings_module_1 = require("./bookings/bookings.module");
@@ -28,6 +29,8 @@ const key_notification_service_1 = require("./keys/key-notification.service");
 const MembershipApplication_Entity_1 = require("./memberApplication/MembershipApplication.Entity");
 const user_entity_1 = require("./users/user.entity");
 const blogs_module_1 = require("./blogs/blogs.module");
+const marketplace_module_1 = require("./marketplace/marketplace.module");
+const marketplace_item_entity_1 = require("./marketplace/entities/marketplace-item.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,18 +41,8 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
                 envFilePath: ['../.env', 'config.env'],
             }),
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'postgres',
-                host: 'localhost',
-                port: 5432,
-                username: 'postgres',
-                password: 'Ntokz@084',
-                database: 'TMGMakerSpace',
-                autoLoadEntities: true,
-                synchronize: true,
-                ssl: false,
-            }),
-            typeorm_1.TypeOrmModule.forFeature([MembershipApplication_Entity_1.MembershipApplicationEntity, user_entity_1.User]),
+            typeorm_1.TypeOrmModule.forRoot((0, database_config_1.getDatabaseConfig)()),
+            typeorm_1.TypeOrmModule.forFeature([MembershipApplication_Entity_1.MembershipApplicationEntity, user_entity_1.User, marketplace_item_entity_1.MarketplaceItem]),
             bookings_module_1.BookingsModule,
             email_module_1.EmailModule,
             auth_module_1.AuthModule,
@@ -58,6 +51,7 @@ exports.AppModule = AppModule = __decorate([
             MembershipAdmin_Module_1.MembershipAdminModule,
             keys_module_1.KeysModule,
             blogs_module_1.BlogsModule,
+            marketplace_module_1.MarketplaceModule,
         ],
         controllers: [app_controller_1.AppController, debug_controller_1.DebugController, test_controller_1.TestController, test_member_controller_1.TestMemberController, email_test_controller_1.EmailTestController],
         providers: [app_service_1.AppService, booking_email_service_1.BookingEmailService, key_notification_service_1.KeyNotificationService],

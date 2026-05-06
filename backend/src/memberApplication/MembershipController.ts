@@ -1,4 +1,5 @@
-import { Controller, Post,  Put,  Get, Patch, Param, Body, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Put, Get, Patch, Param, Body, UploadedFiles, UseInterceptors, UsePipes, Req } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { MembershipService } from './Membership.Service';
@@ -22,13 +23,36 @@ export class MembershipController {
       }),
     }),
   )
-  async apply(@UploadedFiles() files: Express.Multer.File[], @Body() body: any) {
-    const filePaths = files.map(file => file.path);
-    const dto: CreateMembershipDto = {
-      ...body,
-      documents: filePaths,
-    };
-    return this.membershipService.apply(dto);
+  async apply(@Req() req: any, @UploadedFiles() files: Express.Multer.File[]) {
+    try {
+      console.log('=== APPLICATION SUBMISSION DEBUG ===');
+      console.log('Received files:', files);
+      console.log('Received body:', req.body);
+      
+      const filePaths = files ? files.map(file => file.path) : [];
+      
+      // Manual validation and DTO creation
+      if (!req.body.name || !req.body.surname || !req.body.email || !req.body.phone) {
+        throw new Error('Missing required fields: name, surname, email, phone');
+      }
+      
+      const dto: CreateMembershipDto = {
+        name: String(req.body.name).trim(),
+        surname: String(req.body.surname).trim(),
+        email: String(req.body.email).trim().toLowerCase(),
+        phone: String(req.body.phone).trim(),
+        documents: filePaths,
+      };
+      
+      console.log('Created DTO:', dto);
+      const result = await this.membershipService.apply(dto);
+      console.log('Application saved successfully:', result);
+      return result;
+      
+    } catch (error) {
+      console.error('Application submission error:', error);
+      throw error;
+    }
   }
 
 

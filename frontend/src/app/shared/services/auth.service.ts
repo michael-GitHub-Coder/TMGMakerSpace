@@ -197,16 +197,50 @@ export class AuthService {
     );
   }
 
-  logout(): void {
-    if (this.isBrowser) {
-      this.safeLocalStorageRemoveItem(this.TOKEN_KEY);
-      this.safeLocalStorageRemoveItem(this.USER_KEY);
-      this.safeSessionStorageRemoveItem(this.TOKEN_KEY);
-      this.safeSessionStorageRemoveItem(this.USER_KEY);
-    }
-    this.user = null;
-    this.loggedIn.next(false);
-    this.router.navigate(['/sign-in']);
+  logout(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/logout`, {}, { 
+      headers: this.getAuthHeader() 
+    }).pipe(
+      tap(response => {
+        console.log('Logout response:', response);
+        
+        // Clear all auth data regardless of server response
+        if (this.isBrowser) {
+          this.safeLocalStorageRemoveItem(this.TOKEN_KEY);
+          this.safeLocalStorageRemoveItem(this.USER_KEY);
+          this.safeSessionStorageRemoveItem(this.TOKEN_KEY);
+          this.safeSessionStorageRemoveItem(this.USER_KEY);
+        }
+        
+        // Reset auth state
+        this.user = null;
+        this.loggedIn.next(false);
+        
+        // Navigate to sign-in page
+        this.router.navigate(['/sign-in']);
+      }),
+      catchError(error => {
+        console.error('Logout error:', error);
+        
+        // Even if server logout fails, clear local data
+        if (this.isBrowser) {
+          this.safeLocalStorageRemoveItem(this.TOKEN_KEY);
+          this.safeLocalStorageRemoveItem(this.USER_KEY);
+          this.safeSessionStorageRemoveItem(this.TOKEN_KEY);
+          this.safeSessionStorageRemoveItem(this.USER_KEY);
+        }
+        
+        this.user = null;
+        this.loggedIn.next(false);
+        this.router.navigate(['/sign-in']);
+        
+        // Return success even if server fails (local cleanup done)
+        return of({
+          status: 'success',
+          message: 'Logged out locally'
+        });
+      })
+    );
   }
 
   isLoggedIn(): boolean {

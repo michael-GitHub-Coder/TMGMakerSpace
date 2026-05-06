@@ -51,8 +51,10 @@ export class DashboardComponent implements OnInit {
     this.members = JSON.parse(localStorage.getItem('members') || '[]');
     this.admins = JSON.parse(localStorage.getItem('admins') || '[]');
     
-    // Load real blogs from API
-    this.loadBlogs();
+    // Load blogs in background with timeout to prevent hanging
+    setTimeout(() => {
+      this.loadBlogs();
+    }, 100);
     
     // Subscribe to bookings updates
     this.bookingService.bookings$.subscribe(bookings => {
@@ -62,12 +64,23 @@ export class DashboardComponent implements OnInit {
 
   loadBlogs(): void {
     this.isLoading = true;
+    
+    // Add timeout to prevent hanging
+    const timeout = setTimeout(() => {
+      console.warn('Blog loading timeout - setting loading to false');
+      this.isLoading = false;
+      this.blogs = [];
+    }, 5000); // 5 second timeout
+    
     this.blogApiService.getAllBlogs().subscribe({
       next: (blogs: Blog[]) => {
+        clearTimeout(timeout);
         this.blogs = blogs;
         this.isLoading = false;
+        console.log('✅ Blogs loaded successfully:', blogs.length);
       },
       error: (error) => {
+        clearTimeout(timeout);
         console.error('Error loading blogs for dashboard:', error);
         this.blogs = [];
         this.isLoading = false;

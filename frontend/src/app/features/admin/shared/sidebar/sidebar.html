@@ -19,14 +19,18 @@
     <li (click)="navigate('/admin/dashboard')" routerLinkActive="active">
       <i class="bi bi-house-fill"></i> Dashboard
     </li>
-    <li (click)="navigate('/admin/members-management')" routerLinkActive="active">
-      <i class="bi bi-people-fill"></i> Members
-    </li>
-    <li *ngIf="role !== 'member'" (click)="navigate('/admin/key-management')" routerLinkActive="active">
+    <li *ngIf="shouldShowAdminFeatures()" (click)="navigate('/admin/key-management')" routerLinkActive="active">
       <i class="bi bi-key-fill"></i> Key Management
     </li>
-    <li (click)="navigate('/admin/account')" routerLinkActive="active">
+    <li *ngIf="shouldShowAdminFeatures()" (click)="navigate('/admin/members-management')" routerLinkActive="active">
+      <i class="bi bi-people-fill"></i> Members Management
+    </li>
+    <li (click)="navigateToAccount()" routerLinkActive="active">
       <i class="bi bi-person-circle"></i> Account
+    </li>
+
+    <li (click)="logout()" class="logout-btn">
+      <i class="bi bi-box-arrow-right"></i> Logout
     </li>
 
     <li *ngIf="role === 'superadmin'" (click)="navigate('/admin/create-admin')" routerLinkActive="active">

@@ -37,6 +37,10 @@ export const PUBLIC_ROUTES: Routes = [
         path: 'apply',
         loadComponent: () => import('../Application/Application').then(m => m.ApplicationComponent)
     },
+    {
+        path: 'marketplace',
+        loadComponent: () => import('./pages/marketplace/marketplace.component').then(m => m.MarketplaceComponent)
+    },
     
    
     // {

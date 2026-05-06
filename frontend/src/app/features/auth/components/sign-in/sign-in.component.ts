@@ -40,10 +40,37 @@ export class SignInComponent implements OnInit {
     // Get return url from route parameters or default to '/dashboard'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     
+    // Clear form to ensure empty fields
+    this.clearForm();
+    
     // Redirect if already logged in
     if (this.authService.isLoggedIn()) {
       this.router.navigate([this.returnUrl]);
     }
+  }
+
+  // Clear form to ensure empty fields
+  clearForm(): void {
+    this.signInForm.patchValue({
+      email: '',
+      password: '',
+      rememberMe: false
+    });
+    
+    // Remove readonly attributes to allow input
+    setTimeout(() => {
+      const emailInput = document.getElementById('email') as HTMLInputElement;
+      const passwordInput = document.getElementById('password') as HTMLInputElement;
+      
+      if (emailInput) {
+        emailInput.removeAttribute('readonly');
+        emailInput.focus();
+      }
+      
+      if (passwordInput) {
+        passwordInput.removeAttribute('readonly');
+      }
+    }, 100);
   }
 
   onSubmit() {
@@ -61,7 +88,20 @@ export class SignInComponent implements OnInit {
     ).subscribe({
       next: (success) => {
         if (success) {
-          this.router.navigate([this.returnUrl]);
+          // Clear form after successful login
+          this.clearForm();
+          
+          // Check if user logged in with OTP and must change password
+          const user = this.authService.getUser();
+          if (user?.mustChangePassword) {
+            console.log('🔐 User logged in with OTP - forcing password change');
+            // Set OTP login flag for account page to detect
+            sessionStorage.setItem('otp_login', 'true');
+            // Redirect to account page with password change requirement
+            this.router.navigate(['/member/account']);
+          } else {
+            this.router.navigate([this.returnUrl]);
+          }
         } else {
           this.error = 'Invalid email or password. Please try again.';
         }

@@ -1,0 +1,150 @@
+<div class="marketplace-manager">
+  <!-- Header -->
+  <div class="section-header">
+    <h3>My Marketplace Items</h3>
+    <button class="btn btn-primary" (click)="toggleForm()" *ngIf="!showForm">
+      <i class="fas fa-plus"></i> Add New Item
+    </button>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success alert-dismissible" *ngIf="success" role="alert">
+    <strong>Success!</strong> {{ success }}
+    <button type="button" class="btn-close" (click)="success = ''" aria-label="Close"></button>
+  </div>
+  <div class="alert alert-danger alert-dismissible" *ngIf="error" role="alert">
+    <strong>Error!</strong> {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div class="marketplace-form" *ngIf="showForm">
+    <div class="form-card">
+      <h4>{{ editingItem ? 'Edit Item' : 'Add New Item' }}</h4>
+      
+      <form (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="title">Title *</label>
+            <input type="text" id="title" class="form-control" 
+                   [(ngModel)]="formData.title" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="cost">Cost (R) *</label>
+            <input type="number" id="cost" class="form-control" 
+                   [(ngModel)]="formData.cost" name="cost" min="0" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea id="description" class="form-control" rows="4" 
+                    [(ngModel)]="formData.description" name="description" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Image</label>
+          <div class="image-upload">
+            <input type="file" id="image" class="form-control" 
+                   (change)="onFileSelected($event)" accept="image/*">
+            <div class="uploading" *ngIf="uploading">
+              <i class="fas fa-spinner fa-spin"></i> Uploading...
+            </div>
+            <div class="upload-success" *ngIf="!uploading && formData.image">
+              <i class="fas fa-check-circle text-success"></i> Image uploaded successfully
+            </div>
+          </div>
+          
+          <!-- Image Preview -->
+          <div class="image-preview" *ngIf="imagePreview">
+            <img [src]="imagePreview" alt="Preview" class="preview-img">
+            <button type="button" class="btn-remove" (click)="imagePreview = null; selectedFile = null; formData.image = ''">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="formData.isActive" name="isActive">
+            <span class="checkmark"></span>
+            Active (show in marketplace)
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <i class="fas fa-save"></i> 
+            <span *ngIf="!loading">{{ editingItem ? 'Update' : 'Create' }} Item</span>
+            <span *ngIf="loading">
+              <i class="fas fa-spinner fa-spin"></i> 
+              {{ editingItem ? 'Updating...' : 'Creating...' }}
+            </span>
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm(); showForm = false" [disabled]="loading">
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" *ngIf="loading">
+          <div class="loading-content">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>{{ editingItem ? 'Updating item...' : 'Creating item...' }}</p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading && marketplaceItems.length === 0">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Loading your marketplace items...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && marketplaceItems.length === 0 && !showForm">
+    <i class="fas fa-store"></i>
+    <h4>No Marketplace Items Yet</h4>
+    <p>Start by adding your first product or service to the marketplace</p>
+    <button class="btn btn-primary" (click)="toggleForm()">
+      <i class="fas fa-plus"></i> Add Your First Item
+    </button>
+  </div>
+
+  <!-- Items List -->
+  <div class="items-grid" *ngIf="!loading && marketplaceItems.length > 0">
+    <div class="item-card" *ngFor="let item of marketplaceItems" 
+         [class.inactive]="!item.isActive">
+      <div class="item-image" *ngIf="item.image">
+        <img [src]="getImageUrl(item.image)" 
+             [alt]="item.title" 
+             (error)="handleImageError($event)"
+             (load)="handleImageLoad($event)">
+      </div>
+      <div class="item-content">
+        <h4>{{ item.title }}</h4>
+        <p class="item-description">{{ item.description }}</p>
+        <div class="item-cost">R {{ formatCost(item.cost) }}</div>
+        <div class="item-status" [class.active]="item.isActive">
+          <i class="fas fa-circle"></i>
+          {{ item.isActive ? 'Active' : 'Inactive' }}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-sm btn-outline-primary" (click)="editItem(item)">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" 
+                (click)="toggleItemStatus(item)">
+          <i class="fas fa-{{ item.isActive ? 'eye-slash' : 'eye' }}"></i>
+          {{ item.isActive ? 'Hide' : 'Show' }}
+        </button>
+        <button class="btn btn-sm btn-outline-danger" (click)="deleteItem(item)">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

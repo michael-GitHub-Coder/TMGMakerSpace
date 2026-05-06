@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { getDatabaseConfig } from './config/database.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BookingsModule } from './bookings/bookings.module';
@@ -19,6 +20,8 @@ import { KeyNotificationService } from './keys/key-notification.service';
 import { MembershipApplicationEntity } from './memberApplication/MembershipApplication.Entity';
 import { User } from './users/user.entity';
 import { BlogsModule } from './blogs/blogs.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { MarketplaceItem } from './marketplace/entities/marketplace-item.entity';
 
 @Module({
   imports: [
@@ -26,22 +29,8 @@ import { BlogsModule } from './blogs/blogs.module';
       isGlobal: true, // Make ConfigModule available throughout the application
       envFilePath: ['../.env', 'config.env'], // Try both .env files
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-
-      username: 'postgres',              
-      password: 'Ntokz@084',    
-      database: 'TMGMakerSpace',    
-
-     
-
-      autoLoadEntities: true,
-      synchronize: true, //turn OFF in production
-      ssl: false, // PostgreSQL does NOT use encrypt/trustServerCertificate
-    }),
-    TypeOrmModule.forFeature([MembershipApplicationEntity, User]),
+    TypeOrmModule.forRoot(getDatabaseConfig()),
+    TypeOrmModule.forFeature([MembershipApplicationEntity, User, MarketplaceItem]),
     BookingsModule,
     EmailModule,
     AuthModule,
@@ -50,6 +39,7 @@ import { BlogsModule } from './blogs/blogs.module';
     MembershipAdminModule,
     KeysModule,
     BlogsModule,
+    MarketplaceModule,
   ],
   controllers: [AppController, DebugController, TestController, TestMemberController, EmailTestController],
   providers: [AppService, BookingEmailService, KeyNotificationService],

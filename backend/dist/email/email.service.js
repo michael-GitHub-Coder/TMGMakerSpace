@@ -80,6 +80,24 @@ let EmailService = class EmailService {
             console.error('Booking data that caused the error:', booking);
         }
     }
+    async sendOtpEmail(email, name, surname, otp) {
+        console.log('📧 Sending OTP email to new member...');
+        console.log('To:', email);
+        console.log('Subject: Your Membership Account is Ready - Login Credentials');
+        console.log('---');
+        console.log(`Dear ${name} ${surname},`);
+        console.log('');
+        console.log('Your membership application has been approved! You can now log in to your account.');
+        console.log('');
+        console.log('Your Login Credentials:');
+        console.log(`Email: ${email}`);
+        console.log(`One-Time Password: ${otp}`);
+        console.log('');
+        console.log('Use this OTP to log in for the first time. You will be required to change your password after logging in.');
+        console.log('Login here: http://localhost:4200/login');
+        console.log('---');
+        console.log(`[EMAIL] OTP sent to member: ${email}, OTP: ${otp}`);
+    }
 };
 exports.EmailService = EmailService;
 exports.EmailService = EmailService = __decorate([

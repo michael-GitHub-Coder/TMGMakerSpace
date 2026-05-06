@@ -19,7 +19,6 @@ export class BlogsController {
 
   @Post()
   create(@Body(ValidationPipe) createBlogDto: CreateBlogDto) {
-    console.log('[BLOGS CONTROLLER] Received blog creation request:', createBlogDto);
     return this.blogsService.create(createBlogDto);
   }
 

@@ -28,8 +28,8 @@ export class BlogsComponent implements OnInit {
   }
 
   addBlog() {
-    if (!this.newBlog.title || !this.newBlog.description) {
-      this.errorMessage = 'Please fill all required fields.';
+    if (!this.newBlog.title || !this.newBlog.description || !this.newBlog.content) {
+      this.errorMessage = 'Please fill all required fields (Title, Description, and Content).';
       return;
     }
 
@@ -46,6 +46,7 @@ export class BlogsComponent implements OnInit {
       author: this.newBlog.author || undefined,
       image: typeof this.imagePreview === 'string' ? this.imagePreview : undefined,
       tags: processedTags.length > 0 ? processedTags : undefined,
+      content: this.newBlog.content || undefined,
       published: this.newBlog.published
     };
 

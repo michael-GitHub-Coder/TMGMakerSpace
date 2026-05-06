@@ -33,15 +33,45 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     console.log(`[AUTH] Validating user: ${email}`);
     
-    const user = await this.usersService.findByEmail(email);
+    let user = await this.usersService.findByEmail(email);
+    
+    // For members, check if they exist in user table, if not, create from membership application
     if (!user) {
-      console.log(`[AUTH] User not found: ${email}`);
+      console.log(`[AUTH] User not found in user table: ${email}`);
+      
+      // Check if this is a member trying to login with OTP
+      const membershipApplication = await this.membershipApplicationRepo.findOne({
+        where: { email: email, status: 'approved' }
+      });
+      
+      if (membershipApplication && membershipApplication.oneTimePassword) {
+        console.log(`[AUTH] Found approved membership application for: ${email}`);
+        console.log(`[AUTH] Creating user account from membership application`);
+        
+        // Create user from membership application
+        user = await this.usersService.create({
+          firstName: membershipApplication.name,
+          lastName: membershipApplication.surname,
+          email: membershipApplication.email,
+          password: await bcrypt.hash(membershipApplication.oneTimePassword, 10),
+          role: 'member',
+          mustChangePassword: true,
+        });
+        
+        console.log(`[AUTH] ✅ Created user account for: ${email}`);
+      } else {
+        console.log(`[AUTH] No approved membership application found for: ${email}`);
+        return null;
+      }
+    }
+
+    if (!user) {
       return null;
     }
 
     console.log(`[AUTH] User found: ${user.email}, role: ${user.role}`);
 
-    // For members, validate against OTP from membership application
+    // For members, check if they need to use OTP or regular password
     if (user.role === 'member') {
       console.log(`[AUTH] Member login detected for: ${email}`);
       const membershipApplication = await this.membershipApplicationRepo.findOne({
@@ -53,19 +83,31 @@ export class AuthService {
         return null;
       }
       
-      if (!membershipApplication.oneTimePassword) {
-        console.log(`[AUTH] No OTP found for member: ${email}`);
-        return null;
+      // If user has mustChangePassword = true, use OTP validation (first-time login)
+      if (user.mustChangePassword) {
+        console.log(`[AUTH] First-time login detected for: ${email}`);
+        
+        if (!membershipApplication.oneTimePassword) {
+          console.log(`[AUTH] No OTP found for member: ${email}`);
+          return null;
+        }
+        
+        console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
+        console.log(`[AUTH] Comparing input password: ${password} with OTP`);
+        
+        // Compare password with OTP (case-insensitive)
+        const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
+        console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
+        
+        if (!isOtpValid) return null;
+      } else {
+        // Regular password validation for subsequent logins
+        console.log(`[AUTH] Regular password login for: ${email}`);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log(`[AUTH] Password validation result: ${isPasswordValid}`);
+        
+        if (!isPasswordValid) return null;
       }
-      
-      console.log(`[AUTH] Found OTP: ${membershipApplication.oneTimePassword} for member: ${email}`);
-      console.log(`[AUTH] Comparing input password: ${password} with OTP`);
-      
-      // Compare password with OTP (case-insensitive)
-      const isOtpValid = password.toLowerCase() === membershipApplication.oneTimePassword.toLowerCase();
-      console.log(`[AUTH] OTP validation result: ${isOtpValid}`);
-      
-      if (!isOtpValid) return null;
     } else {
       // For non-members, validate against regular password
       console.log(`[AUTH] Non-member login detected for: ${email}`);

@@ -20,10 +20,10 @@
       </div>
 
       <div class="form-group">
-        <label>Full Content</label>
-        <textarea placeholder="Full blog content (appears on 'Read More' page )" [(ngModel)]="newBlog.content" name="content" rows="8"></textarea>
+        <label>Full Content *</label>
+        <textarea placeholder="Full blog content (appears on 'Read More' page )" [(ngModel)]="newBlog.content" name="content" rows="8" required></textarea>
         <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
-          Use this for the complete blog content.)
+          Use this for the complete blog content. This field is required for the blog to display properly.
         </small>
       </div>
 

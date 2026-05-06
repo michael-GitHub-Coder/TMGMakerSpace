@@ -14,10 +14,8 @@ export class BlogsService {
 
   async create(createBlogDto: CreateBlogDto): Promise<Blog> {
     try {
-      console.log('[BLOGS SERVICE] Creating blog with DTO:', createBlogDto);
       const blog = this.blogRepository.create(createBlogDto);
       const result = await this.blogRepository.save(blog);
-      console.log('[BLOGS SERVICE] Blog created successfully:', result);
       return result;
     } catch (error) {
       console.error('[BLOGS SERVICE] Error creating blog:', error);

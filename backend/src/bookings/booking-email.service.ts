@@ -19,7 +19,7 @@ export interface BookingConfirmationData {
 @Injectable()
 export class BookingEmailService {
   private readonly logger = new Logger(BookingEmailService.name);
-  private transporter: nodemailer.Transporter;
+  public transporter: nodemailer.Transporter;
 
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({

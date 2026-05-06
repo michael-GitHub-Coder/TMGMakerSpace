@@ -1,10 +1,12 @@
 import { Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { MembershipApplicationEntity } from 'src/memberApplication/MembershipApplication.Entity';
+import { BookingEmailService } from 'src/bookings/booking-email.service';
 export declare class MembershipAdminService {
     private membershipRepo;
     private userRepo;
-    constructor(membershipRepo: Repository<MembershipApplicationEntity>, userRepo: Repository<User>);
+    private bookingEmailService;
+    constructor(membershipRepo: Repository<MembershipApplicationEntity>, userRepo: Repository<User>, bookingEmailService: BookingEmailService);
     approve(id: number): Promise<{
         message: string;
         email: string;

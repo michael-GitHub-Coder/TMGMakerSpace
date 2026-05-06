@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
+import { join } from 'path';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { SerializationInterceptor } from './interceptors/serialization.interceptor';
 
@@ -21,18 +22,36 @@ async function bootstrap() {
   });
   
   // Increase payload size limits for image uploads
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ limit: '10mb', extended: true }));
+  // Note: Don't apply JSON middleware globally as it conflicts with FormData
+  // app.use(express.json({ limit: '10mb' }));
   
-  // Enable validation
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    forbidNonWhitelisted: false,
-    transformOptions: {
-      enableImplicitConversion: true,
-    },
-  }));
+  // Apply URL-encoded middleware with exception for multipart routes
+  app.use((req, res, next) => {
+    if (req.path === '/memberships/apply' && req.method === 'POST') {
+      // Skip body parsing for membership application
+      return next();
+    }
+    return express.urlencoded({ limit: '10mb', extended: true })(req, res, next);
+  });
+  
+  // Serve static files from uploads directory
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+  
+  // Serve static files from marketplace directory
+  app.use('/marketplace', express.static(join(__dirname, '..', 'marketplace')));
+  
+  // Serve static files from images directory
+  app.use('/images', express.static(join(__dirname, '..', 'images')));
+  
+  // Disable global validation to prevent FormData conflicts
+  // app.useGlobalPipes(new ValidationPipe({
+  //   whitelist: true,
+  //   transform: true,
+  //   forbidNonWhitelisted: false,
+  //   transformOptions: {
+  //     enableImplicitConversion: true,
+  //   },
+  // }));
   
   // Apply global exception filter
   app.useGlobalFilters(new HttpExceptionFilter());

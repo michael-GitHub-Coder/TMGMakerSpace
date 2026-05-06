@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
       // User is logged in but does not have the right role
       // Redirect based on role
    
-      if (user.role === 'admin') return this.router.createUrlTree(['/admin/dashboard']);
+      if (user.role === 'admin' || user.role === 'superadmin') return this.router.createUrlTree(['/admin/dashboard']);
       if (user.role === 'member') return this.router.createUrlTree(['/member/dashboard']);
       return this.router.createUrlTree(['/home']); 
     }

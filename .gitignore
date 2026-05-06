@@ -101,3 +101,56 @@ jspm_packages/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test scripts with sensitive data
+test-*.js
+debug-*.js
+check-*.js
+
+# Database backups and dumps
+*.sql
+*.dump
+*.backup
+*.bak
+
+# SSL certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+
+# Session files
+*.session
+*.cookie
+
+# Temporary test files
+temp-*
+test-*
+
+# Angular specific
+/frontend/src/environments/environment.*.ts
+!frontend/src/environments/environment.example.ts
+
+# NestJS specific
+/backend/src/config/*.ts
+!backend/src/config/config.example.ts
+
+# Logs and debugging
+logs/
+debug.log
+error.log
+access.log
+
+# Sensitive configuration files
+config.json
+secrets.json
+credentials.json
+
+# Security check scripts
+check-sensitive-files.js
+pre-commit-check.sh
+
+# UI libraries (minified files)
+frontend/src/UI/libs/**/*.min.js
+frontend/src/UI/libs/**/*.min.css
+frontend/src/UI/libs/**/*.map
