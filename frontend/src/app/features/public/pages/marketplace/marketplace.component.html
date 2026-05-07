@@ -53,7 +53,10 @@
         <ng-template carouselSlide>
           <div class="marketplace-card">
             <div class="marketplace-card-image">
-              <img [src]="getMarketplaceImageUrl(item.image)" [alt]="item.title" />
+              <img [src]="getMarketplaceImageUrl(item.image)" 
+                   [alt]="item.title" 
+                   (error)="handleImageError($event)"
+                   (load)="handleImageLoad($event)" />
             </div>
             <div class="marketplace-card-content">
               <div class="marketplace-meta">

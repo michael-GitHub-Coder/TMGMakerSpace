@@ -14,21 +14,31 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
+  // Set global body parser limits BEFORE other middleware
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
+  
   // Enable CORS for frontend
   app.enableCors({
-    origin: ['http://localhost:4200', 'http://localhost:51581', 'http://localhost:62378'],
+    origin: true, // Allow all origins during development
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
   
   // Increase payload size limits for image uploads
-  // Note: Don't apply JSON middleware globally as it conflicts with FormData
-  // app.use(express.json({ limit: '10mb' }));
+  // Apply JSON middleware with higher limits (but skip for multipart routes)
+  app.use((req, res, next) => {
+    // Skip JSON parsing for multipart/form-data (file uploads) and membership applications
+    if (req.path.includes('/upload') || (req.path === '/memberships/apply' && req.method === 'POST')) {
+      return next();
+    }
+    return express.json({ limit: '10mb' })(req, res, next);
+  });
   
   // Apply URL-encoded middleware with exception for multipart routes
   app.use((req, res, next) => {
-    if (req.path === '/memberships/apply' && req.method === 'POST') {
-      // Skip body parsing for membership application
+    // Skip for multipart routes and membership applications
+    if (req.path.includes('/upload') || (req.path === '/memberships/apply' && req.method === 'POST')) {
       return next();
     }
     return express.urlencoded({ limit: '10mb', extended: true })(req, res, next);

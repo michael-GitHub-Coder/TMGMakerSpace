@@ -33,13 +33,21 @@ const serialization_interceptor_1 = require("./interceptors/serialization.interc
 dotenv.config();
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.use(express.json({ limit: '50mb' }));
+    app.use(express.urlencoded({ limit: '50mb', extended: true }));
     app.enableCors({
-        origin: ['http://localhost:4200', 'http://localhost:51581', 'http://localhost:62378'],
+        origin: true,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     });
     app.use((req, res, next) => {
-        if (req.path === '/memberships/apply' && req.method === 'POST') {
+        if (req.path.includes('/upload') || (req.path === '/memberships/apply' && req.method === 'POST')) {
+            return next();
+        }
+        return express.json({ limit: '10mb' })(req, res, next);
+    });
+    app.use((req, res, next) => {
+        if (req.path.includes('/upload') || (req.path === '/memberships/apply' && req.method === 'POST')) {
             return next();
         }
         return express.urlencoded({ limit: '10mb', extended: true })(req, res, next);

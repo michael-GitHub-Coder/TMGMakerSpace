@@ -57,7 +57,10 @@
           
           <!-- Image Preview -->
           <div class="image-preview" *ngIf="imagePreview">
-            <img [src]="imagePreview" alt="Preview" class="preview-img">
+            <img [src]="imagePreview" 
+                 alt="Preview" 
+                 class="preview-img"
+                 (error)="handleImageError($event)">
             <button type="button" class="btn-remove" (click)="imagePreview = null; selectedFile = null; formData.image = ''">
               <i class="fas fa-times"></i>
             </button>

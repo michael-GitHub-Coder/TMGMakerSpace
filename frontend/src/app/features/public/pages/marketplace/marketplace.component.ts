@@ -134,32 +134,9 @@ export class MarketplaceComponent implements OnInit {
       return imagePath;
     }
     
-    // For Handmade Beaded Necklace, try only realistic patterns
-    if (imagePath.toLowerCase().includes('necklace') || imagePath.includes('necklace')) {
-      console.log('🚀 MARKETPLACE: 📿 REAL NECKLACE DETECTED - Using realistic URL patterns');
-      
-      // Try only realistic necklace image patterns (no mock/fallback URLs)
-      const realisticNecklacePatterns = [
-        `http://localhost:3000/uploads/${imagePath}`, // Most likely - uploads folder
-        `http://localhost:3000/${imagePath}`, // If path includes uploads/
-        `http://localhost:3000/marketplace/${imagePath}`, // Marketplace folder
-      ];
-      
-      // Return the first realistic pattern for initial load
-      const url = realisticNecklacePatterns[0];
-      console.log('🚀 MARKETPLACE: 📿 Using REAL necklace URL pattern:', url);
-      return url;
-    }
-    
-    // Try only realistic URL patterns based on backend response (no mock URLs)
-    const realisticUrls = [
-      `http://localhost:3000/${imagePath}`, // If imagePath includes uploads/
-      `http://localhost:3000/uploads/${imagePath}`, // If imagePath is just filename
-      `http://localhost:3000/marketplace/${imagePath}`, // If marketplace folder
-    ];
-    
-    // Return the first realistic URL pattern
-    const url = realisticUrls[0];
+    // Backend stores images as "uploads/marketplace/filename.png" and serves them at "/uploads/marketplace/filename.png"
+    // So we need to use the exact path that's stored in the database
+    const url = `http://localhost:3000/${imagePath}`;
     console.log('🚀 MARKETPLACE: Using REAL URL pattern:', url);
     return url;
   }
@@ -168,38 +145,16 @@ export class MarketplaceComponent implements OnInit {
   handleImageError(event: any): void {
     console.log('🚀 MARKETPLACE: ❌ REAL IMAGE FAILED TO LOAD - HIDING:', event.target.src);
     
-    // Try alternative URL patterns for this image (only for real images)
+    // Hide the image if it fails to load (no fallback URLs needed since we use the correct pattern)
     const img = event.target;
-    const originalSrc = img.src;
-    const imagePath = img.getAttribute('data-original-path');
-    const triedCount = parseInt(img.getAttribute('data-tried-count') || '0');
-    
-    if (imagePath && triedCount < 3) { // Limit to 3 attempts to avoid endless retries
-      // Try only realistic URL patterns for real images
-      const realisticPatterns = [
-        `http://localhost:3000/uploads/${imagePath}`,
-        `http://localhost:3000/${imagePath}`,
-        `http://localhost:3000/marketplace/${imagePath}`,
-      ];
-      
-      if (triedCount < realisticPatterns.length) {
-        const nextUrl = realisticPatterns[triedCount];
-        img.src = nextUrl;
-        img.setAttribute('data-tried-count', (triedCount + 1).toString());
-        console.log(`🚀 MARKETPLACE: � Trying real image pattern ${triedCount + 1}/${realisticPatterns.length}:`, nextUrl);
-        return;
-      }
-    }
-    
-    // HIDE IMAGE - NO PLACEHOLDERS ALLOWED
-    console.log('🚀 MARKETPLACE: 🚫 HIDING FAILED IMAGE - NO MOCK IMAGES ALLOWED');
     img.style.display = 'none';
     
-    // Also hide the entire image container if needed
     const imageContainer = img.closest('.item-image');
     if (imageContainer) {
       imageContainer.style.display = 'none';
     }
+    
+    console.log('🚀 MARKETPLACE: 🚫 Image hidden due to loading error');
   }
 
   // Handle successful image loading
@@ -230,22 +185,10 @@ export class MarketplaceComponent implements OnInit {
     
     console.log('🚀 MARKETPLACE: 📿 PROACTIVE REAL NECKLACE IMAGE SEARCH - NO MOCKS');
     
-    // Test only realistic necklace image URLs (no mock/fallback URLs)
-    const realisticUrls = [
-      `http://localhost:3000/uploads/${item.image}`, // Most likely - uploads folder
-      `http://localhost:3000/${item.image}`, // If path includes uploads/
-      `http://localhost:3000/marketplace/${item.image}`, // Marketplace folder
-    ];
-    
-    // Test each realistic URL
-    for (const url of realisticUrls) {
-      console.log('🚀 MARKETPLACE: 📿 Testing REAL necklace URL:', url);
-      this.testImageUrl(url);
-    }
-    
-    // Return the first realistic URL for initial display
-    const url = realisticUrls[0];
+    // Use the correct URL pattern that matches backend static serving
+    const url = this.getFullImageUrl(item.image);
     console.log('🚀 MARKETPLACE: 📿 Using REAL necklace URL:', url);
+    this.testImageUrl(url);
     return url;
   }
 
@@ -259,15 +202,8 @@ export class MarketplaceComponent implements OnInit {
       return ''; // Return empty - no placeholder images
     }
     
-    // ONLY allow member-uploaded images (uploads/ path)
-    if (imagePath.startsWith('uploads/') || imagePath.startsWith('uploads\\')) {
-      console.log('🚀 MARKETPLACE: 📸 Using member uploaded image URL for:', imagePath);
-      return `http://localhost:3000/${imagePath}`;
-    }
-    
-    // NO DEFAULT IMAGES - reject all other paths
-    console.log('🚀 MARKETPLACE: ❌ REJECTED - Not a member uploaded image:', imagePath);
-    return ''; // Return empty for non-member images
+    console.log('🚀 MARKETPLACE: 📸 Using member uploaded image URL for:', imagePath);
+    return `http://localhost:3000/${imagePath}`;
   }
 
   // Format cost safely - handle different data types

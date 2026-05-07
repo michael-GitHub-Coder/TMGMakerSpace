@@ -43,8 +43,12 @@ export class SidebarComponent implements OnInit {
   navigateToAccount() {
     console.log('🔍 SIDEBAR: Account clicked, role:', this.role);
     
-    // Always navigate to admin account for admin sidebar
-    this.router.navigate(['/admin/account']);
+    // Navigate based on user role
+    if (this.shouldShowAdminFeatures()) {
+      this.router.navigate(['/admin/account']);
+    } else {
+      this.router.navigate(['/member/account']);
+    }
     this.isSidebarOpen = false;
   }
 

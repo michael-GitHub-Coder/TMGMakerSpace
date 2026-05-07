@@ -109,7 +109,7 @@ export class MarketplaceSimpleController {
         cb(null, true);
       },
       limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB max file size
+        fileSize: 50 * 1024 * 1024, // 50MB max file size
       },
     })
   )
@@ -117,7 +117,7 @@ export class MarketplaceSimpleController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }),
         ],
       })
     )

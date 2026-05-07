@@ -139,7 +139,8 @@ export class MarketplaceManagerComponent implements OnInit {
     console.log('🚀 MARKETPLACE MANAGER: ✏️ EDITING ITEM:', item);
     this.editingItem = item;
     this.formData = { ...item };
-    this.imagePreview = item.image || null;
+    // Set imagePreview to full URL for proper display in edit form
+    this.imagePreview = item.image ? this.getImageUrl(item.image) : null;
     this.showForm = true;
     
     console.log('🚀 MARKETPLACE MANAGER: 📋 Form data loaded:', this.formData);
@@ -176,6 +177,26 @@ export class MarketplaceManagerComponent implements OnInit {
         type: this.selectedFile.type,
         lastModified: this.selectedFile.lastModified
       });
+      
+      // Check file size (50MB limit)
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      if (this.selectedFile.size > maxSize) {
+        this.error = `File size (${(this.selectedFile.size / 1024 / 1024).toFixed(2)}MB) exceeds the maximum allowed size (50MB). Please choose a smaller image.`;
+        console.log('🚀 MARKETPLACE MANAGER: ❌ File too large:', this.selectedFile.size);
+        // Clear the file input
+        input.value = '';
+        return;
+      }
+      
+      // Check file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(this.selectedFile.type)) {
+        this.error = 'Invalid file type. Please select a valid image file (JPG, PNG, or GIF).';
+        console.log('🚀 MARKETPLACE MANAGER: ❌ Invalid file type:', this.selectedFile.type);
+        // Clear the file input
+        input.value = '';
+        return;
+      }
       
       // Create preview
       const reader = new FileReader();
@@ -361,7 +382,7 @@ export class MarketplaceManagerComponent implements OnInit {
     return numCost.toFixed(2);
   }
 
-  // Get full image URL with multiple fallback patterns
+  // Get full image URL - use the correct pattern that matches backend static serving
   getImageUrl(imagePath: string): string {
     console.log('🚀 MARKETPLACE MANAGER: 🖼️ Getting image URL for:', imagePath);
     
@@ -370,16 +391,9 @@ export class MarketplaceManagerComponent implements OnInit {
       return '';
     }
     
-    // Try different URL patterns
-    const urlPatterns = [
-      `http://localhost:3000/${imagePath}`, // If path includes uploads/
-      `http://localhost:3000/uploads/${imagePath}`, // If path is just filename
-      `http://localhost:3000/marketplace/${imagePath}`, // Marketplace folder
-      `http://localhost:3000/images/${imagePath}`, // Images folder
-    ];
-    
-    // Return the first pattern (will be tested in accessibility method)
-    const url = urlPatterns[0];
+    // Backend stores images as "uploads/marketplace/filename.png" and serves them at "/uploads/marketplace/filename.png"
+    // So we need to use the exact path that's stored in the database
+    const url = `http://localhost:3000/${imagePath}`;
     console.log('🚀 MARKETPLACE MANAGER: 📸 Using image URL:', url);
     return url;
   }
@@ -388,41 +402,16 @@ export class MarketplaceManagerComponent implements OnInit {
   handleImageError(event: any): void {
     console.log('🚀 MARKETPLACE MANAGER: ❌ Image failed to load:', event.target.src);
     
-    // Try alternative URLs
+    // Hide the image if it fails to load (no fallback URLs needed since we use the correct pattern)
     const img = event.target;
-    const currentSrc = img.src;
-    const imagePath = img.getAttribute('data-image-path');
+    img.style.display = 'none';
     
-    if (!imagePath) {
-      // Extract image path from current URL
-      const pathMatch = currentSrc.match(/\/([^\/]+)$/);
-      if (pathMatch) {
-        img.setAttribute('data-image-path', pathMatch[1]);
-      }
+    const imageContainer = img.closest('.item-image');
+    if (imageContainer) {
+      imageContainer.style.display = 'none';
     }
     
-    // Try next URL pattern
-    const urlPatterns = [
-      `http://localhost:3000/uploads/${imagePath}`,
-      `http://localhost:3000/marketplace/${imagePath}`,
-      `http://localhost:3000/images/${imagePath}`,
-    ];
-    
-    const triedIndex = parseInt(img.getAttribute('data-tried-index') || '0');
-    if (triedIndex < urlPatterns.length) {
-      const nextUrl = urlPatterns[triedIndex];
-      img.src = nextUrl;
-      img.setAttribute('data-tried-index', (triedIndex + 1).toString());
-      console.log('🚀 MARKETPLACE MANAGER: 🔄 Trying alternative URL:', nextUrl);
-    } else {
-      // Hide image if all attempts failed
-      console.log('🚀 MARKETPLACE MANAGER: 🚫 All image URL attempts failed, hiding image');
-      img.style.display = 'none';
-      const imageContainer = img.closest('.item-image');
-      if (imageContainer) {
-        imageContainer.style.display = 'none';
-      }
-    }
+    console.log('🚀 MARKETPLACE MANAGER: 🚫 Image hidden due to loading error');
   }
 
   // Handle successful image loading
