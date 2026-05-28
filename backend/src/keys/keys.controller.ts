@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Patch, HttpException, HttpStatus } 
 import { KeysService } from './keys.service';
 import { Key } from './key.entity';
 
-@Controller('keys')
+@Controller('api/v1/keys')
 export class KeysController {
   constructor(private readonly keysService: KeysService) {}
 

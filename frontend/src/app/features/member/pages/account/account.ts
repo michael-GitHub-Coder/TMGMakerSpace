@@ -105,6 +105,14 @@ export class AccountComponent implements OnInit {
         if (response.status === 'success') {
           alert('Password updated successfully!');
           this.closePasswordModal();
+          
+          // Update the current user object to reflect password change
+          const currentUser = this.authService.getCurrentUser();
+          if (currentUser) {
+            currentUser.mustChangePassword = false;
+            this.authService.updateUser(currentUser);
+          }
+          
           // Clear OTP login flag after successful password update
           sessionStorage.removeItem('otp_login');
           sessionStorage.removeItem('otp_notification_seen');

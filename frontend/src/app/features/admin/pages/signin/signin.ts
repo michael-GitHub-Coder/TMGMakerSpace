@@ -41,24 +41,30 @@ export class SigninComponent {
       password: this.password,
       rememberMe: this.rememberMe
     }).pipe(
-      map(response => response.status === 'success'),
       catchError(error => {
         console.error('Login error:', error);
         this.error = error.error?.message || error.message || 'An error occurred during login. Please try again.';
-        return of(false);
+        return of(null);
       }),
       finalize(() => this.isLoading = false)
-    ).subscribe(success => {
-      if (success) {
+    ).subscribe(response => {
+      if (response && response.status === 'success') {
+        const user = response.data.user;
+        console.log('Login successful, user:', user);
 
-        const user = this.authService.getUser();
         localStorage.setItem('role', user.role);
 
-        if (user?.role === 'admin' || user?.role === 'superadmin') {
+        const userRole = user.role?.toLowerCase();
+        console.log('User role (lowercase):', userRole);
+
+        if (userRole === 'admin' || userRole === 'superadmin') {
+          console.log('Navigating to admin dashboard');
           this.router.navigate(['/admin/dashboard']);
-        } else if (user?.role === 'member') {
+        } else if (userRole === 'member') {
+          console.log('Navigating to member dashboard');
           this.router.navigate(['/member/dashboard']);
         } else {
+          console.log('Unknown role, navigating to home');
           this.router.navigate(['/']); // fallback if role unknown
         }
       } else if (!this.error) {

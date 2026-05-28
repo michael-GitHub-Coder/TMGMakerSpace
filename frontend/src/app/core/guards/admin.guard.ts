@@ -1,33 +1,40 @@
 import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router, UrlTree } from '@angular/router';
-import { Observable, map, of, switchMap } from 'rxjs';
+import { Observable, of, map, take } from 'rxjs';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminGuard implements CanActivate {
+
   private authService = inject(AuthService);
   private router = inject(Router);
 
   canActivate(): Observable<boolean | UrlTree> {
     return this.authService.loggedIn$.pipe(
-      switchMap(loggedIn => {
-        if (!loggedIn) {
-          return of(this.router.createUrlTree(['/admin/signin'], {
-            queryParams: { returnUrl: this.router.url }
-          }));
-        }
-        
+      map((loggedIn) => {
         const user = this.authService.getCurrentUser();
-        if (user?.role === 'admin') {
-          return of(true);
+        console.log('AdminGuard check - loggedIn:', loggedIn, 'user:', user, 'user.role:', user?.role);
+
+        // 1. Not logged in
+        if (!loggedIn || !user) {
+          console.log('AdminGuard: Not logged in, redirecting to signin');
+          return this.router.createUrlTree(['/admin/signin']);
         }
-        
-        // If not admin, redirect to signin with error
-        return of(this.router.createUrlTree(['/admin/signin'], {
-          queryParams: { error: 'admin_required' }
-        }));
+
+        // 2. Not admin (case-insensitive comparison)
+        const userRole = user.role?.toLowerCase();
+        if (userRole !== 'admin' && userRole !== 'superadmin') {
+          console.log('AdminGuard: Not admin role, redirecting to signin');
+          return this.router.createUrlTree(['/admin/signin'], {
+            queryParams: { error: 'admin_required' }
+          });
+        }
+
+        // 3. OK
+        console.log('AdminGuard: Access granted');
+        return true;
       })
     );
   }

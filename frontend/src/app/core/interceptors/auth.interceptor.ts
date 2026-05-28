@@ -65,17 +65,24 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(request);
     }
 
-    // Get the auth token from storage
     const token = this.getToken();
-    
-    // Clone the request and add the authorization header
+
     if (token) {
-      request = request.clone({
-        headers: new HttpHeaders({
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        })
-      });
+      // For FormData (file uploads), only add Authorization header
+      // and let the browser automatically set Content-Type with the correct multipart boundary
+      if (request.body instanceof FormData) {
+        request = request.clone({
+          headers: request.headers.set('Authorization', `Bearer ${token}`)
+        });
+      } else {
+        // For all other requests, add both Authorization and Content-Type
+        request = request.clone({
+          headers: new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          })
+        });
+      }
     }
 
     // Send the request and handle errors
@@ -83,24 +90,22 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         // Handle 401 Unauthorized responses
         if (error.status === 401) {
-          // Clear auth data
           if (isPlatformBrowser(this.platformId)) {
             this.safeLocalStorageRemoveItem(this.tokenKey);
             this.safeLocalStorageRemoveItem(this.userKey);
             this.safeSessionStorageRemoveItem(this.tokenKey);
             this.safeSessionStorageRemoveItem(this.userKey);
           }
-          
-          // Navigate to login page with return URL if not already there
-        if (!this.router.url.includes(this.loginUrl)) {
-          this.router.navigate([this.loginUrl], {
-            queryParams: { 
-              returnUrl: this.router.routerState.snapshot.url === '/sign-in' 
-                ? '/' 
-                : this.router.routerState.snapshot.url 
-            }
-          });
-        }
+
+          if (!this.router.url.includes(this.loginUrl)) {
+            this.router.navigate([this.loginUrl], {
+              queryParams: {
+                returnUrl: this.router.routerState.snapshot.url === '/sign-in'
+                  ? '/'
+                  : this.router.routerState.snapshot.url
+              }
+            });
+          }
         }
         return throwError(() => error);
       })

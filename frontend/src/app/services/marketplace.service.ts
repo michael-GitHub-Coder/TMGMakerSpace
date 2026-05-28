@@ -51,24 +51,7 @@ export class MarketplaceService {
 
   // Update marketplace item
   updateMarketplaceItem(id: string, item: Partial<MarketplaceItem>): Observable<MarketplaceItem> {
-    console.log('🚀 MARKETPLACE SERVICE: 🔄 UPDATING ITEM');
-    console.log('🚀 MARKETPLACE SERVICE: 🆔 Item ID:', id);
-    console.log('🚀 MARKETPLACE SERVICE: 📦 Update data:', item);
-    console.log('🚀 MARKETPLACE SERVICE: 🔗 Full URL:', `${this.apiUrl}/items/${id}`);
-    
-    return this.http.put<MarketplaceItem>(`${this.apiUrl}/items/${id}`, item).pipe(
-      // Add logging to the observable
-      tap({
-        next: (response: MarketplaceItem) => {
-          console.log('🚀 MARKETPLACE SERVICE: ✅ UPDATE RESPONSE:', response);
-        },
-        error: (err: any) => {
-          console.error('🚀 MARKETPLACE SERVICE: ❌ UPDATE ERROR:', err);
-          console.error('🚀 MARKETPLACE SERVICE: Status:', err.status);
-          console.error('🚀 MARKETPLACE SERVICE: Error body:', err.error);
-        }
-      })
-    );
+    return this.http.put<MarketplaceItem>(`${this.apiUrl}/items/${id}`, item);
   }
 
   // Delete marketplace item

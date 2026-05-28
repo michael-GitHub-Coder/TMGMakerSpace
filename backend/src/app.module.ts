@@ -27,7 +27,7 @@ import { MarketplaceItem } from './marketplace/entities/marketplace-item.entity'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Make ConfigModule available throughout the application
-      envFilePath: ['../.env', 'config.env'], // Try both .env files
+      envFilePath: '../.env',
     }),
     TypeOrmModule.forRoot(getDatabaseConfig()),
     TypeOrmModule.forFeature([MembershipApplicationEntity, User, MarketplaceItem]),

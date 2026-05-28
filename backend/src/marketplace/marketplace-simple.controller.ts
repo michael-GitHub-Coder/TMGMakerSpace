@@ -87,25 +87,20 @@ export class MarketplaceSimpleController {
         destination: (req, file, cb) => {
           // Create uploads/marketplace directory if it doesn't exist
           const uploadPath = join(process.cwd(), 'uploads', 'marketplace');
-          console.log('🚀 BACKEND: 📁 Upload path:', uploadPath);
           cb(null, uploadPath);
         },
         filename: (req, file, cb) => {
           // Generate unique filename
           const randomSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
           const filename = `${file.fieldname}-${randomSuffix}${extname(file.originalname)}`;
-          console.log('🚀 BACKEND: 📝 Generated filename:', filename);
           cb(null, filename);
         },
       }),
       fileFilter: (req, file, cb) => {
-        console.log('🚀 BACKEND: 🔍 File filter checking:', file.originalname);
         // Only allow image files
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-          console.log('🚀 BACKEND: ❌ Invalid file type:', file.originalname);
           return cb(new Error('Only image files are allowed!'), false);
         }
-        console.log('🚀 BACKEND: ✅ Valid file type:', file.originalname);
         cb(null, true);
       },
       limits: {
@@ -123,19 +118,8 @@ export class MarketplaceSimpleController {
     )
     file: Express.Multer.File,
   ): Promise<{ imageUrl: string }> {
-    console.log('🚀 BACKEND: 📸 Upload endpoint called!');
-    console.log('🚀 BACKEND: 📸 File received:', {
-      originalname: file.originalname,
-      filename: file.filename,
-      size: file.size,
-      mimetype: file.mimetype,
-      path: file.path
-    });
-    
     // Return the relative path to the uploaded file
     const imageUrl = `uploads/marketplace/${file.filename}`;
-    console.log('🚀 BACKEND: 🖼️ Image URL:', imageUrl);
-    console.log('🚀 BACKEND: 📁 Full file path:', file.path);
     
     return { imageUrl };
   }

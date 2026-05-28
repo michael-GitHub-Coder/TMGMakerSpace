@@ -7,3 +7,4 @@ export class CreateMarketplaceItemDto {
   memberName: string;
   isActive?: boolean = true;
 }
+

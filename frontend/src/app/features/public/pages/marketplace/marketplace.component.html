@@ -52,7 +52,7 @@
       <ng-container *ngFor="let item of marketplaceItems">
         <ng-template carouselSlide>
           <div class="marketplace-card">
-            <div class="marketplace-card-image">
+            <div class="marketplace-card-image" *ngIf="item.image && item.image.trim() !== ''">
               <img [src]="getMarketplaceImageUrl(item.image)" 
                    [alt]="item.title" 
                    (error)="handleImageError($event)"

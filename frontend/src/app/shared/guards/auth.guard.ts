@@ -13,21 +13,22 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
-    const user = this.authService.getUser(); 
+    const user = this.authService.getUser();
 
     if (!user) {
       return this.router.createUrlTree(['/signin']);
     }
 
-    // Check if route has a role restriction
+    // Check if route has a role restriction (case-insensitive)
     const expectedRole = route.data['role'];
-    if (expectedRole && user.role !== expectedRole) {
+    const userRole = user.role?.toLowerCase();
+    if (expectedRole && userRole !== expectedRole.toLowerCase()) {
       // User is logged in but does not have the right role
       // Redirect based on role
-   
-      if (user.role === 'admin' || user.role === 'superadmin') return this.router.createUrlTree(['/admin/dashboard']);
-      if (user.role === 'member') return this.router.createUrlTree(['/member/dashboard']);
-      return this.router.createUrlTree(['/home']); 
+
+      if (userRole === 'admin' || userRole === 'superadmin') return this.router.createUrlTree(['/admin/dashboard']);
+      if (userRole === 'member') return this.router.createUrlTree(['/member/dashboard']);
+      return this.router.createUrlTree(['/home']);
     }
 
     return true; // logged in and role is allowed

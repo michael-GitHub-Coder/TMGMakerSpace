@@ -137,7 +137,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], KeysController.prototype, "createKey", null);
 exports.KeysController = KeysController = __decorate([
-    (0, common_1.Controller)('keys'),
+    (0, common_1.Controller)('api/v1/keys'),
     __metadata("design:paramtypes", [keys_service_1.KeysService])
 ], KeysController);
 //# sourceMappingURL=keys.controller.js.map

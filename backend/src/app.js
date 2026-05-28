@@ -10,7 +10,7 @@ const hpp = require('hpp');
 const path = require('path');
 
 // Load environment variables
-require('dotenv').config({ path: './config.env' });
+require('dotenv').config({ path: '../.env' });
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');

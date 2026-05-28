@@ -44,26 +44,45 @@
 
         <div class="form-group">
           <label for="image">Image</label>
+          <div class="image-edit-help" *ngIf="editingItem && editingItem.image">
+            <small class="text-muted">
+              <i class="fas fa-info-circle"></i> 
+              {{ editingItem.image ? 'Current image shown below. Select a new file above to change it, or remove it to use no image.' : 'Select an image file to add an image to your item.' }}
+            </small>
+          </div>
           <div class="image-upload">
             <input type="file" id="image" class="form-control" 
-                   (change)="onFileSelected($event)" accept="image/*">
+                   (change)="onFileSelected($event)" accept="image/*"
+                   placeholder="{{ editingItem ? 'Choose new image to replace current' : 'Choose image' }}">
             <div class="uploading" *ngIf="uploading">
               <i class="fas fa-spinner fa-spin"></i> Uploading...
             </div>
             <div class="upload-success" *ngIf="!uploading && formData.image">
-              <i class="fas fa-check-circle text-success"></i> Image uploaded successfully
+              <i class="fas fa-check-circle text-success"></i> 
+              {{ editingItem ? 'Image changed successfully!' : 'Image uploaded successfully' }}
             </div>
           </div>
           
           <!-- Image Preview -->
           <div class="image-preview" *ngIf="imagePreview">
+            <div class="preview-header">
+              <span class="preview-label">
+                {{ editingItem ? 'Current/New Image' : 'Image Preview' }}
+              </span>
+              <button type="button" class="btn-remove" (click)="removeImage()" 
+                      title="{{ editingItem ? 'Remove current image' : 'Remove this image' }}">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
             <img [src]="imagePreview" 
                  alt="Preview" 
                  class="preview-img"
                  (error)="handleImageError($event)">
-            <button type="button" class="btn-remove" (click)="imagePreview = null; selectedFile = null; formData.image = ''">
-              <i class="fas fa-times"></i>
-            </button>
+          </div>
+          <div class="no-image" *ngIf="!imagePreview && editingItem && !editingItem.image">
+            <small class="text-muted">
+              <i class="fas fa-image"></i> No image currently set
+            </small>
           </div>
         </div>
 
@@ -120,7 +139,7 @@
   <div class="items-grid" *ngIf="!loading && marketplaceItems.length > 0">
     <div class="item-card" *ngFor="let item of marketplaceItems" 
          [class.inactive]="!item.isActive">
-      <div class="item-image" *ngIf="item.image">
+      <div class="item-image" *ngIf="item.image && item.image.trim() !== ''">
         <img [src]="getImageUrl(item.image)" 
              [alt]="item.title" 
              (error)="handleImageError($event)"

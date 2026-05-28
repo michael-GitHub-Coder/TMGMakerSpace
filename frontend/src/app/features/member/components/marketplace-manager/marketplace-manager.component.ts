@@ -46,34 +46,21 @@ export class MarketplaceManagerComponent implements OnInit {
   }
 
   loadMemberItems(): void {
-    console.log('🚀 MARKETPLACE MANAGER: 🔄 LOADING MEMBER ITEMS');
     this.loading = true;
     const memberEmail = this.currentUser?.email;
     
     if (!memberEmail) {
-      console.error('🚀 MARKETPLACE MANAGER: ❌ User email not found');
-      this.error = 'User email not found';
+      this.error = 'User email not found. Please log in again.';
       this.loading = false;
       return;
     }
 
-    console.log('🚀 MARKETPLACE MANAGER: 👤 Loading items for:', memberEmail);
-
     this.marketplaceService.getMemberMarketplaceItems(memberEmail).subscribe({
       next: (items) => {
-        console.log('🚀 MARKETPLACE MANAGER: ✅ ITEMS LOADED:', items);
         this.marketplaceItems = items;
         
         // Debug image URLs for each item
         items.forEach((item, index) => {
-          console.log(`🚀 MARKETPLACE MANAGER: 🖼️ Item ${index + 1} Image Debug:`, {
-            title: item.title,
-            imagePath: item.image,
-            hasImage: !!item.image,
-            imageType: typeof item.image,
-            fullUrl: item.image ? `http://localhost:3000/${item.image}` : 'No image'
-          });
-          
           // Test image accessibility
           if (item.image) {
             this.testImageAccessibility(item.image, index + 1);
@@ -82,9 +69,9 @@ export class MarketplaceManagerComponent implements OnInit {
         
         this.loading = false;
       },
-      error: (err) => {
-        console.error('🚀 MARKETPLACE MANAGER: ❌ ERROR LOADING ITEMS:', err);
-        this.error = 'Failed to load marketplace items';
+      error: (error) => {
+        console.error('🚀 MARKETPLACE MANAGER: ❌ ERROR LOADING ITEMS:', error);
+        this.error = 'Failed to load marketplace items. Please try again.';
         this.loading = false;
       }
     });
@@ -92,25 +79,16 @@ export class MarketplaceManagerComponent implements OnInit {
 
   // Test if image URL is accessible
   testImageAccessibility(imagePath: string, itemIndex: number): void {
-    const testUrls = [
-      `http://localhost:3000/${imagePath}`,
-      `http://localhost:3000/uploads/${imagePath}`,
-      `http://localhost:3000/marketplace/${imagePath}`,
-      `http://localhost:3000/images/${imagePath}`,
-    ];
-
-    console.log(`🚀 MARKETPLACE MANAGER: 🧪 Testing image ${itemIndex} accessibility`);
-
-    testUrls.forEach((url, index) => {
-      const testImg = new Image();
-      testImg.onload = () => {
-        console.log(`🚀 MARKETPLACE MANAGER: ✅ Image ${itemIndex} - URL ${index + 1} WORKS:`, url);
-      };
-      testImg.onerror = () => {
-        console.log(`🚀 MARKETPLACE MANAGER: ❌ Image ${itemIndex} - URL ${index + 1} FAILED:`, url);
-      };
-      testImg.src = url;
-    });
+    // Only test the correct URL pattern
+    const testUrl = `http://localhost:3000/${imagePath}`;
+    const testImg = new Image();
+    testImg.onload = () => {
+      console.log(`✅ Image ${itemIndex} accessible: ${testUrl}`);
+    };
+    testImg.onerror = () => {
+      console.log(`❌ Image ${itemIndex} failed: ${testUrl}`);
+    };
+    testImg.src = testUrl;
   }
 
   toggleForm(): void {
@@ -136,15 +114,11 @@ export class MarketplaceManagerComponent implements OnInit {
   }
 
   editItem(item: MarketplaceItem): void {
-    console.log('🚀 MARKETPLACE MANAGER: ✏️ EDITING ITEM:', item);
     this.editingItem = item;
     this.formData = { ...item };
     // Set imagePreview to full URL for proper display in edit form
     this.imagePreview = item.image ? this.getImageUrl(item.image) : null;
     this.showForm = true;
-    
-    console.log('🚀 MARKETPLACE MANAGER: 📋 Form data loaded:', this.formData);
-    console.log('🚀 MARKETPLACE MANAGER: 🖼️ Image preview:', this.imagePreview);
   }
 
   deleteItem(item: MarketplaceItem): void {
@@ -166,23 +140,14 @@ export class MarketplaceManagerComponent implements OnInit {
   }
 
   onFileSelected(event: Event): void {
-    console.log('🚀 MARKETPLACE MANAGER: 📁 File selected event triggered');
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
-      
-      console.log('🚀 MARKETPLACE MANAGER: 📸 File selected:', {
-        name: this.selectedFile.name,
-        size: this.selectedFile.size,
-        type: this.selectedFile.type,
-        lastModified: this.selectedFile.lastModified
-      });
       
       // Check file size (50MB limit)
       const maxSize = 50 * 1024 * 1024; // 50MB
       if (this.selectedFile.size > maxSize) {
         this.error = `File size (${(this.selectedFile.size / 1024 / 1024).toFixed(2)}MB) exceeds the maximum allowed size (50MB). Please choose a smaller image.`;
-        console.log('🚀 MARKETPLACE MANAGER: ❌ File too large:', this.selectedFile.size);
         // Clear the file input
         input.value = '';
         return;
@@ -192,7 +157,6 @@ export class MarketplaceManagerComponent implements OnInit {
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(this.selectedFile.type)) {
         this.error = 'Invalid file type. Please select a valid image file (JPG, PNG, or GIF).';
-        console.log('🚀 MARKETPLACE MANAGER: ❌ Invalid file type:', this.selectedFile.type);
         // Clear the file input
         input.value = '';
         return;
@@ -202,55 +166,35 @@ export class MarketplaceManagerComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.imagePreview = e.target?.result as string;
-        console.log('🚀 MARKETPLACE MANAGER: 🖼️ Image preview created, length:', this.imagePreview?.length);
       };
       reader.readAsDataURL(this.selectedFile);
       
       // AUTOMATICALLY UPLOAD THE IMAGE
-      console.log('🚀 MARKETPLACE MANAGER: 🔄 Auto-uploading selected image...');
       this.uploadImage();
-    } else {
-      console.log('🚀 MARKETPLACE MANAGER: ❌ No file selected');
     }
   }
 
   uploadImage(): void {
     if (!this.selectedFile) {
-      console.log('🚀 MARKETPLACE MANAGER: ❌ No file to upload');
       return;
     }
-    
-    console.log('🚀 MARKETPLACE MANAGER: ⬆️ Starting image upload');
-    console.log('🚀 MARKETPLACE MANAGER: 📸 File being uploaded:', this.selectedFile.name);
-    console.log('🚀 MARKETPLACE MANAGER: 🔗 Upload URL: http://localhost:3000/api/marketplace/upload');
     
     this.uploading = true;
     
     this.marketplaceService.uploadImage(this.selectedFile).subscribe({
       next: (response) => {
-        console.log('🚀 MARKETPLACE MANAGER: ✅ Upload response received:', response);
-        console.log('🚀 MARKETPLACE MANAGER: 🖼️ Image URL from server:', response.imageUrl);
-        
         if (response && response.imageUrl) {
           this.formData.image = response.imageUrl;
-          console.log('🚀 MARKETPLACE MANAGER: 📋 Form data image updated to:', this.formData.image);
-          console.log('🚀 MARKETPLACE MANAGER: ✅ Image will be saved when form is submitted');
-        } else {
-          console.log('🚀 MARKETPLACE MANAGER: ❌ Invalid upload response - no imageUrl');
         }
         
         this.uploading = false;
         
-        // Test the uploaded image URL
+        // Test to uploaded image URL
         if (response && response.imageUrl) {
-          console.log('🚀 MARKETPLACE MANAGER: 🧪 Testing uploaded image URL:', `http://localhost:3000/${response.imageUrl}`);
           this.testImageAccessibility(response.imageUrl, 999); // Use 999 for uploaded images
         }
       },
       error: (err) => {
-        console.error('🚀 MARKETPLACE MANAGER: ❌ Upload error:', err);
-        console.error('🚀 MARKETPLACE MANAGER: Error status:', err.status);
-        console.error('🚀 MARKETPLACE MANAGER: Error details:', err.error);
         this.error = 'Failed to upload image: ' + (err.error?.message || err.message);
         this.uploading = false;
       }
@@ -258,10 +202,6 @@ export class MarketplaceManagerComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('🚀 MARKETPLACE MANAGER: 📝 FORM SUBMITTED');
-    console.log('🚀 MARKETPLACE MANAGER: 📋 Form data:', this.formData);
-    console.log('🚀 MARKETPLACE MANAGER: ✏️ Editing item:', this.editingItem);
-    
     // Clear previous messages
     this.error = '';
     this.success = '';
@@ -269,7 +209,6 @@ export class MarketplaceManagerComponent implements OnInit {
     // Validation
     if (!this.formData.title || !this.formData.description || !this.formData.cost) {
       this.error = 'Please fill in all required fields';
-      console.log('🚀 MARKETPLACE MANAGER: ❌ VALIDATION FAILED - Missing required fields');
       return;
     }
 
@@ -278,7 +217,6 @@ export class MarketplaceManagerComponent implements OnInit {
     
     if (!memberEmail) {
       this.error = 'User email not found';
-      console.log('🚀 MARKETPLACE MANAGER: ❌ USER EMAIL NOT FOUND');
       return;
     }
 
@@ -292,24 +230,13 @@ export class MarketplaceManagerComponent implements OnInit {
       isActive: this.formData.isActive ?? true
     };
 
-    console.log('🚀 MARKETPLACE MANAGER: 📦 Prepared item data:', itemData);
-    console.log('🚀 MARKETPLACE MANAGER: 🖼️ Image data being sent:', {
-      originalImage: this.formData.image,
-      imageLength: this.formData.image ? this.formData.image.length : 0,
-      imageType: typeof this.formData.image,
-      imageValue: JSON.stringify(this.formData.image)
-    });
     this.loading = true;
 
     if (this.editingItem && this.editingItem.id) {
       // Update existing item
-      console.log('🚀 MARKETPLACE MANAGER: 🔄 UPDATING EXISTING ITEM');
-      console.log('🚀 MARKETPLACE MANAGER: 🆔 Item ID:', this.editingItem.id);
-      console.log('🚀 MARKETPLACE MANAGER: 📦 Update data:', itemData);
       
       this.marketplaceService.updateMarketplaceItem(this.editingItem.id, itemData).subscribe({
         next: (response) => {
-          console.log('🚀 MARKETPLACE MANAGER: ✅ UPDATE SUCCESS:', response);
           this.success = `✅ Item "${itemData.title}" updated successfully!`;
           this.loading = false;
           
@@ -324,8 +251,6 @@ export class MarketplaceManagerComponent implements OnInit {
           setTimeout(() => this.success = '', 5000);
         },
         error: (err) => {
-          console.error('🚀 MARKETPLACE MANAGER: ❌ UPDATE ERROR:', err);
-          console.error('🚀 MARKETPLACE MANAGER: Error details:', err.error);
           this.error = `❌ Failed to update item "${itemData.title}": ` + (err.error?.message || err.message);
           this.loading = false;
           
@@ -335,11 +260,8 @@ export class MarketplaceManagerComponent implements OnInit {
       });
     } else {
       // Create new item
-      console.log('🚀 MARKETPLACE MANAGER: ➕ CREATING NEW ITEM');
-      
       this.marketplaceService.createMarketplaceItem(itemData).subscribe({
         next: (response) => {
-          console.log('🚀 MARKETPLACE MANAGER: ✅ CREATE SUCCESS:', response);
           this.success = `✅ Item "${itemData.title}" created successfully!`;
           this.loading = false;
           
@@ -354,7 +276,6 @@ export class MarketplaceManagerComponent implements OnInit {
           setTimeout(() => this.success = '', 5000);
         },
         error: (err) => {
-          console.error('🚀 MARKETPLACE MANAGER: ❌ CREATE ERROR:', err);
           this.error = `❌ Failed to create item "${itemData.title}": ` + (err.error?.message || err.message);
           this.loading = false;
           
@@ -382,41 +303,40 @@ export class MarketplaceManagerComponent implements OnInit {
     return numCost.toFixed(2);
   }
 
-  // Get full image URL - use the correct pattern that matches backend static serving
+  // Get image URL - only real images
   getImageUrl(imagePath: string): string {
-    console.log('🚀 MARKETPLACE MANAGER: 🖼️ Getting image URL for:', imagePath);
-    
-    if (!imagePath) {
-      console.log('🚀 MARKETPLACE MANAGER: ❌ No image path provided');
+    // Return empty for no images - *ngIf will handle hiding the container
+    if (!imagePath || imagePath.trim() === '') {
       return '';
     }
     
     // Backend stores images as "uploads/marketplace/filename.png" and serves them at "/uploads/marketplace/filename.png"
     // So we need to use the exact path that's stored in the database
     const url = `http://localhost:3000/${imagePath}`;
-    console.log('🚀 MARKETPLACE MANAGER: 📸 Using image URL:', url);
     return url;
   }
 
   // Handle image loading errors
-  handleImageError(event: any): void {
-    console.log('🚀 MARKETPLACE MANAGER: ❌ Image failed to load:', event.target.src);
-    
-    // Hide the image if it fails to load (no fallback URLs needed since we use the correct pattern)
-    const img = event.target;
+  handleImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
     img.style.display = 'none';
+  }
+
+  removeImage(): void {
+    this.imagePreview = null;
+    this.selectedFile = null;
+    this.formData.image = '';
     
-    const imageContainer = img.closest('.item-image');
-    if (imageContainer) {
-      imageContainer.style.display = 'none';
+    // Clear the file input
+    const fileInput = document.getElementById('image') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
     }
-    
-    console.log('🚀 MARKETPLACE MANAGER: 🚫 Image hidden due to loading error');
   }
 
   // Handle successful image loading
   handleImageLoad(event: any): void {
-    console.log('🚀 MARKETPLACE MANAGER: ✅ Image loaded successfully:', event.target.src);
+    // Image loaded successfully
   }
 
   toggleItemStatus(item: MarketplaceItem): void {

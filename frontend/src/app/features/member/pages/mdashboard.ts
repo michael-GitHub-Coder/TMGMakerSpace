@@ -71,6 +71,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   hasLoadedData: boolean = false;
   showPasswordChangeWarning: boolean = false;
+  private isLoadingData: boolean = false;
 
   constructor(
     private router: Router,
@@ -99,22 +100,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Load fresh dashboard data
   loadDashboardData() {
+    // Prevent duplicate calls
+    if (this.isLoadingData) {
+      return;
+    }
+    
     this.isLoading = true;
-    console.log('🚀 MEMBER DASHBOARD: Loading dashboard data...');
+    this.isLoadingData = true;
     
     const user = this.authService.getCurrentUser();
-    console.log('🚀 MEMBER DASHBOARD: User data:', user);
     
     this.name = user?.firstName || user?.name || 'Member';
     this.email = user?.email || 'member@example.com';
     this.role = user?.role || '';
     this.isMember = this.role?.toLowerCase() === 'member';
     
-    console.log('🚀 MEMBER DASHBOARD: Dashboard info:', { name: this.name, email: this.email, role: this.role });
-    
     // Check if user must change password and show warning
     if (user && user.mustChangePassword) {
-      console.log('🔐 MEMBER DASHBOARD: User must change password - showing warning');
       this.showPasswordChangeWarning = true;
     } else {
       this.showPasswordChangeWarning = false;
@@ -129,7 +131,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const hasPasswordChangeSuccess = sessionStorage.getItem('password_change_success') === 'true';
       
       if (isFromAccountPage && hasPasswordChangeSuccess) {
-        console.log('🔐 MEMBER DASHBOARD: User changed password successfully - hiding warning');
         this.showPasswordChangeWarning = false;
         // Clear the password change success flag
         sessionStorage.removeItem('password_change_success');
@@ -140,7 +141,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       const hasPasswordChangeSuccess = sessionStorage.getItem('password_change_success') === 'true';
       if (hasPasswordChangeSuccess) {
-        console.log('🔐 MEMBER DASHBOARD: Initial check - hiding warning after password change');
         this.showPasswordChangeWarning = false;
         sessionStorage.removeItem('password_change_success');
       }
@@ -159,9 +159,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Load bookings data
   loadBookings(): void {
-    console.log('🚀 MEMBER DASHBOARD: Loading bookings...');
     this.bookingService.bookings$.subscribe(bookings => {
-      console.log('🚀 MEMBER DASHBOARD: Bookings loaded:', bookings);
       this.bookings = bookings;
       this.checkLoadingComplete();
     });
@@ -169,28 +167,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Load member's laser cutter keys
   loadMemberKeys(): void {
-    console.log('🚀 MEMBER DASHBOARD: Loading member laser cutter keys...');
     const user = this.authService.getCurrentUser();
     const memberName = user?.firstName || user?.name || 'Member';
     
     this.http.get<any[]>(`http://localhost:3000/api/v1/keys/member/${encodeURIComponent(memberName)}`).subscribe({
       next: (keys: any[]) => {
-        console.log('🚀 MEMBER DASHBOARD: Member keys loaded:', keys);
         // Filter only laser cutter keys that are currently issued
         this.memberKeys = keys.filter(key => 
           key.equipmentName.toLowerCase().includes('laser') && 
           key.keyStatus === 'issued'
         );
-        console.log('🚀 MEMBER DASHBOARD: Laser cutter keys filtered:', this.memberKeys);
         this.checkLoadingComplete();
       },
       error: (error: any) => {
         // Handle 404 (no keys found) gracefully - this is expected behavior
-        if (error.status === 404) {
-          console.log('🚀 MEMBER DASHBOARD: No keys found for member (expected behavior)');
-        } else {
-          console.error('🚀 MEMBER DASHBOARD: Error loading member keys:', error);
-        }
         this.memberKeys = [];
         this.checkLoadingComplete();
       }
@@ -199,20 +189,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Check if all data has loaded
   checkLoadingComplete(): void {
-    console.log('Checking loading complete...');
     // Use a timeout to ensure all data has time to load
     setTimeout(() => {
       this.isLoading = false;
       this.hasLoadedData = true;
-      console.log('Dashboard data loading complete - showing content');
+      this.isLoadingData = false; // Reset the flag to allow future loading
     }, 500);
   }
 
   loadBlogs(): void {
-    console.log('🚀 MEMBER DASHBOARD: Loading blogs...');
     this.blogApiService.getAllBlogs().subscribe({
       next: (blogs: BlogPost[]) => {
-        console.log('🚀 MEMBER DASHBOARD: Blogs loaded:', blogs);
         this.blogs = blogs;
         this.checkLoadingComplete();
       },
@@ -340,10 +327,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       const dashboardContent = document.querySelector('.dashboard-content');
       if (dashboardContent) {
-        console.log('🚀 MEMBER DASHBOARD: Scrolling to dashboard content area');
         dashboardContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
-        console.log('🚀 MEMBER DASHBOARD: Dashboard content element not found, using fallback scroll');
         // Fallback: scroll to top with offset for sidebar
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
       }

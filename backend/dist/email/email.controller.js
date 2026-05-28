@@ -25,6 +25,19 @@ let EmailController = class EmailController {
         await this.emailService.sendAdminNotification(data);
         return { message: 'Emails sent successfully' };
     }
+    async sendOtpEmail(data) {
+        try {
+            await this.emailService.sendOtpEmail(data.email, data.name, data.surname, data.otp);
+            return { success: true, message: 'OTP email sent successfully!' };
+        }
+        catch (error) {
+            return {
+                success: false,
+                message: 'Failed to send OTP email',
+                error: error.message
+            };
+        }
+    }
 };
 exports.EmailController = EmailController;
 __decorate([
@@ -34,6 +47,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], EmailController.prototype, "sendBookingConfirmation", null);
+__decorate([
+    (0, common_1.Post)('send-otp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EmailController.prototype, "sendOtpEmail", null);
 exports.EmailController = EmailController = __decorate([
     (0, common_1.Controller)('email'),
     __metadata("design:paramtypes", [email_service_1.EmailService])

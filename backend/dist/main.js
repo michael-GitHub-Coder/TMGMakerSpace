@@ -24,6 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
+const fs = __importStar(require("fs"));
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const express = __importStar(require("express"));
@@ -32,33 +33,40 @@ const http_exception_filter_1 = require("./filters/http-exception.filter");
 const serialization_interceptor_1 = require("./interceptors/serialization.interceptor");
 dotenv.config();
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.use(express.json({ limit: '50mb' }));
-    app.use(express.urlencoded({ limit: '50mb', extended: true }));
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, { bodyParser: false });
+    ['uploads/marketplace', 'images', 'marketplace'].forEach(dir => {
+        const fullPath = (0, path_1.join)(process.cwd(), dir);
+        if (!fs.existsSync(fullPath)) {
+            fs.mkdirSync(fullPath, { recursive: true });
+            console.log(`Created directory: ${fullPath}`);
+        }
+    });
+    app.use((req, res, next) => {
+        if (req.headers['content-type']?.startsWith('multipart/form-data')) {
+            return next();
+        }
+        express.json({ limit: '50mb' })(req, res, (err) => {
+            if (err)
+                return next(err);
+            express.urlencoded({ limit: '50mb', extended: true })(req, res, next);
+        });
+    });
     app.enableCors({
-        origin: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        origin: 'http://localhost:4200',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     });
-    app.use((req, res, next) => {
-        if (req.path.includes('/upload') || (req.path === '/memberships/apply' && req.method === 'POST')) {
-            return next();
-        }
-        return express.json({ limit: '10mb' })(req, res, next);
-    });
-    app.use((req, res, next) => {
-        if (req.path.includes('/upload') || (req.path === '/memberships/apply' && req.method === 'POST')) {
-            return next();
-        }
-        return express.urlencoded({ limit: '10mb', extended: true })(req, res, next);
-    });
-    app.use('/uploads', express.static((0, path_1.join)(__dirname, '..', 'uploads')));
-    app.use('/marketplace', express.static((0, path_1.join)(__dirname, '..', 'marketplace')));
-    app.use('/images', express.static((0, path_1.join)(__dirname, '..', 'images')));
+    app.use('/uploads', express.static((0, path_1.join)(process.cwd(), 'uploads')));
+    app.use('/marketplace', express.static((0, path_1.join)(process.cwd(), 'marketplace')));
+    app.use('/images', express.static((0, path_1.join)(process.cwd(), 'images')));
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
     app.useGlobalInterceptors(new serialization_interceptor_1.SerializationInterceptor());
     await app.listen(process.env.PORT ?? 3000);
-    console.log('Backend server running on http://localhost:3000');
+    console.log(`Backend server running on http://localhost:${process.env.PORT ?? 3000}`);
+    console.log(`Static files served from: ${(0, path_1.join)(process.cwd(), 'uploads')}`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

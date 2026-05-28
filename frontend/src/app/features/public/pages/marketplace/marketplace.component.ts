@@ -121,23 +121,18 @@ export class MarketplaceComponent implements OnInit {
 
   // Helper method to construct full image URL - REAL IMAGES ONLY
   getFullImageUrl(imagePath: string | undefined): string {
-    console.log('🚀 MARKETPLACE: Processing REAL image path:', imagePath);
-    
     if (!imagePath) {
-      console.log('🚀 MARKETPLACE: ❌ No real image path - NO PLACEHOLDER');
       return ''; // Return empty - no placeholder images
     }
     
     // If it's already a full URL, return as is
     if (imagePath.startsWith('http')) {
-      console.log('🚀 MARKETPLACE: ✅ Real full URL detected:', imagePath);
       return imagePath;
     }
     
     // Backend stores images as "uploads/marketplace/filename.png" and serves them at "/uploads/marketplace/filename.png"
     // So we need to use the exact path that's stored in the database
     const url = `http://localhost:3000/${imagePath}`;
-    console.log('🚀 MARKETPLACE: Using REAL URL pattern:', url);
     return url;
   }
 
@@ -183,26 +178,19 @@ export class MarketplaceComponent implements OnInit {
       return this.getFullImageUrl(item.image);
     }
     
-    console.log('🚀 MARKETPLACE: 📿 PROACTIVE REAL NECKLACE IMAGE SEARCH - NO MOCKS');
-    
     // Use the correct URL pattern that matches backend static serving
     const url = this.getFullImageUrl(item.image);
-    console.log('🚀 MARKETPLACE: 📿 Using REAL necklace URL:', url);
     this.testImageUrl(url);
     return url;
   }
 
-  // Get marketplace image URL - ONLY member uploads allowed
+  // Get marketplace image URL - only real images
   getMarketplaceImageUrl(imagePath: string | undefined): string {
-    console.log('🚀 MARKETPLACE: 🖼️ Getting marketplace image URL for:', imagePath);
-    
-    // If no image path, return empty - NO DEFAULT IMAGES
+    // Return empty for no images - *ngIf will handle hiding the container
     if (!imagePath || imagePath.trim() === '') {
-      console.log('🚀 MARKETPLACE: ❌ No image path - NO DEFAULT IMAGES ALLOWED');
-      return ''; // Return empty - no placeholder images
+      return '';
     }
     
-    console.log('🚀 MARKETPLACE: 📸 Using member uploaded image URL for:', imagePath);
     return `http://localhost:3000/${imagePath}`;
   }
 

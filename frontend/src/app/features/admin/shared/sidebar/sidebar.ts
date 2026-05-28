@@ -20,19 +20,16 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.role = localStorage.getItem('role');
-    console.log('🔍 SIDEBAR: User role detected:', this.role);
-    console.log('🔍 SIDEBAR: localStorage role:', localStorage.getItem('role'));
-    
+
     // Also check from auth service
     const user = this.authService.getUser();
-    console.log('🔍 SIDEBAR: Auth service user:', user);
-    console.log('🔍 SIDEBAR: Auth service role:', user?.role);
-    
+
     // Use auth service role if localStorage is empty
     if (!this.role && user?.role) {
       this.role = user.role;
-      console.log('🔍 SIDEBAR: Using auth service role:', this.role);
     }
+
+    console.log('Sidebar initialized - role from localStorage:', this.role, 'user from auth:', user);
   }
 
   navigate(route: string) {
@@ -40,15 +37,29 @@ export class SidebarComponent implements OnInit {
     this.isSidebarOpen = false; 
   }
 
+  navigateToDashboard() {
+    // Navigate based on user role
+    if (this.shouldShowAdminFeatures()) {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate(['/member/dashboard']);
+    }
+    this.isSidebarOpen = false;
+  }
+
   navigateToAccount() {
-    console.log('🔍 SIDEBAR: Account clicked, role:', this.role);
-    
     // Navigate based on user role
     if (this.shouldShowAdminFeatures()) {
       this.router.navigate(['/admin/account']);
     } else {
       this.router.navigate(['/member/account']);
     }
+    this.isSidebarOpen = false;
+  }
+
+  navigateToBookings() {
+    // Navigate to bookings page for members
+    this.router.navigate(['/booking']);
     this.isSidebarOpen = false;
   }
 
@@ -62,19 +73,14 @@ export class SidebarComponent implements OnInit {
 
   // Method to determine if admin features should be shown
   shouldShowAdminFeatures(): boolean {
-    const isAdmin = this.role === 'admin' || this.role === 'superadmin';
-    
+    const isAdmin = this.role?.toLowerCase() === 'admin' || this.role?.toLowerCase() === 'superadmin';
+
     // Also check auth service as fallback
     const user = this.authService.getUser();
-    const isUserAdmin = user?.role === 'admin' || user?.role === 'superadmin';
-    
-    console.log('🔍 SIDEBAR: shouldShowAdminFeatures check:');
-    console.log('  - Role from localStorage:', this.role);
-    console.log('  - Role from auth service:', user?.role);
-    console.log('  - isAdmin:', isAdmin);
-    console.log('  - isUserAdmin:', isUserAdmin);
-    console.log('  - Final result:', isAdmin || isUserAdmin);
-    
+    const isUserAdmin = user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'superadmin';
+
+    console.log('shouldShowAdminFeatures - isAdmin:', isAdmin, 'isUserAdmin:', isUserAdmin, 'role:', this.role, 'user.role:', user?.role);
+
     return isAdmin || isUserAdmin;
   }
 

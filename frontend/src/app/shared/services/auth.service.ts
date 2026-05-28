@@ -276,6 +276,10 @@ export class AuthService {
     }
   }
 
+  public updateUser(updatedUser: any): void {
+    this.setUser(updatedUser);
+  }
+
   private setUser(user: any): void {
     if (!this.isBrowser) return;
     

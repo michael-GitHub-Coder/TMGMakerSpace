@@ -39,7 +39,7 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
-                envFilePath: ['../.env', 'config.env'],
+                envFilePath: '../.env',
             }),
             typeorm_1.TypeOrmModule.forRoot((0, database_config_1.getDatabaseConfig)()),
             typeorm_1.TypeOrmModule.forFeature([MembershipApplication_Entity_1.MembershipApplicationEntity, user_entity_1.User, marketplace_item_entity_1.MarketplaceItem]),
