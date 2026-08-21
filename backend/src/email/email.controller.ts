@@ -19,10 +19,10 @@ export class EmailController {
       await this.emailService.sendOtpEmail(data.email, data.name, data.surname, data.otp);
       return { success: true, message: 'OTP email sent successfully!' };
     } catch (error) {
-      return { 
-        success: false, 
-        message: 'Failed to send OTP email', 
-        error: error.message 
+      return {
+        success: false,
+        message: 'Failed to send OTP email',
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }

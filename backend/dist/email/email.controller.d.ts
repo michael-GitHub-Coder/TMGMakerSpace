@@ -18,6 +18,6 @@ export declare class EmailController {
     } | {
         success: boolean;
         message: string;
-        error: any;
+        error: string;
     }>;
 }

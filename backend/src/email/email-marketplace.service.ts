@@ -38,7 +38,7 @@ export class EmailMarketplaceService {
       
     } catch (error) {
       console.error('❌ Error sending email:', error);
-      throw new Error(`Failed to send email: ${error.message}`);
+      throw new Error(`Failed to send email: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

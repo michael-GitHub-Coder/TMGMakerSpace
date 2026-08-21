@@ -34,7 +34,7 @@ let EmailController = class EmailController {
             return {
                 success: false,
                 message: 'Failed to send OTP email',
-                error: error.message
+                error: error instanceof Error ? error.message : String(error)
             };
         }
     }

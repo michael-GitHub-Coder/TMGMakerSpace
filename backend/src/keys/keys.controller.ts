@@ -39,7 +39,7 @@ export class KeysController {
       return result;
     } catch (error) {
       console.error(`[CONTROLLER] Key issuance failed for key ${id}:`, error);
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error instanceof Error ? error.message : String(error), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -51,7 +51,7 @@ export class KeysController {
     try {
       return await this.keysService.returnKey(id, returnedBy);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error instanceof Error ? error.message : String(error), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -75,7 +75,7 @@ export class KeysController {
     try {
       return await this.keysService.create(keyData);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error instanceof Error ? error.message : String(error), HttpStatus.BAD_REQUEST);
     }
   }
 }

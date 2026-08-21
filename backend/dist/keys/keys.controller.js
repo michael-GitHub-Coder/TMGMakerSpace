@@ -43,7 +43,7 @@ let KeysController = class KeysController {
         }
         catch (error) {
             console.error(`[CONTROLLER] Key issuance failed for key ${id}:`, error);
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+            throw new common_1.HttpException(error instanceof Error ? error.message : String(error), common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async returnKey(id, returnedBy) {
@@ -51,7 +51,7 @@ let KeysController = class KeysController {
             return await this.keysService.returnKey(id, returnedBy);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+            throw new common_1.HttpException(error instanceof Error ? error.message : String(error), common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async getKeysByStatus(status) {
@@ -68,7 +68,7 @@ let KeysController = class KeysController {
             return await this.keysService.create(keyData);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+            throw new common_1.HttpException(error instanceof Error ? error.message : String(error), common_1.HttpStatus.BAD_REQUEST);
         }
     }
 };

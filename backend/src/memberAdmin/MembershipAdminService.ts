@@ -105,13 +105,13 @@ export class MembershipAdminService {
     } catch (emailError) {
       console.error(`[EMAIL] ❌ Failed to send OTP to ${application.email}:`, emailError);
       console.error(`[EMAIL] Error details:`, {
-        code: emailError.code,
-        message: emailError.message,
-        response: emailError.response
+        code: emailError instanceof Error && 'code' in emailError ? (emailError as any).code : undefined,
+        message: emailError instanceof Error ? emailError.message : String(emailError),
+        response: emailError instanceof Error && 'response' in emailError ? (emailError as any).response : undefined
       });
       
       // Don't continue - let admin know email failed
-      throw new BadRequestException(`OTP email could not be sent to ${application.email}. Error: ${emailError.message}`);
+      throw new BadRequestException(`OTP email could not be sent to ${application.email}. Error: ${emailError instanceof Error ? emailError.message : String(emailError)}`);
     }
 
     return {

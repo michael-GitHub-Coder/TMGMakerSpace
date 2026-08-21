@@ -85,7 +85,7 @@ export class KeyNotificationService {
       this.logger.log(`[EMAIL NOTIFICATION] Key issued notification sent to ${data.memberEmail}`);
     } catch (error) {
       this.logger.error(`[EMAIL NOTIFICATION] Failed to send key issued notification:`, error);
-      throw new Error(`Failed to send email notification: ${error.message}`);
+      throw new Error(`Failed to send email notification: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -130,7 +130,7 @@ export class KeyNotificationService {
       this.logger.log(`[EMAIL NOTIFICATION] Key return reminder sent to ${data.memberEmail}`);
     } catch (error) {
       this.logger.error(`[EMAIL NOTIFICATION] Failed to send key return reminder:`, error);
-      throw new Error(`Failed to send reminder email: ${error.message}`);
+      throw new Error(`Failed to send reminder email: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -174,7 +174,7 @@ export class KeyNotificationService {
       this.logger.log(`[EMAIL NOTIFICATION] Key returned confirmation sent to ${data.memberEmail}`);
     } catch (error) {
       this.logger.error(`[EMAIL NOTIFICATION] Failed to send key returned confirmation:`, error);
-      throw new Error(`Failed to send confirmation email: ${error.message}`);
+      throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

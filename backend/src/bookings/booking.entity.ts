@@ -9,53 +9,53 @@ import {
 @Entity('bookings')
 export class BookingEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   // @Column()
   // userId: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  surname: string;
+  surname!: string;
 
   @Column()
-  email: string;
+  email!: string;
 
   @Column()
-  phone: string;
+  phone!: string;
 
   // Machine & pricing
   @Column()
-  machineType: string;
+  machineType!: string;
 
   @Column('decimal')
-  pricePerHour: number;
+  pricePerHour!: number;
 
   // Booking timing
   @Column()
-  bookingDate: string;
+  bookingDate!: string;
 
   @Column()
-  bookingTime: string;
+  bookingTime!: string;
 
   @Column()
-  duration: number;
+  duration!: number;
 
   @Column('decimal')
-  totalPrice: number;
+  totalPrice!: number;
 
   // Status
   @Column({ default: 'pending' })
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status!: 'pending' | 'confirmed' | 'cancelled';
 
   // Timestamps
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
 
 

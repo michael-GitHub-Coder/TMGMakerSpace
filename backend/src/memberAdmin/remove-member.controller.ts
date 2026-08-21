@@ -61,7 +61,7 @@ export class RemoveMemberController {
       console.error(`❌ Error removing member:`, error);
       return {
         success: false,
-        message: `Error removing member: ${error.message}`
+        message: `Error removing member: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }

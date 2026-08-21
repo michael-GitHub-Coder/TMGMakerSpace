@@ -4,36 +4,36 @@ import { User } from '../users/user.entity'; // Your existing user entity
 @Entity('Bookings')
 export class BookingEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'UserId' })
-  user: User;
+  user!: User;
 
   @Column()
-  machineType: string;
+  machineType!: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  pricePerHour: number;
+  pricePerHour!: number;
 
   @Column()
-  bookingDate: string;
+  bookingDate!: string;
 
   @Column()
-  bookingTime: string;
+  bookingTime!: string;
 
   @Column()
-  duration: number;
+  duration!: number;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  totalPrice: number;
+  totalPrice!: number;
 
   @Column()
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status!: 'pending' | 'confirmed' | 'cancelled';
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

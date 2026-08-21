@@ -78,7 +78,7 @@ export class BookingEmailService {
       this.logger.log(`[BOOKING EMAIL] Confirmation sent to ${booking.email} for ${booking.machineType}`);
     } catch (error) {
       this.logger.error(`[BOOKING EMAIL] Failed to send booking confirmation:`, error);
-      throw new Error(`Failed to send booking confirmation email: ${error.message}`);
+      throw new Error(`Failed to send booking confirmation email: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -121,7 +121,7 @@ export class BookingEmailService {
       this.logger.log(`[BOOKING EMAIL] Reminder sent to ${booking.email} for ${booking.machineType}`);
     } catch (error) {
       this.logger.error(`[BOOKING EMAIL] Failed to send booking reminder:`, error);
-      throw new Error(`Failed to send booking reminder email: ${error.message}`);
+      throw new Error(`Failed to send booking reminder email: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

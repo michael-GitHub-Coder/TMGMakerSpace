@@ -34,11 +34,11 @@ export class EmailTestController {
       await this.bookingEmailService.sendBookingConfirmation(mockBooking);
       return { success: true, message: 'Booking email sent successfully!' };
     } catch (error) {
-      return { 
-        success: false, 
-        message: 'Failed to send booking email', 
-        error: error.message,
-        details: error 
+      return {
+        success: false,
+        message: 'Failed to send booking email',
+        error: error instanceof Error ? error.message : String(error),
+        details: error
       };
     }
   }
@@ -58,11 +58,11 @@ export class EmailTestController {
       await this.keyNotificationService.sendKeyIssuedNotification(mockKeyData);
       return { success: true, message: 'Key email sent successfully!' };
     } catch (error) {
-      return { 
-        success: false, 
-        message: 'Failed to send key email', 
-        error: error.message,
-        details: error 
+      return {
+        success: false,
+        message: 'Failed to send key email',
+        error: error instanceof Error ? error.message : String(error),
+        details: error
       };
     }
   }

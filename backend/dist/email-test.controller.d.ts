@@ -15,7 +15,7 @@ export declare class EmailTestController {
     } | {
         success: boolean;
         message: string;
-        error: any;
+        error: string;
         details: any;
     }>;
     testKeyEmail(testData: {
@@ -29,7 +29,7 @@ export declare class EmailTestController {
     } | {
         success: boolean;
         message: string;
-        error: any;
+        error: string;
         details: any;
     }>;
 }

@@ -28,7 +28,7 @@ export class TestController {
       return {
         success: false,
         message: 'Login error',
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }

@@ -3,32 +3,32 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Entity('marketplace_items')
 export class MarketplaceItem {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ length: 255 })
-  title: string;
+  title!: string;
 
   @Column('text')
-  description: string;
+  description!: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  cost: number;
+  cost!: number;
 
   @Column({ length: 500, nullable: true })
-  image: string;
+  image!: string;
 
   @Column({ length: 255 })
-  memberEmail: string;
+  memberEmail!: string;
 
   @Column({ length: 255 })
-  memberName: string;
+  memberName!: string;
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

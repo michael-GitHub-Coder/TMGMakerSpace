@@ -45,25 +45,25 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Prim
 @Entity('membership_applications')
 export class MembershipApplicationEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  surname: string;
+  surname!: string;
 
   @Column()
-  email: string;
+  email!: string;
 
   @Column()
-  phone: string;
+  phone!: string;
 
   @Column('simple-array') 
-  documents: string[];
+  documents!: string[];
 
   @Column({ default: 'pending' }) 
-  status: 'pending' | 'approved' | 'rejected' | 'info-required';
+  status!: 'pending' | 'approved' | 'rejected' | 'info-required';
 
   @Column({ nullable: true }) 
   oneTimePassword?: string;
@@ -72,14 +72,14 @@ export class MembershipApplicationEntity {
   rejectionReason?: string;
   
   @Column({ unique: true })
-  applicationCode: string;
+  applicationCode!: string;
 
   @Column({ nullable: true })
   adminComment?: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

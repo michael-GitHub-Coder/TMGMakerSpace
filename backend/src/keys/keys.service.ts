@@ -89,7 +89,7 @@ export class KeysService {
       return updatedKey;
     } catch (error) {
       console.error(`[KEY SERVICE] Database update failed for key ${id}:`, error);
-      throw new Error(`Database update failed: ${error.message}`);
+      throw new Error(`Database update failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -200,7 +200,7 @@ export class KeysService {
       
     } catch (error) {
       console.error(`[KEY ISSUANCE] Database error during key issuance:`, error);
-      throw new Error(`Failed to save key issuance to database: ${error.message}`);
+      throw new Error(`Failed to save key issuance to database: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -247,7 +247,7 @@ export class KeysService {
       return updatedKey;
     } catch (error) {
       console.error(`[KEY RETURN] Failed to return key ${id}:`, error);
-      throw new Error(`Failed to return key: ${error.message}`);
+      throw new Error(`Failed to return key: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

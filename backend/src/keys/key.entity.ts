@@ -9,13 +9,13 @@ import {
 @Entity('keys')
 export class KeyEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  equipmentName: string;
+  equipmentName!: string;
 
   @Column()
-  memberName: string;
+  memberName!: string;
 
   @Column({ nullable: true })
   memberEmail?: string;
@@ -24,10 +24,10 @@ export class KeyEntity {
   memberPhone?: string;
 
   @Column()
-  bookingDateTime: string;
+  bookingDateTime!: string;
 
   @Column({ default: 'available' })
-  keyStatus: 'available' | 'issued' | 'returned';
+  keyStatus!: 'available' | 'issued' | 'returned';
 
   @Column({ nullable: true })
   issuedBy?: string;
@@ -39,10 +39,10 @@ export class KeyEntity {
   returnedDateTime?: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
 
 export interface Key {

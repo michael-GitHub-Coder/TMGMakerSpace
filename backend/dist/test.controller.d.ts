@@ -20,7 +20,7 @@ export declare class TestController {
     } | {
         success: boolean;
         message: string;
-        error: any;
+        error: string;
         user?: undefined;
         token?: undefined;
     }>;

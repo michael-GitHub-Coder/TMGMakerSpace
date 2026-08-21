@@ -48,7 +48,7 @@ let EmailTestController = class EmailTestController {
             return {
                 success: false,
                 message: 'Failed to send booking email',
-                error: error.message,
+                error: error instanceof Error ? error.message : String(error),
                 details: error
             };
         }
@@ -70,7 +70,7 @@ let EmailTestController = class EmailTestController {
             return {
                 success: false,
                 message: 'Failed to send key email',
-                error: error.message,
+                error: error instanceof Error ? error.message : String(error),
                 details: error
             };
         }
